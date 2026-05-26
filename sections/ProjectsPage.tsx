@@ -1,0 +1,72 @@
+"use client";
+
+import { useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
+import { YELLOW, BORDER, projects } from "@/constants";
+import type { Project } from "@/types";
+import ProjectCard from "@/components/ProjectCard";
+
+interface ProjectsPageProps {
+  setActivePage: (page: string) => void;
+  setActiveProject: (project: Project) => void;
+}
+
+export default function ProjectsPage({ setActivePage, setActiveProject }: ProjectsPageProps) {
+  const [filter, setFilter] = useState("All");
+  const filters = ["All", "Product", "Systems", "UI"];
+  const filtered = filter === "All" ? projects : projects.filter((p) => p.type === filter);
+
+  return (
+    <div style={{ minHeight: "100vh", padding: "120px 40px 80px", maxWidth: 900, margin: "0 auto" }}>
+      <button
+        onClick={() => setActivePage("home")}
+        style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 40, padding: 0, display: "flex", alignItems: "center", gap: 8 }}
+        onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = YELLOW; }}
+        onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = "#555"; }}
+      >
+        ← BACK
+      </button>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 48 }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3 }}>04 — ALL WORK</div>
+        <div style={{ flex: 1, height: 1, background: BORDER }} />
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 48, flexWrap: "wrap", gap: 16 }}>
+        <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 48px)", margin: 0, letterSpacing: -1 }}>
+          All <span style={{ color: YELLOW }}>Projects</span>
+        </h1>
+        <div style={{ display: "flex", gap: 8 }}>
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: 1,
+                padding: "7px 14px", borderRadius: 4, cursor: "pointer",
+                background: filter === f ? YELLOW : "transparent",
+                color: filter === f ? "#000" : "#666",
+                border: `1px solid ${filter === f ? YELLOW : BORDER}`,
+                fontWeight: filter === f ? 700 : 400,
+                transition: "all 0.2s",
+              }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+        {filtered.map((p, i) => (
+          <ProjectCard
+            key={p.id}
+            project={p}
+            index={i}
+            onClick={(proj: Project) => { setActiveProject(proj); setActivePage("casestudy"); }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
