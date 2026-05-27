@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, CARD_BG, BORDER } from "@/constants";
+import { useProfile } from "@/lib/hooks";
 
 export default function AboutSection() {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
+  const profile = useProfile();
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -17,19 +19,14 @@ export default function AboutSection() {
     return () => obs.disconnect();
   }, []);
 
-  const skills = ["React", "Next.js", "TypeScript", "Supabase", "Framer Motion", "Figma", "Node.js", "Tailwind"];
-
-  const blurbs = [
-    "Frontend developer based in Malaysia. I build web products — not just pages.",
-    "My edge: I don't just implement designs, I question why they exist. Every component I ship serves a user goal.",
-    "Currently focused on SaaS dashboards, fintech interfaces, and tools that make complex things simple.",
-  ];
+  const skills = profile.skills;
+  const blurbs = profile.about;
 
   const stats = [
     { num: "3+", label: "Years building" },
-    { num: "12+", label: "Projects shipped" },
-    { num: "4", label: "Active products" },
-    { num: "1", label: "Clear vision" },
+    { num: "6+", label: "Products shipped" },
+    { num: "60%", label: "Ops time saved (OrderCalc)" },
+    { num: "40%", label: "Drop-off reduced (OptimaBank)" },
   ];
 
   return (

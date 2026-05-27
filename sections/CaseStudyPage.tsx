@@ -59,7 +59,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
   }, []);
 
   const sections = [
-    { label: "Context", content: `${project.title} was built to address a real gap in the market. The product targets users who need a better experience — faster, clearer, and more intuitive than existing solutions.` },
+    { label: "Context", content: project.context },
     { label: "Problem", content: project.problem },
     { label: "Solution", content: project.solution },
     { label: "Outcome", content: project.outcome },
@@ -89,7 +89,12 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(32px, 8vw, 72px)", lineHeight: 1.0, margin: "0 0 20px", letterSpacing: -2 }}>
             {project.title}<span style={{ color: project.color }}>.</span>
           </h1>
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(12px, 2.5vw, 14px)", color: "#888", lineHeight: 1.7, margin: 0 }}>{project.tagline}</p>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(12px, 2.5vw, 14px)", color: "#888", lineHeight: 1.7, margin: "0 0 16px" }}>{project.tagline}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2 }}>ROLE</div>
+            <div style={{ flex: 1, height: 1, background: "#1a1a1a", maxWidth: 24 }} />
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: project.color }}>{project.role}</div>
+          </div>
         </div>
 
         {/* Hero visual */}

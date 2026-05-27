@@ -1,9 +1,10 @@
 "use client";
 
 import type { MouseEvent as ReactMouseEvent } from "react";
-import { YELLOW, BORDER, projects } from "@/constants";
+import { YELLOW, BORDER } from "@/constants";
 import type { Project } from "@/types";
 import ProjectCard from "@/components/ProjectCard";
+import { useFeaturedProjects } from "@/lib/hooks";
 
 interface FeaturedSectionProps {
   setActivePage: (page: string) => void;
@@ -11,7 +12,7 @@ interface FeaturedSectionProps {
 }
 
 export default function FeaturedSection({ setActivePage, setActiveProject }: FeaturedSectionProps) {
-  const featuredProjects = projects.filter((p) => p.featured);
+  const featuredProjects = useFeaturedProjects();
 
   return (
     <section id="projects-featured" style={{ padding: "80px clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto" }}>

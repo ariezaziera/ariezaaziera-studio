@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, CARD_BG, BORDER } from "@/constants";
+import { useProfile } from "@/lib/hooks";
 
 export default function ContactSection() {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
+  const profile = useProfile();
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -18,9 +20,9 @@ export default function ContactSection() {
   }, []);
 
   const links = [
-    { label: "EMAIL", value: "arieza@email.com", href: "mailto:arieza@email.com" },
-    { label: "GITHUB", value: "github.com/arieza", href: "#" },
-    { label: "LINKEDIN", value: "linkedin.com/in/arieza", href: "#" },
+    { label: "EMAIL", value: profile.email, href: `mailto:${profile.email}` },
+    { label: "GITHUB", value: profile.github.replace("https://", ""), href: profile.github },
+    { label: "LINKEDIN", value: profile.linkedin.replace("https://", ""), href: profile.linkedin },
   ];
 
   return (

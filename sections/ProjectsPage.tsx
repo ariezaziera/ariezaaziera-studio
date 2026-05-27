@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
-import { YELLOW, BORDER, projects } from "@/constants";
+import { YELLOW, BORDER } from "@/constants";
 import type { Project } from "@/types";
 import ProjectCard from "@/components/ProjectCard";
+import { useProjects } from "@/lib/hooks";
 
 interface ProjectsPageProps {
   setActivePage: (page: string) => void;
@@ -12,6 +13,7 @@ interface ProjectsPageProps {
 }
 
 export default function ProjectsPage({ setActivePage, setActiveProject }: ProjectsPageProps) {
+  const projects = useProjects();
   const [filter, setFilter] = useState("All");
   const filters = ["All", "Product", "Systems", "UI"];
   const filtered = filter === "All" ? projects : projects.filter((p) => p.type === filter);

@@ -7,6 +7,8 @@ export interface Project {
   tech: string[];
   color: string;
   featured: boolean;
+  role: string;
+  context: string;
   problem: string;
   solution: string;
   outcome: string;
