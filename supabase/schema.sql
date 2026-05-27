@@ -52,3 +52,10 @@ create policy "Public can read profile"
 
 create policy "Authenticated can update profile"
   on profile for update using (auth.role() = 'authenticated');
+-- Media fields migration (add to existing projects table)
+ALTER TABLE projects
+  ADD COLUMN IF NOT EXISTS screenshots TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS mockup_type TEXT DEFAULT 'desktop',
+  ADD COLUMN IF NOT EXISTS video_url TEXT,
+  ADD COLUMN IF NOT EXISTS github_url TEXT,
+  ADD COLUMN IF NOT EXISTS live_url TEXT;
