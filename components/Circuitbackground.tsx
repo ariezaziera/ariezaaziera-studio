@@ -33,6 +33,9 @@ export default function CircuitBackground() {
     let nodes: Node[] = [];
     let lines: Line[] = [];
 
+    // ✅ Detect mobile
+    const isMobile = () => window.innerWidth < 768;
+
     function resize() {
       W = canvas!.width = canvas!.offsetWidth;
       H = canvas!.height = canvas!.offsetHeight;
@@ -43,15 +46,19 @@ export default function CircuitBackground() {
       nodes = [];
       lines = [];
 
-      const cols = Math.floor(W / 80);
-      const rows = Math.floor(H / 80);
+      // ✅ Smaller grid spacing on mobile
+      const GRID = isMobile() ? 50 : 80;
+      const MAX_DIST = isMobile() ? 100 : 160;
+
+      const cols = Math.floor(W / GRID);
+      const rows = Math.floor(H / GRID);
 
       for (let r = 0; r <= rows; r++) {
         for (let c = 0; c <= cols; c++) {
           if (Math.random() > 0.45) {
             nodes.push({
-              x: c * 80 + (Math.random() - 0.5) * 20,
-              y: r * 80 + (Math.random() - 0.5) * 20,
+              x: c * GRID + (Math.random() - 0.5) * (isMobile() ? 12 : 20),
+              y: r * GRID + (Math.random() - 0.5) * (isMobile() ? 12 : 20),
               pulse: Math.random() * Math.PI * 2,
             });
           }
@@ -63,12 +70,15 @@ export default function CircuitBackground() {
           const dx = nodes[j].x - nodes[i].x;
           const dy = nodes[j].y - nodes[i].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 160 && Math.random() > 0.5) {
+          if (dist < MAX_DIST && Math.random() > 0.5) {
             lines.push({
               from: nodes[i],
               to: nodes[j],
               progress: Math.random(),
-              speed: 0.002 + Math.random() * 0.003,
+              // ✅ Slightly slower on mobile for smoother feel
+              speed: isMobile()
+                ? 0.0015 + Math.random() * 0.002
+                : 0.002 + Math.random() * 0.003,
               active: Math.random() > 0.6,
             });
           }
@@ -77,7 +87,9 @@ export default function CircuitBackground() {
     }
 
     function drawNode(x: number, y: number, pulse: number) {
-      const r = 2 + Math.sin(pulse) * 0.8;
+      // ✅ Slightly smaller nodes on mobile
+      const baseR = isMobile() ? 1.5 : 2;
+      const r = baseR + Math.sin(pulse) * 0.8;
 
       ctx!.beginPath();
       ctx!.arc(x, y, r, 0, Math.PI * 2);
@@ -113,7 +125,8 @@ export default function CircuitBackground() {
       }
 
       ctx!.strokeStyle = COLOR + "55";
-      ctx!.lineWidth = 0.8;
+      // ✅ Slightly thinner lines on mobile
+      ctx!.lineWidth = isMobile() ? 0.6 : 0.8;
       ctx!.stroke();
     }
 
