@@ -17,7 +17,7 @@ export default function ProjectsPage({ setActivePage, setActiveProject }: Projec
   const filtered = filter === "All" ? projects : projects.filter((p) => p.type === filter);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "120px 40px 80px", maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", padding: "100px clamp(20px, 6vw, 40px) 80px", maxWidth: 900, margin: "0 auto" }}>
       <button
         onClick={() => setActivePage("home")}
         style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 40, padding: 0, display: "flex", alignItems: "center", gap: 8 }}
@@ -27,23 +27,23 @@ export default function ProjectsPage({ setActivePage, setActiveProject }: Projec
         ← BACK
       </button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 48 }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3 }}>04 — ALL WORK</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 40 }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3, whiteSpace: "nowrap" }}>04 — ALL WORK</div>
         <div style={{ flex: 1, height: 1, background: BORDER }} />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 48, flexWrap: "wrap", gap: 16 }}>
-        <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 5vw, 48px)", margin: 0, letterSpacing: -1 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 40, flexWrap: "wrap", gap: 20 }}>
+        <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 6vw, 48px)", margin: 0, letterSpacing: -1 }}>
           All <span style={{ color: YELLOW }}>Projects</span>
         </h1>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {filters.map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               style={{
                 fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: 1,
-                padding: "7px 14px", borderRadius: 4, cursor: "pointer",
+                padding: "7px 12px", borderRadius: 4, cursor: "pointer",
                 background: filter === f ? YELLOW : "transparent",
                 color: filter === f ? "#000" : "#666",
                 border: `1px solid ${filter === f ? YELLOW : BORDER}`,
@@ -57,7 +57,7 @@ export default function ProjectsPage({ setActivePage, setActiveProject }: Projec
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: 16 }}>
         {filtered.map((p, i) => (
           <ProjectCard
             key={p.id}

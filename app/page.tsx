@@ -14,10 +14,18 @@ export default function App() {
   const [activePage, setActivePage] = useState("home");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [activeSection] = useState("home");
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activePage]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#fff", fontFamily: "'DM Mono', monospace" }}>
@@ -36,10 +44,12 @@ export default function App() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 1; }
         }
-        * { cursor: none !important; }
+        @media (hover: hover) and (pointer: fine) {
+          * { cursor: none !important; }
+        }
       `}</style>
 
-      <Cursor />
+      {!isMobile && <Cursor />}
       <Noise />
       <Nav activePage={activePage} setActivePage={setActivePage} activeSection={activeSection} />
 
