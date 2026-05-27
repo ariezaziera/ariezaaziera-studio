@@ -11,7 +11,7 @@ export default function AboutSection() {
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
@@ -33,16 +33,17 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="about" ref={ref} style={{ padding: "120px 40px", maxWidth: 900, margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 64 }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3 }}>02 — ABOUT</div>
+    <section id="about" ref={ref} style={{ padding: "80px clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 48 }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3, whiteSpace: "nowrap" }}>02 — ABOUT</div>
         <div style={{ flex: 1, height: 1, background: BORDER }} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+      {/* Responsive grid: 2 cols on desktop, 1 col on mobile */}
+      <div className="about-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
         {/* Left */}
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transition: "all 0.7s ease" }}>
-          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1.1, marginBottom: 24, letterSpacing: -1 }}>
+          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(26px, 5vw, 42px)", lineHeight: 1.1, marginBottom: 24, letterSpacing: -1 }}>
             I think in<br /><span style={{ color: YELLOW }}>systems.</span><br />Build in code.
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -57,7 +58,7 @@ export default function AboutSection() {
         {/* Right */}
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transition: "all 0.7s 0.3s ease" }}>
           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 20 }}>STACK</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 48 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 40 }}>
             {skills.map((s, i) => (
               <div
                 key={s}
@@ -70,16 +71,25 @@ export default function AboutSection() {
             ))}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {stats.map(({ num, label }, i) => (
-              <div key={i} style={{ padding: "20px", background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 8, opacity: visible ? 1 : 0, transition: `all 0.5s ${0.4 + i * 0.1}s ease` }}>
-                <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 32, color: YELLOW, lineHeight: 1 }}>{num}</div>
+              <div key={i} style={{ padding: "18px", background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 8, opacity: visible ? 1 : 0, transition: `all 0.5s ${0.4 + i * 0.1}s ease` }}>
+                <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 28, color: YELLOW, lineHeight: 1 }}>{num}</div>
                 <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", marginTop: 4 }}>{label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .about-grid {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
