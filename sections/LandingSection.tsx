@@ -270,12 +270,21 @@ export default function LandingSection({
 
         @keyframes mobileCardEnter {
           0% {
-            transform: translateX(120%) translate(-50%, -50%);
+            transform: translateX(120%) translate(-50%, -50%) scale(0.82);
             opacity: 0;
+            filter: blur(10px);
           }
-          100% {
-            transform: translateX(0) translate(-50%, -50%);
+
+          60% {
+            transform: translateX(-8%) translate(-50%, -50%) scale(1.03);
             opacity: 1;
+            filter: blur(0px);
+          }
+
+          100% {
+            transform: translateX(0) translate(-50%, -50%) scale(1);
+            opacity: 1;
+            filter: blur(0px);
           }
         }
 
@@ -327,14 +336,13 @@ export default function LandingSection({
           position: "absolute",
           top: "55%",
           left: "50%",
-          transform: "translate(-50%, -50%)",
           zIndex: 999,
           pointerEvents: "none",
-          // Fixed timing: enter (0–1.5s) → wait (1.5–4.5s) → exit (4.5–5.3s)
+
           animation: `
-            mobileCardEnter 2.8s cubic-bezier(0.22, 1, 0.36, 1) 1s forwards,
-            mobileCardWait 2.5s ease-out 3.8s forwards,
-            mobileCardExit 0.9s ease-in 6.3s forwards
+            mobileCardEnter 2s cubic-bezier(0.22, 1, 0.36, 1) 5s forwards,
+            mobileCardWait 2.5s ease-out 8 forwards,
+            mobileCardExit 0.9s ease-in 9s forwards
           `,
         }}
       >
