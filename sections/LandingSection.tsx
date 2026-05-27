@@ -332,9 +332,9 @@ export default function LandingSection({
           pointerEvents: "none",
           // Fixed timing: enter (0–1.5s) → wait (1.5–4.5s) → exit (4.5–5.3s)
           animation: `
-            mobileCardEnter 1.5s ease-out forwards,
-            mobileCardWait 3s ease-out 1.5s forwards,
-            mobileCardExit 0.8s ease-in 4.5s forwards
+            mobileCardEnter 2.8s cubic-bezier(0.22, 1, 0.36, 1) 1s forwards,
+            mobileCardWait 2.5s ease-out 3.8s forwards,
+            mobileCardExit 0.9s ease-in 6.3s forwards
           `,
         }}
       >
@@ -349,7 +349,7 @@ export default function LandingSection({
             boxShadow: `0 0 0 1px ${YELLOW}22, 0 16px 40px rgba(0,0,0,0.6)`,
             perspective: "600px",
             transformStyle: "preserve-3d",
-            animation: "cardFlip 0.7s ease-out 0.4s forwards",
+            animation: "cardFlip 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.8s forwards",
           }}
         >
           {cornerAccents(10, 1.5)}
