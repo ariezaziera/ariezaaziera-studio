@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, BORDER } from "@/constants";
 import Image from "next/image";
+import CircuitBackground from "@/components/Circuitbackground";
 
 interface LandingSectionProps {
   setActivePage: (page: string) => void;
@@ -17,10 +18,22 @@ export default function LandingSection({
   const [typed, setTyped] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   const [photoLoaded, setPhotoLoaded] = useState(false);
-  const [cardKey, setCardKey] = useState(0);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [hasSeenAnimation, setHasSeenAnimation] = useState(true);
 
   const fullText = "Frontend Developer\n& Product Builder";
+
+  useEffect(() => {
+    const seen = sessionStorage.getItem("landing_animation_seen");
+    if (!seen) {
+      setHasSeenAnimation(false);
+
+      const timer = setTimeout(() => {
+        sessionStorage.setItem("landing_animation_seen", "1");
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     let i = 0;
@@ -42,19 +55,6 @@ export default function LandingSection({
       clearInterval(interval);
       clearInterval(blink);
     };
-  }, []);
-
-  // Force remount card on page visibility change (fixes cached/deployed version)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        setCardKey((k) => k + 1);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   const lines = typed.split("\n");
@@ -118,22 +118,8 @@ export default function LandingSection({
         overflow: "hidden",
       }}
     >
-      {/* Background Grid */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `
-            linear-gradient(${BORDER} 1px, transparent 1px),
-            linear-gradient(90deg, ${BORDER} 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-          opacity: 0.35,
-          maskImage:
-            "radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%)",
-          animation: "gridDrift 20s ease-in-out infinite",
-        }}
-      />
+      {/* ✅ Circuit Background — ganti grid div lama */}
+      <CircuitBackground />
 
       {/* Floating Orbs */}
       <div
@@ -202,11 +188,6 @@ export default function LandingSection({
       />
 
       <style>{`
-        @keyframes gridDrift {
-          0%, 100% { background-position: 0px 0px; }
-          50% { background-position: 12px 8px; }
-        }
-
         @keyframes orbFloat1 {
           0%, 100% { transform: translate(0, 0) scale(1); }
           33% { transform: translate(24px, -18px) scale(1.06); }
@@ -274,13 +255,11 @@ export default function LandingSection({
             opacity: 0;
             filter: blur(10px);
           }
-
           60% {
             transform: translateX(-8%) translate(-50%, -50%) scale(1.03);
             opacity: 1;
             filter: blur(0px);
           }
-
           100% {
             transform: translateX(0) translate(-50%, -50%) scale(1);
             opacity: 1;
@@ -327,159 +306,155 @@ export default function LandingSection({
         }
       `}</style>
 
-      {/* MOBILE FLOATING PHOTO CARD — key forces remount on visibility change */}
-      <div
-        key={cardKey}
-        ref={cardRef}
-        className="landing-photo-mobile"
-        style={{
-          position: "absolute",
-          top: "55%",
-          left: "50%",
-          zIndex: 999,
-          pointerEvents: "none",
-
-          animation: `
-            mobileCardEnter 2s cubic-bezier(0.22, 1, 0.36, 1) 5s forwards,
-            mobileCardWait 2.5s ease-out 8 forwards,
-            mobileCardExit 0.9s ease-in 9s forwards
-          `,
-        }}
-      >
+      {/* MOBILE FLOATING PHOTO CARD */}
+      {!hasSeenAnimation && (
         <div
+          className="landing-photo-mobile"
           style={{
-            width: "clamp(220px, 65vw, 360px)",
-            background: "#0f0f0f",
-            border: `1px solid ${BORDER}`,
-            borderRadius: 8,
-            overflow: "visible",
-            position: "relative",
-            boxShadow: `0 0 0 1px ${YELLOW}22, 0 16px 40px rgba(0,0,0,0.6)`,
-            perspective: "600px",
-            transformStyle: "preserve-3d",
-            animation: "cardFlip 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.8s forwards",
+            position: "absolute",
+            top: "55%",
+            left: "50%",
+            zIndex: 999,
+            pointerEvents: "none",
+            animation: `
+              mobileCardEnter 2s cubic-bezier(0.22, 1, 0.36, 1) 5s forwards,
+              mobileCardWait 2.5s ease-out 8 forwards,
+              mobileCardExit 0.9s ease-in 9s forwards
+            `,
           }}
         >
-          {cornerAccents(10, 1.5)}
-
-          {/* Backlight flicker */}
           <div
             style={{
-              position: "absolute",
-              inset: 0,
+              width: "clamp(220px, 65vw, 360px)",
+              background: "#0f0f0f",
+              border: `1px solid ${BORDER}`,
               borderRadius: 8,
-              pointerEvents: "none",
-              zIndex: 0,
+              overflow: "visible",
+              position: "relative",
+              boxShadow: `0 0 0 1px ${YELLOW}22, 0 16px 40px rgba(0,0,0,0.6)`,
+              perspective: "600px",
+              transformStyle: "preserve-3d",
+              animation: "cardFlip 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.8s forwards",
             }}
           >
+            {cornerAccents(10, 1.5)}
+
             <div
               style={{
                 position: "absolute",
                 inset: 0,
-                background: `radial-gradient(circle, ${YELLOW}66 0%, ${YELLOW}22 40%, transparent 70%)`,
                 borderRadius: 8,
-                opacity: 0,
-                animation: "backlightFlicker 0.5s ease-out 1.1s forwards",
+                pointerEvents: "none",
+                zIndex: 0,
               }}
-            />
-          </div>
-
-          {/* Photo */}
-          <div
-            style={{
-              position: "relative",
-              aspectRatio: "3/4",
-              borderRadius: "8px 8px 0 0",
-              overflow: "hidden",
-              transformStyle: "preserve-3d",
-            }}
-          >
-            {!photoLoaded && (
+            >
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backfaceVisibility: "hidden",
-                  background: "#1a1a1a",
+                  background: `radial-gradient(circle, ${YELLOW}66 0%, ${YELLOW}22 40%, transparent 70%)`,
+                  borderRadius: 8,
+                  opacity: 0,
+                  animation: "backlightFlicker 0.5s ease-out 1.1s forwards",
                 }}
-              >
-                <span
-                  style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: 9,
-                    color: "#333",
-                    letterSpacing: 2,
-                  }}
-                >
-                  [ PHOTO ]
-                </span>
-              </div>
-            )}
+              />
+            </div>
+
             <div
               style={{
-                position: "absolute",
-                inset: 0,
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-                opacity: 0,
-                animation: "photoReveal 0.7s ease-out 0.4s forwards",
+                position: "relative",
+                aspectRatio: "3/4",
+                borderRadius: "8px 8px 0 0",
+                overflow: "hidden",
+                transformStyle: "preserve-3d",
               }}
             >
-              {photoImg}
+              {!photoLoaded && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backfaceVisibility: "hidden",
+                    background: "#1a1a1a",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'DM Mono', monospace",
+                      fontSize: 9,
+                      color: "#333",
+                      letterSpacing: 2,
+                    }}
+                  >
+                    [ PHOTO ]
+                  </span>
+                </div>
+              )}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  opacity: 0,
+                  animation: "photoReveal 0.7s ease-out 0.4s forwards",
+                }}
+              >
+                {photoImg}
+              </div>
             </div>
-          </div>
 
-          {/* Bottom tag */}
-          <div
-            style={{
-              padding: "6px 8px",
-              borderTop: `1px solid ${BORDER}`,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "#0a0a0a",
-              borderRadius: "0 0 8px 8px",
-            }}
-          >
-            <span
+            <div
               style={{
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 8,
-                color: "#444",
-                letterSpacing: 1.5,
-              }}
-            >
-              KL, MY
-            </span>
-            <span
-              style={{
-                display: "inline-flex",
+                padding: "6px 8px",
+                borderTop: `1px solid ${BORDER}`,
+                display: "flex",
+                justifyContent: "space-between",
                 alignItems: "center",
-                gap: 4,
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 8,
-                color: YELLOW,
-                letterSpacing: 1,
+                background: "#0a0a0a",
+                borderRadius: "0 0 8px 8px",
               }}
             >
               <span
                 style={{
-                  width: 4,
-                  height: 4,
-                  borderRadius: "50%",
-                  background: YELLOW,
-                  animation: "cornerPulse 1.5s infinite",
-                  display: "inline-block",
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: 8,
+                  color: "#444",
+                  letterSpacing: 1.5,
                 }}
-              />
-              AVAILABLE
-            </span>
+              >
+                KL, MY
+              </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: 8,
+                  color: YELLOW,
+                  letterSpacing: 1,
+                }}
+              >
+                <span
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: "50%",
+                    background: YELLOW,
+                    animation: "cornerPulse 1.5s infinite",
+                    display: "inline-block",
+                  }}
+                />
+                AVAILABLE
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* MAIN GRID */}
       <div
@@ -493,7 +468,7 @@ export default function LandingSection({
           display: "grid",
           gridTemplateColumns: "1fr auto",
           gap: "clamp(40px, 6vw, 80px)",
-          alignItems: "end",
+          alignItems: "center",
         }}
       >
         {/* LEFT CONTENT */}
@@ -664,6 +639,7 @@ export default function LandingSection({
             opacity: 0,
             animation: "fadeUp 0.8s 1.1s forwards",
             flexShrink: 0,
+            marginBottom: "80px",
           }}
         >
           <div
@@ -699,7 +675,6 @@ export default function LandingSection({
               />
             ))}
 
-            {/* Accent line */}
             <div
               style={{
                 position: "absolute",
@@ -713,7 +688,6 @@ export default function LandingSection({
               }}
             />
 
-            {/* PHOTO CONTAINER */}
             <div
               style={{
                 position: "relative",
@@ -774,7 +748,6 @@ export default function LandingSection({
               )}
             </div>
 
-            {/* TAG */}
             <div
               style={{
                 marginTop: 12,

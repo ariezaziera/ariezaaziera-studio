@@ -83,6 +83,7 @@ export default function App() {
         style={{
           opacity: contentVisible ? 1 : 0,
           animation: contentVisible ? "appFadeIn 0.6s ease both" : "none",
+          paddingTop: isMobile ? "30px" : "80px",
         }}
       >
         <Nav

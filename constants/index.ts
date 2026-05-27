@@ -1,7 +1,7 @@
 import type { Project } from "@/types";
 
 export const YELLOW = "#F5C542";
-export const BG = "#080808";
+export const BG = "#0d0800";
 export const CARD_BG = "#0f0f0f";
 export const BORDER = "#1a1a1a";
 
