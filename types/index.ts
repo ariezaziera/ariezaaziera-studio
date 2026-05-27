@@ -12,4 +12,5 @@ export interface Project {
   problem: string;
   solution: string;
   outcome: string;
+  image_url?: string;
 }

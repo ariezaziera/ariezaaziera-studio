@@ -5,12 +5,13 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, BORDER } from "@/constants";
 import Image from "next/image";
 import CircuitBackground from "@/components/Circuitbackground";
+import { useProfile } from "@/lib/hooks";
 
 interface LandingSectionProps {
   setActivePage: (page: string) => void;
 }
 
-const PHOTO_SRC = "/profile1.png";
+
 
 export default function LandingSection({
   setActivePage,
@@ -19,6 +20,9 @@ export default function LandingSection({
   const [showCursor, setShowCursor] = useState(true);
   const [photoLoaded, setPhotoLoaded] = useState(false);
   const [hasSeenAnimation, setHasSeenAnimation] = useState(true);
+
+  const profile = useProfile();
+  const PHOTO_SRC = (profile as typeof profile & { photo_url?: string }).photo_url || "/profile1.png";
 
   const fullText = "Frontend Developer\n& Product Builder";
 
