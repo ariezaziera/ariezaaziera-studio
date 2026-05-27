@@ -31,9 +31,8 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
   };
 
   useEffect(() => {
-    // Generate scattered dots
     setDots(
-      Array.from({ length: 28 }, (_, i) => ({
+      Array.from({ length: 28 }, () => ({
         x: Math.random() * 100,
         y: Math.random() * 100,
         size: Math.random() * 3 + 1,
@@ -114,20 +113,16 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           100% { top: 100%; opacity: 0; }
         }
         @keyframes introBracketLeft {
-          from { transform: translateX(-20px); opacity: 0; }
-          to   { transform: translateX(0); opacity: 1; }
+          from { transform: translateY(-50%) translateX(-12px); opacity: 0; }
+          to   { transform: translateY(-50%) translateX(0); opacity: 1; }
         }
         @keyframes introBracketRight {
-          from { transform: translateX(20px); opacity: 0; }
-          to   { transform: translateX(0); opacity: 1; }
+          from { transform: translateY(-50%) translateX(12px); opacity: 0; }
+          to   { transform: translateY(-50%) translateX(0); opacity: 1; }
         }
         @keyframes introBarFill {
           from { width: 0%; }
           to   { width: 100%; }
-        }
-        @keyframes introCurtain {
-          from { height: 100%; }
-          to   { height: 0%; }
         }
       `}</style>
 
@@ -149,7 +144,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         />
       ))}
 
-      {/* Grid lines subtle */}
+      {/* Grid */}
       <div style={{
         position: "absolute", inset: 0,
         backgroundImage: `linear-gradient(rgba(245,197,66,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,66,0.04) 1px, transparent 1px)`,
@@ -166,7 +161,14 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
       }} />
 
       {/* Main content */}
-      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 24px" }}>
+      <div style={{
+        position: "relative",
+        zIndex: 2,
+        textAlign: "center",
+        padding: "0 clamp(32px, 8vw, 64px)", // responsive padding kiri kanan
+        width: "100%",
+        boxSizing: "border-box",
+      }}>
         {/* Top label */}
         <div style={{
           fontFamily: "'DM Mono', monospace",
@@ -181,11 +183,21 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         </div>
 
         {/* Name with glitch reveal */}
-        <div style={{ position: "relative", display: "inline-block" }}>
+        <div style={{
+          position: "relative",
+          display: "inline-flex",
+          alignItems: "center",
+          // padding kiri kanan bagi ruang bracket
+          padding: "0 clamp(28px, 5vw, 48px)",
+        }}>
           {/* Ghost/glitch layer */}
           {phase === "reveal" && (
             <div style={{
-              position: "absolute", inset: 0,
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 900,
               fontSize: "clamp(36px, 10vw, 96px)",
@@ -200,22 +212,20 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             </div>
           )}
 
-          {/* Brackets */}
+          {/* Bracket kiri — flush dengan edge of padding box */}
           {phase === "reveal" && (
-            <>
-              <span style={{
-                position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)",
-                fontFamily: "'DM Mono', monospace", fontSize: "clamp(24px, 6vw, 64px)",
-                color: YELLOW, opacity: 0.35,
-                animation: "introBracketLeft 0.5s 0.1s both",
-              }}>{"["}</span>
-              <span style={{
-                position: "absolute", right: -28, top: "50%", transform: "translateY(-50%)",
-                fontFamily: "'DM Mono', monospace", fontSize: "clamp(24px, 6vw, 64px)",
-                color: YELLOW, opacity: 0.35,
-                animation: "introBracketRight 0.5s 0.1s both",
-              }}>{"]"}</span>
-            </>
+            <span style={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "clamp(24px, 6vw, 64px)",
+              lineHeight: 1,
+              color: YELLOW,
+              opacity: 0.35,
+              animation: "introBracketLeft 0.5s 0.1s both",
+            }}>{"["}</span>
           )}
 
           <h1 style={{
@@ -226,6 +236,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             margin: 0,
             color: "#fff",
             animation: phase === "reveal" ? "introGlitch 0.6s ease-out both" : "none",
+            whiteSpace: "nowrap",
           }}>
             <span style={{ color: "#fff" }}>{typedName.slice(0, 6)}</span>
             <span style={{ color: YELLOW }}>{typedName.slice(6)}</span>
@@ -233,6 +244,22 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
               <span style={{ color: YELLOW, animation: "introDotPulse 0.6s infinite" }}>_</span>
             )}
           </h1>
+
+          {/* Bracket kanan */}
+          {phase === "reveal" && (
+            <span style={{
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "clamp(24px, 6vw, 64px)",
+              lineHeight: 1,
+              color: YELLOW,
+              opacity: 0.35,
+              animation: "introBracketRight 0.5s 0.1s both",
+            }}>{"]"}</span>
+          )}
         </div>
 
         {/* Divider line */}

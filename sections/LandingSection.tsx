@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, BORDER } from "@/constants";
 import Image from "next/image";
@@ -17,6 +17,8 @@ export default function LandingSection({
   const [typed, setTyped] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [cardKey, setCardKey] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const fullText = "Frontend Developer\n& Product Builder";
 
@@ -40,6 +42,19 @@ export default function LandingSection({
       clearInterval(interval);
       clearInterval(blink);
     };
+  }, []);
+
+  // Force remount card on page visibility change (fixes cached/deployed version)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        setCardKey((k) => k + 1);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   const lines = typed.split("\n");
@@ -73,17 +88,13 @@ export default function LandingSection({
           width: size,
           height: size,
           borderTop:
-            pos.top !== undefined
-              ? `${thickness}px solid ${YELLOW}`
-              : "none",
+            pos.top !== undefined ? `${thickness}px solid ${YELLOW}` : "none",
           borderBottom:
             pos.bottom !== undefined
               ? `${thickness}px solid ${YELLOW}`
               : "none",
           borderLeft:
-            pos.left !== undefined
-              ? `${thickness}px solid ${YELLOW}`
-              : "none",
+            pos.left !== undefined ? `${thickness}px solid ${YELLOW}` : "none",
           borderRight:
             pos.right !== undefined
               ? `${thickness}px solid ${YELLOW}`
@@ -245,23 +256,6 @@ export default function LandingSection({
           50% { opacity: 1; }
         }
 
-        @keyframes cardPopIn {
-          0% {
-            opacity: 0;
-            transform: translateX(60px) scale(0.85);
-          }
-          60% {
-            transform: translateX(-6px) scale(1.03);
-          }
-          80% {
-            transform: translateX(3px) scale(0.98);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-          }
-        }
-
         .landing-photo-desktop { display: block; }
         .landing-photo-mobile { display: none; }
 
@@ -304,52 +298,30 @@ export default function LandingSection({
         }
 
         @keyframes cardFlip {
-          0% {
-            transform: rotateY(0deg);
-          }
-          50% {
-            transform: rotateY(90deg);
-          }
-          100% {
-            transform: rotateY(0deg);
-          }
+          0% { transform: rotateY(0deg); }
+          50% { transform: rotateY(90deg); }
+          100% { transform: rotateY(0deg); }
         }
 
         @keyframes photoReveal {
-          0% {
-            opacity: 0;
-            transform: rotateY(180deg);
-          }
-          100% {
-            opacity: 1;
-            transform: rotateY(0deg);
-          }
+          0% { opacity: 0; transform: rotateY(180deg); }
+          100% { opacity: 1; transform: rotateY(0deg); }
         }
 
         @keyframes backlightFlicker {
-          0% {
-            opacity: 0;
-          }
-          20% {
-            opacity: 0.8;
-          }
-          40% {
-            opacity: 0.3;
-          }
-          60% {
-            opacity: 0.9;
-          }
-          80% {
-            opacity: 0.4;
-          }
-          100% {
-            opacity: 0;
-          }
+          0%   { opacity: 0; }
+          20%  { opacity: 0.8; }
+          40%  { opacity: 0.3; }
+          60%  { opacity: 0.9; }
+          80%  { opacity: 0.4; }
+          100% { opacity: 0; }
         }
       `}</style>
 
-      {/* MOBILE FLOATING PHOTO CARD */}
+      {/* MOBILE FLOATING PHOTO CARD — key forces remount on visibility change */}
       <div
+        key={cardKey}
+        ref={cardRef}
         className="landing-photo-mobile"
         style={{
           position: "absolute",
@@ -358,10 +330,11 @@ export default function LandingSection({
           transform: "translate(-50%, -50%)",
           zIndex: 999,
           pointerEvents: "none",
+          // Fixed timing: enter (0–1.5s) → wait (1.5–4.5s) → exit (4.5–5.3s)
           animation: `
-            mobileCardEnter 0.8s ease-out forwards,
-            mobileCardWait 3s ease-out 0.8s forwards,
-            mobileCardExit 0.8s ease-in 3.8s forwards
+            mobileCardEnter 1.5s ease-out forwards,
+            mobileCardWait 3s ease-out 1.5s forwards,
+            mobileCardExit 0.8s ease-in 4.5s forwards
           `,
         }}
       >
@@ -374,14 +347,14 @@ export default function LandingSection({
             overflow: "visible",
             position: "relative",
             boxShadow: `0 0 0 1px ${YELLOW}22, 0 16px 40px rgba(0,0,0,0.6)`,
+            perspective: "600px",
             transformStyle: "preserve-3d",
             animation: "cardFlip 0.7s ease-out 0.4s forwards",
           }}
         >
-          {/* Corner accents */}
           {cornerAccents(10, 1.5)}
 
-          {/* Backlight flicker effect */}
+          {/* Backlight flicker */}
           <div
             style={{
               position: "absolute",
@@ -567,8 +540,8 @@ export default function LandingSection({
               animation: "fadeUp 0.6s 0.8s forwards",
             }}
           >
-            I build interactive web systems that turn ideas into real
-            products. Not just UI — full product thinking, front to back.
+            I build interactive web systems that turn ideas into real products.
+            Not just UI — full product thinking, front to back.
           </p>
 
           {/* BUTTONS */}
@@ -691,7 +664,6 @@ export default function LandingSection({
               width: "clamp(180px, 22vw, 280px)",
             }}
           >
-            {/* Corners */}
             {[
               { top: -8, left: -8 },
               { top: -8, right: -8 },
@@ -706,21 +678,13 @@ export default function LandingSection({
                   width: 16,
                   height: 16,
                   borderTop:
-                    pos.top !== undefined
-                      ? `2px solid ${YELLOW}`
-                      : "none",
+                    pos.top !== undefined ? `2px solid ${YELLOW}` : "none",
                   borderBottom:
-                    pos.bottom !== undefined
-                      ? `2px solid ${YELLOW}`
-                      : "none",
+                    pos.bottom !== undefined ? `2px solid ${YELLOW}` : "none",
                   borderLeft:
-                    pos.left !== undefined
-                      ? `2px solid ${YELLOW}`
-                      : "none",
+                    pos.left !== undefined ? `2px solid ${YELLOW}` : "none",
                   borderRight:
-                    pos.right !== undefined
-                      ? `2px solid ${YELLOW}`
-                      : "none",
+                    pos.right !== undefined ? `2px solid ${YELLOW}` : "none",
                   animation: `cornerPulse ${2 + i * 0.3}s ease-in-out infinite`,
                   zIndex: 3,
                 }}
@@ -755,7 +719,6 @@ export default function LandingSection({
                 background: "transparent",
               }}
             >
-              {/* Glow */}
               <div
                 style={{
                   position: "absolute",
@@ -766,8 +729,6 @@ export default function LandingSection({
                   zIndex: 0,
                 }}
               />
-
-              {/* Scanline */}
               <div
                 style={{
                   position: "absolute",
@@ -828,7 +789,6 @@ export default function LandingSection({
               >
                 KL, MY
               </span>
-
               <span
                 style={{
                   display: "inline-flex",
