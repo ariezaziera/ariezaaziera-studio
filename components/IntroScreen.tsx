@@ -1,0 +1,328 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { YELLOW } from "@/constants";
+
+interface IntroScreenProps {
+  onComplete: () => void;
+}
+
+export default function IntroScreen({ onComplete }: IntroScreenProps) {
+  const [phase, setPhase] = useState<"idle" | "typing" | "reveal" | "exit">("idle");
+  const [typedName, setTypedName] = useState("");
+  const [showTagline, setShowTagline] = useState(false);
+  const [showSkip, setShowSkip] = useState(false);
+  const [exitStarted, setExitStarted] = useState(false);
+  const [dots, setDots] = useState<{ x: number; y: number; size: number; delay: number; dur: number }[]>([]);
+  const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const fullName = "ARIEZA AZIERA";
+
+  const scheduleExit = () => {
+    const t = setTimeout(() => triggerExit(), 1400);
+    timeouts.current.push(t);
+  };
+
+  const triggerExit = () => {
+    if (exitStarted) return;
+    setExitStarted(true);
+    setPhase("exit");
+    timeouts.current.push(setTimeout(onComplete, 900));
+  };
+
+  useEffect(() => {
+    // Generate scattered dots
+    setDots(
+      Array.from({ length: 28 }, (_, i) => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 3 + 1,
+        delay: Math.random() * 2,
+        dur: Math.random() * 3 + 2,
+      }))
+    );
+
+    const t0 = setTimeout(() => setPhase("typing"), 300);
+    timeouts.current.push(t0);
+    return () => timeouts.current.forEach(clearTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (phase !== "typing") return;
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i <= fullName.length) {
+        setTypedName(fullName.slice(0, i));
+        i++;
+      } else {
+        clearInterval(interval);
+        const t1 = setTimeout(() => {
+          setPhase("reveal");
+          setShowTagline(true);
+          const t2 = setTimeout(() => setShowSkip(true), 600);
+          timeouts.current.push(t2);
+          scheduleExit();
+        }, 300);
+        timeouts.current.push(t1);
+      }
+    }, 80);
+    return () => clearInterval(interval);
+  }, [phase]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "#050505",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        transform: phase === "exit" ? "translateY(-100%)" : "translateY(0)",
+        transition: phase === "exit" ? "transform 0.85s cubic-bezier(0.76, 0, 0.24, 1)" : "none",
+      }}
+    >
+      <style>{`
+        @keyframes introDotPulse {
+          0%, 100% { opacity: 0.08; transform: scale(1); }
+          50%       { opacity: 0.22; transform: scale(1.5); }
+        }
+        @keyframes introLineGrow {
+          from { width: 0; }
+          to   { width: 100%; }
+        }
+        @keyframes introFadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: none; }
+        }
+        @keyframes introGlitch {
+          0%   { clip-path: inset(0 0 100% 0); transform: skewX(0deg); }
+          10%  { clip-path: inset(15% 0 72% 0); transform: skewX(-2deg); }
+          20%  { clip-path: inset(40% 0 40% 0); transform: skewX(1.5deg); }
+          30%  { clip-path: inset(60% 0 20% 0); transform: skewX(-1deg); }
+          40%  { clip-path: inset(80% 0 5% 0); transform: skewX(0.5deg); }
+          50%  { clip-path: inset(0 0 0 0); transform: skewX(0deg); }
+          100% { clip-path: inset(0 0 0 0); transform: skewX(0deg); }
+        }
+        @keyframes introScan {
+          0%   { top: -4px; opacity: 0; }
+          8%   { opacity: 1; }
+          92%  { opacity: 0.7; }
+          100% { top: 100%; opacity: 0; }
+        }
+        @keyframes introBracketLeft {
+          from { transform: translateX(-20px); opacity: 0; }
+          to   { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes introBracketRight {
+          from { transform: translateX(20px); opacity: 0; }
+          to   { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes introBarFill {
+          from { width: 0%; }
+          to   { width: 100%; }
+        }
+        @keyframes introCurtain {
+          from { height: 100%; }
+          to   { height: 0%; }
+        }
+      `}</style>
+
+      {/* Ambient dots */}
+      {dots.map((dot, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: `${dot.x}%`,
+            top: `${dot.y}%`,
+            width: dot.size,
+            height: dot.size,
+            borderRadius: "50%",
+            background: YELLOW,
+            animation: `introDotPulse ${dot.dur}s ${dot.delay}s ease-in-out infinite`,
+            pointerEvents: "none",
+          }}
+        />
+      ))}
+
+      {/* Grid lines subtle */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: `linear-gradient(rgba(245,197,66,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,66,0.04) 1px, transparent 1px)`,
+        backgroundSize: "80px 80px",
+        pointerEvents: "none",
+      }} />
+
+      {/* Scan line */}
+      <div style={{
+        position: "absolute", left: 0, right: 0, height: 1,
+        background: `linear-gradient(90deg, transparent, ${YELLOW}44, transparent)`,
+        animation: "introScan 3s linear infinite",
+        pointerEvents: "none",
+      }} />
+
+      {/* Main content */}
+      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 24px" }}>
+        {/* Top label */}
+        <div style={{
+          fontFamily: "'DM Mono', monospace",
+          fontSize: 10,
+          letterSpacing: 5,
+          color: `${YELLOW}88`,
+          marginBottom: 32,
+          opacity: phase !== "idle" ? 1 : 0,
+          transition: "opacity 0.6s 0.2s",
+        }}>
+          PORTFOLIO — {new Date().getFullYear()}
+        </div>
+
+        {/* Name with glitch reveal */}
+        <div style={{ position: "relative", display: "inline-block" }}>
+          {/* Ghost/glitch layer */}
+          {phase === "reveal" && (
+            <div style={{
+              position: "absolute", inset: 0,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(36px, 10vw, 96px)",
+              letterSpacing: -1,
+              color: YELLOW,
+              opacity: 0.12,
+              transform: "translate(3px, -2px)",
+              userSelect: "none",
+              pointerEvents: "none",
+            }}>
+              {fullName}
+            </div>
+          )}
+
+          {/* Brackets */}
+          {phase === "reveal" && (
+            <>
+              <span style={{
+                position: "absolute", left: -28, top: "50%", transform: "translateY(-50%)",
+                fontFamily: "'DM Mono', monospace", fontSize: "clamp(24px, 6vw, 64px)",
+                color: YELLOW, opacity: 0.35,
+                animation: "introBracketLeft 0.5s 0.1s both",
+              }}>{"["}</span>
+              <span style={{
+                position: "absolute", right: -28, top: "50%", transform: "translateY(-50%)",
+                fontFamily: "'DM Mono', monospace", fontSize: "clamp(24px, 6vw, 64px)",
+                color: YELLOW, opacity: 0.35,
+                animation: "introBracketRight 0.5s 0.1s both",
+              }}>{"]"}</span>
+            </>
+          )}
+
+          <h1 style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(36px, 10vw, 96px)",
+            letterSpacing: -1,
+            margin: 0,
+            color: "#fff",
+            animation: phase === "reveal" ? "introGlitch 0.6s ease-out both" : "none",
+          }}>
+            <span style={{ color: "#fff" }}>{typedName.slice(0, 6)}</span>
+            <span style={{ color: YELLOW }}>{typedName.slice(6)}</span>
+            {phase === "typing" && (
+              <span style={{ color: YELLOW, animation: "introDotPulse 0.6s infinite" }}>_</span>
+            )}
+          </h1>
+        </div>
+
+        {/* Divider line */}
+        {phase === "reveal" && (
+          <div style={{
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${YELLOW}60, transparent)`,
+            margin: "20px auto",
+            animation: "introLineGrow 0.6s 0.2s both",
+          }} />
+        )}
+
+        {/* Tagline */}
+        {showTagline && (
+          <p style={{
+            fontFamily: "'DM Mono', monospace",
+            fontSize: "clamp(10px, 2vw, 13px)",
+            color: "#555",
+            letterSpacing: 3,
+            marginTop: 8,
+            animation: "introFadeUp 0.5s 0.1s both",
+          }}>
+            FRONTEND DEVELOPER &nbsp;·&nbsp; PRODUCT BUILDER
+          </p>
+        )}
+
+        {/* Loading bar */}
+        {phase === "reveal" && (
+          <div style={{
+            margin: "40px auto 0",
+            width: "clamp(120px, 30vw, 200px)",
+            height: 1,
+            background: "#1a1a1a",
+            borderRadius: 1,
+            overflow: "hidden",
+          }}>
+            <div style={{
+              height: "100%",
+              background: YELLOW,
+              animation: "introBarFill 1.2s 0.1s cubic-bezier(0.4, 0, 0.2, 1) both",
+            }} />
+          </div>
+        )}
+      </div>
+
+      {/* Skip button */}
+      {showSkip && !exitStarted && (
+        <button
+          onClick={triggerExit}
+          style={{
+            position: "absolute",
+            bottom: 32,
+            right: 32,
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 10,
+            letterSpacing: 2,
+            color: "#333",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            padding: "8px 12px",
+            transition: "color 0.2s",
+            animation: "introFadeUp 0.4s both",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = YELLOW)}
+          onMouseLeave={e => (e.currentTarget.style.color = "#333")}
+        >
+          SKIP →
+        </button>
+      )}
+
+      {/* Corner accents */}
+      {["top-left", "top-right", "bottom-left", "bottom-right"].map((corner) => {
+        const isTop = corner.includes("top");
+        const isLeft = corner.includes("left");
+        return (
+          <div key={corner} style={{
+            position: "absolute",
+            [isTop ? "top" : "bottom"]: 20,
+            [isLeft ? "left" : "right"]: 20,
+            width: 20, height: 20,
+            borderTop: isTop ? `1px solid ${YELLOW}30` : "none",
+            borderBottom: !isTop ? `1px solid ${YELLOW}30` : "none",
+            borderLeft: isLeft ? `1px solid ${YELLOW}30` : "none",
+            borderRight: !isLeft ? `1px solid ${YELLOW}30` : "none",
+            opacity: phase !== "idle" ? 1 : 0,
+            transition: "opacity 0.8s 0.4s",
+          }} />
+        );
+      })}
+    </div>
+  );
+}
