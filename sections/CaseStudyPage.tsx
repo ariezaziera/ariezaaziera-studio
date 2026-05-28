@@ -241,7 +241,7 @@ function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screen
         width: "100%",
         display: "flex",
         flexDirection: isMobileScreen ? "column" : "row",
-        alignItems: "flex-end",
+        alignItems: isMobileScreen ? "center" : "flex-end",
         justifyContent: "center",
         gap,
       }}
