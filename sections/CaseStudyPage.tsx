@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, CARD_BG, BORDER } from "@/constants";
 import type { Project } from "@/types";
-import type { SplitScreenshots } from "@/app/admin/components/ScreenshotsUpload";
+import type { SplitScreenshots } from "@/types/split-screenshots";
 
 interface CaseStudyPageProps {
   project: Project;
