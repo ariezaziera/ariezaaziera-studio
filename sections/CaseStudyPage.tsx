@@ -65,40 +65,92 @@ function MobileMockup({ src, color, delay = 0 }: { src: string; color: string; d
         animation: visible ? `mobileFloat ${3.5 + delay}s ease-in-out infinite` : "none",
         cursor: "pointer",
         display: "inline-block",
+        filter: "drop-shadow(0 30px 40px rgba(0,0,0,0.6)) drop-shadow(0 10px 20px rgba(0,0,0,0.4))",
       }}
     >
+      {/* Outer silver frame */}
       <div style={{
         width: "100%",
-        maxHeight: "100%",        // <-- tambah ni
-        borderRadius: 28,
-        border: `2px solid ${color}44`,
-        background: "#111",
-        padding: "10px 6px",
-        boxShadow: `0 0 0 1px ${BORDER}, 0 24px 48px rgba(0,0,0,0.5), 0 0 40px ${color}18`,
+        borderRadius: 52,
+        background: "linear-gradient(145deg, #d0d0d0 0%, #a0a0a0 30%, #c8c8c8 50%, #888 70%, #b0b0b0 100%)",
+        padding: 3,
+        boxShadow: `
+          inset 0 1px 1px rgba(255,255,255,0.6),
+          inset 0 -1px 1px rgba(0,0,0,0.3),
+          0 0 0 1px rgba(0,0,0,0.4)
+        `,
         position: "relative",
       }}>
-        {/* Notch */}
-        <div style={{ width: 60, height: 8, borderRadius: 10, background: "#000", margin: "0 auto 6px", position: "relative", zIndex: 2 }} />
-        {/* Screen */}
-        <div style={{ borderRadius: 18, overflow: "hidden", aspectRatio: "9/16", background: "#0a0a0a", position: "relative" }}>
-          {src ? (
-            <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
-          ) : (
-            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: color + "33", border: `1px solid ${color}55`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: 14, height: 14, borderRadius: 4, background: color, opacity: 0.7 }} />
+
+        {/* Side buttons - volume up */}
+        <div style={{ position: "absolute", left: -4, top: 80, width: 4, height: 28, borderRadius: "3px 0 0 3px", background: "linear-gradient(180deg, #bbb 0%, #888 50%, #bbb 100%)", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.4)" }} />
+        {/* Side buttons - volume down */}
+        <div style={{ position: "absolute", left: -4, top: 118, width: 4, height: 28, borderRadius: "3px 0 0 3px", background: "linear-gradient(180deg, #bbb 0%, #888 50%, #bbb 100%)", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.4)" }} />
+        {/* Side buttons - power */}
+        <div style={{ position: "absolute", right: -4, top: 90, width: 4, height: 42, borderRadius: "0 3px 3px 0", background: "linear-gradient(180deg, #bbb 0%, #888 50%, #bbb 100%)", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.4)" }} />
+
+        {/* Inner black bezel */}
+        <div style={{
+          borderRadius: 50,
+          background: "#0a0a0a",
+          padding: "10px 8px 8px",
+          overflow: "hidden",
+        }}>
+          {/* Status bar */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 14px",
+            marginBottom: 6,
+            height: 20,
+          }}>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 600, color: "#fff", letterSpacing: 0.3 }}>09:45</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              {/* Signal bars */}
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 1.5 }}>
+                {[4, 6, 8, 10].map((h, i) => (
+                  <div key={i} style={{ width: 3, height: h, borderRadius: 1, background: i < 3 ? "#fff" : "#ffffff55" }} />
+                ))}
               </div>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(8px,1.2vw,10px)", color: "#333", letterSpacing: 1 }}>SCREENSHOT</span>
+              {/* WiFi icon */}
+              <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+                <path d="M12 12.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="white"/>
+                <path d="M7.5 8.8C9 7.4 10.9 6.5 12 6.5s3 .9 4.5 2.3" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                <path d="M4 5.2C6.5 2.8 9.1 1.5 12 1.5s5.5 1.3 8 3.7" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5"/>
+              </svg>
+              {/* Battery */}
+              <div style={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <div style={{ width: 22, height: 11, borderRadius: 3, border: "1.5px solid #fff", position: "relative", padding: 2 }}>
+                  <div style={{ width: "75%", height: "100%", borderRadius: 1.5, background: "#fff" }} />
+                </div>
+                <div style={{ width: 2, height: 5, borderRadius: "0 1px 1px 0", background: "#ffffff88" }} />
+              </div>
             </div>
-          )}
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "35%", background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)", pointerEvents: "none", borderRadius: "18px 18px 0 0" }} />
+          </div>
+
+          {/* Dynamic island */}
+          <div style={{ width: 90, height: 28, borderRadius: 20, background: "#000", margin: "0 auto 6px", position: "relative", zIndex: 2, boxShadow: "0 0 0 1px #1a1a1a" }} />
+
+          {/* Screen */}
+          <div style={{ borderRadius: 40, overflow: "hidden", aspectRatio: "9/16", background: "#0a0a0a", position: "relative" }}>
+            {src ? (
+              <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+            ) : (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: color + "33", border: `1px solid ${color}55`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 14, height: 14, borderRadius: 4, background: color, opacity: 0.7 }} />
+                </div>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#333", letterSpacing: 1 }}>SCREENSHOT</span>
+              </div>
+            )}
+            {/* Screen glare */}
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)", pointerEvents: "none" }} />
+          </div>
+
+          {/* Home indicator */}
+          <div style={{ width: 100, height: 4, borderRadius: 2, background: "#ffffff33", margin: "10px auto 4px" }} />
         </div>
-        {/* Home indicator */}
-        <div style={{ width: 50, height: 3, borderRadius: 2, background: "#333", margin: "8px auto 0" }} />
-        {/* Side buttons */}
-        <div style={{ position: "absolute", right: -3, top: 60, width: 3, height: 28, borderRadius: "0 3px 3px 0", background: "#222" }} />
-        <div style={{ position: "absolute", left: -3, top: 50, width: 3, height: 18, borderRadius: "3px 0 0 3px", background: "#222" }} />
-        <div style={{ position: "absolute", left: -3, top: 76, width: 3, height: 18, borderRadius: "3px 0 0 3px", background: "#222" }} />
       </div>
     </div>
   );
