@@ -7,12 +7,17 @@ import type { SplitScreenshots } from "@/types/split-screenshots";
 
 // ─── Crop aspect ratios per device ───────────────────────────────────────────
 const CROP_RATIOS = {
-  mobile: 271 / 441,   // matches PHONE_RATIO in CaseStudyPage
-  desktop: 1.3256,     // matches DESKTOP_RATIO in CaseStudyPage
+  mobile: 271 / 441,  // portrait 9:16-ish
+  desktop: 1.3256,    // landscape 4:3-ish
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 export type { SplitScreenshots } from "@/types/split-screenshots";
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const MOBILE_ACCENT = "#A78BFA";
+const DESKTOP_ACCENT = "#60A5FA";
+const MOBILE_ACCENT_BG = "rgba(167,139,250,0.10)";
+const DESKTOP_ACCENT_BG = "rgba(96,165,250,0.10)";
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
 function CropModal({
@@ -26,7 +31,6 @@ function CropModal({
   onConfirm: (blob: Blob) => void;
   onCancel: () => void;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [imgSrc] = useState(() => URL.createObjectURL(file));
   const [cropX, setCropX] = useState(0);
@@ -41,25 +45,28 @@ function CropModal({
 
   const PREVIEW_W = 480;
   const targetRatio = CROP_RATIOS[deviceType];
+  const accent = deviceType === "mobile" ? MOBILE_ACCENT : DESKTOP_ACCENT;
 
-  const initCrop = useCallback((natW: number, natH: number) => {
-    const imgRatio = natW / natH;
-    let cw: number, ch: number;
-    if (imgRatio > targetRatio) {
-      // image wider than target: constrain by height
-      ch = natH;
-      cw = Math.round(ch * targetRatio);
-    } else {
-      cw = natW;
-      ch = Math.round(cw / targetRatio);
-    }
-    setCropW(cw);
-    setCropH(ch);
-    setCropX(Math.round((natW - cw) / 2));
-    setCropY(Math.round((natH - ch) / 2));
-    setImgNaturalW(natW);
-    setImgNaturalH(natH);
-  }, [targetRatio]);
+  const initCrop = useCallback(
+    (natW: number, natH: number) => {
+      const imgRatio = natW / natH;
+      let cw: number, ch: number;
+      if (imgRatio > targetRatio) {
+        ch = natH;
+        cw = Math.round(ch * targetRatio);
+      } else {
+        cw = natW;
+        ch = Math.round(cw / targetRatio);
+      }
+      setCropW(cw);
+      setCropH(ch);
+      setCropX(Math.round((natW - cw) / 2));
+      setCropY(Math.round((natH - ch) / 2));
+      setImgNaturalW(natW);
+      setImgNaturalH(natH);
+    },
+    [targetRatio]
+  );
 
   const scale = imgNaturalW > 0 ? PREVIEW_W / imgNaturalW : 1;
   const previewH = Math.round(imgNaturalH * scale);
@@ -96,12 +103,9 @@ function CropModal({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-    canvas.toBlob((blob) => {
-      if (blob) onConfirm(blob);
-    }, "image/webp", 0.92);
+    canvas.toBlob((blob) => { if (blob) onConfirm(blob); }, "image/webp", 0.92);
   };
 
-  const deviceLabel = deviceType === "mobile" ? "MOBILE (portrait)" : "DESKTOP (landscape)";
   const cropPreviewX = Math.round(cropX * scale);
   const cropPreviewY = Math.round(cropY * scale);
   const cropPreviewW = Math.round(cropW * scale);
@@ -109,21 +113,30 @@ function CropModal({
 
   return (
     <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.96)",
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
       zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center",
       padding: 24,
     }}>
       <div style={{
-        background: "#0f0f0f", border: `1px solid #1a1a1a`,
-        borderRadius: 12, padding: 28, maxWidth: 560, width: "100%",
+        background: "#0f0f0f", border: `1px solid #1e1e1e`,
+        borderRadius: 14, padding: 28, maxWidth: 560, width: "100%",
       }}>
         {/* Header */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 16, letterSpacing: -0.5, marginBottom: 4 }}>
-            Crop Image
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: 7, background: `${accent}18`,
+            border: `1px solid ${accent}30`, display: "flex", alignItems: "center",
+            justifyContent: "center", fontSize: 14, flexShrink: 0,
+          }}>
+            ✂️
           </div>
-          <div style={{ fontSize: 10, color: "#555", letterSpacing: 1 }}>
-            {deviceLabel} — drag the highlighted area to reposition
+          <div>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>
+              Crop to fit
+            </div>
+            <div style={{ fontSize: 11, color: "#555", marginTop: 1 }}>
+              {deviceType === "mobile" ? "Portrait · 9:16" : "Landscape · 4:3"} — drag to reposition
+            </div>
           </div>
         </div>
 
@@ -131,9 +144,9 @@ function CropModal({
         <div
           style={{
             position: "relative", width: PREVIEW_W, height: previewH || 270,
-            overflow: "hidden", borderRadius: 8, border: `1px solid #1a1a1a`,
-            cursor: "grab", userSelect: "none", margin: "0 auto 16px",
-            background: "#080808",
+            overflow: "hidden", borderRadius: 10, border: `1px solid #1e1e1e`,
+            cursor: dragging ? "grabbing" : "grab", userSelect: "none",
+            margin: "0 auto 14px", background: "#080808",
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -149,59 +162,43 @@ function CropModal({
               const img = e.currentTarget;
               initCrop(img.naturalWidth, img.naturalHeight);
             }}
-            style={{
-              width: PREVIEW_W, height: previewH || "auto",
-              display: "block", pointerEvents: "none",
-              filter: "brightness(0.35)",
-            }}
+            style={{ width: PREVIEW_W, height: previewH || "auto", display: "block", pointerEvents: "none", filter: "brightness(0.3)" }}
           />
-          {/* Crop highlight box */}
           {cropW > 0 && (
             <div style={{
               position: "absolute",
               left: cropPreviewX, top: cropPreviewY,
               width: cropPreviewW, height: cropPreviewH,
-              border: `2px solid ${YELLOW}`,
-              boxShadow: `0 0 0 9999px rgba(0,0,0,0.55)`,
+              border: `2px solid ${accent}`,
+              boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
               pointerEvents: "none",
             }}>
-              {/* Rule-of-thirds grid */}
               {[1, 2].map(n => (
-                <div key={`h${n}`} style={{
-                  position: "absolute", left: 0, right: 0,
-                  top: `${(n / 3) * 100}%`, height: 1,
-                  background: `${YELLOW}30`,
-                }} />
+                <div key={`h${n}`} style={{ position: "absolute", left: 0, right: 0, top: `${(n / 3) * 100}%`, height: 1, background: `${accent}30` }} />
               ))}
               {[1, 2].map(n => (
-                <div key={`v${n}`} style={{
-                  position: "absolute", top: 0, bottom: 0,
-                  left: `${(n / 3) * 100}%`, width: 1,
-                  background: `${YELLOW}30`,
-                }} />
+                <div key={`v${n}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${(n / 3) * 100}%`, width: 1, background: `${accent}30` }} />
               ))}
             </div>
           )}
         </div>
 
-        {/* Info */}
-        <div style={{ fontSize: 10, color: "#444", letterSpacing: 1, textAlign: "center", marginBottom: 20 }}>
-          CROP SIZE: {cropW} × {cropH}px · RATIO {deviceType === "mobile" ? "9:16 (portrait)" : "4:3 (landscape)"}
+        <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 20, letterSpacing: 0.5 }}>
+          {cropW} × {cropH}px
         </div>
 
-        {/* Actions */}
         <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={handleConfirm}
-            style={{ ...btnStyle, flex: 1, background: YELLOW, color: "#000", border: `1px solid ${YELLOW}`, fontSize: 11 }}
+            style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
           >
-            CONFIRM CROP ↑
+            Confirm crop
           </button>
           <button
             onClick={() => { URL.revokeObjectURL(imgSrc); onCancel(); }}
-            style={{ ...btnStyle, fontSize: 11 }}
+            style={{ ...btnStyle, fontSize: 12 }}
           >
-            CANCEL
+            Cancel
           </button>
         </div>
       </div>
@@ -209,133 +206,146 @@ function CropModal({
   );
 }
 
-// ─── UploadZone ───────────────────────────────────────────────────────────────
-function UploadZone({
+// ─── ThumbnailGrid ────────────────────────────────────────────────────────────
+function ThumbnailGrid({
   deviceType,
   screenshots,
-  uploading,
-  uploadProgress,
-  onFilesSelected,
   onRemove,
   onMove,
 }: {
   deviceType: "mobile" | "desktop";
   screenshots: string[];
-  uploading: boolean;
-  uploadProgress: string;
-  onFilesSelected: (files: File[]) => void;
   onRemove: (idx: number) => void;
   onMove: (idx: number, dir: -1 | 1) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-
   const isMobile = deviceType === "mobile";
-  const label = isMobile ? "MOBILE SCREENSHOTS" : "DESKTOP SCREENSHOTS";
-  const hint = isMobile ? "Portrait · 9:16 ratio" : "Landscape · 4:3 ratio";
-  const aspectRatio = isMobile ? "9/16" : "16/9";
-  const accentColor = isMobile ? "#C084FC" : "#60A5FA"; // purple for mobile, blue for desktop
+  const accent = isMobile ? MOBILE_ACCENT : DESKTOP_ACCENT;
+
+  if (screenshots.length === 0) return null;
 
   return (
-    <div style={{ flex: 1 }}>
-      {/* Zone header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <div style={{
-          fontSize: 9, color: accentColor, letterSpacing: 2,
-          background: `${accentColor}12`, border: `1px solid ${accentColor}30`,
-          padding: "3px 8px", borderRadius: 3,
-        }}>
-          {isMobile ? "📱" : "🖥"} {label}
-        </div>
-        <div style={{ fontSize: 9, color: "#444" }}>{hint}</div>
-        {screenshots.length > 0 && (
-          <div style={{ marginLeft: "auto", fontSize: 9, color: accentColor, background: `${accentColor}12`, border: `1px solid ${accentColor}30`, padding: "2px 8px", borderRadius: 3 }}>
-            {screenshots.length} FILE{screenshots.length > 1 ? "S" : ""}
-          </div>
-        )}
-      </div>
-
-      {/* Thumbnail grid */}
-      {screenshots.length > 0 && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile
-            ? "repeat(auto-fill, minmax(70px, 1fr))"
-            : "repeat(auto-fill, minmax(130px, 1fr))",
-          gap: 6, marginBottom: 8,
-        }}>
-          {screenshots.map((url, i) => (
-            <div key={url + i} style={{
-              position: "relative", borderRadius: 5, overflow: "hidden",
-              border: `1px solid ${i === 0 ? accentColor + "60" : BORDER}`,
-              aspectRatio,
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: isMobile
+        ? "repeat(auto-fill, minmax(72px, 1fr))"
+        : "repeat(auto-fill, minmax(144px, 1fr))",
+      gap: 8,
+      marginBottom: 12,
+    }}>
+      {screenshots.map((url, i) => (
+        <div
+          key={url + i}
+          style={{
+            position: "relative",
+            borderRadius: 8,
+            overflow: "hidden",
+            border: `1px solid ${i === 0 ? accent + "50" : BORDER}`,
+            aspectRatio: isMobile ? "9/16" : "16/9",
+            background: "#0a0a0a",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt={`${deviceType} ${i + 1}`}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+          />
+          {i === 0 && (
+            <div style={{
+              position: "absolute", bottom: 4, left: 4,
+              fontSize: 9, fontWeight: 600, letterSpacing: 0.5,
+              color: accent, background: "rgba(0,0,0,0.88)",
+              border: `1px solid ${accent}30`, padding: "2px 6px", borderRadius: 4,
             }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={url} alt={`${deviceType} ${i + 1}`}
-                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
-              />
-              {i === 0 && (
-                <div style={{
-                  position: "absolute", bottom: 3, left: 3,
-                  fontSize: 7, color: accentColor, background: "rgba(0,0,0,0.9)",
-                  border: `1px solid ${accentColor}40`, padding: "1px 5px", borderRadius: 2, letterSpacing: 1,
-                }}>
-                  HERO
-                </div>
-              )}
-              <div style={{ position: "absolute", top: 3, right: 3, display: "flex", gap: 2 }}>
-                <button
-                  onClick={() => onMove(i, -1)} disabled={i === 0}
-                  style={{ ...btnStyle, fontSize: 8, padding: "1px 4px", background: "rgba(0,0,0,0.85)", opacity: i === 0 ? 0.3 : 1 }}
-                >◀</button>
-                <button
-                  onClick={() => onMove(i, 1)} disabled={i === screenshots.length - 1}
-                  style={{ ...btnStyle, fontSize: 8, padding: "1px 4px", background: "rgba(0,0,0,0.85)", opacity: i === screenshots.length - 1 ? 0.3 : 1 }}
-                >▶</button>
-                <button
-                  onClick={() => onRemove(i)}
-                  style={{ ...btnStyle, fontSize: 8, padding: "1px 4px", background: "rgba(0,0,0,0.85)", border: `1px solid ${RED}`, color: RED }}
-                >✕</button>
-              </div>
+              Hero
             </div>
-          ))}
+          )}
+          <div style={{ position: "absolute", top: 4, right: 4, display: "flex", gap: 3 }}>
+            <button
+              onClick={() => onMove(i, -1)}
+              disabled={i === 0}
+              title="Move left"
+              style={{
+                ...btnStyle, fontSize: 9, padding: "2px 5px",
+                background: "rgba(0,0,0,0.88)", opacity: i === 0 ? 0.25 : 1,
+              }}
+            >◀</button>
+            <button
+              onClick={() => onMove(i, 1)}
+              disabled={i === screenshots.length - 1}
+              title="Move right"
+              style={{
+                ...btnStyle, fontSize: 9, padding: "2px 5px",
+                background: "rgba(0,0,0,0.88)", opacity: i === screenshots.length - 1 ? 0.25 : 1,
+              }}
+            >▶</button>
+            <button
+              onClick={() => onRemove(i)}
+              title="Remove"
+              style={{ ...btnStyle, fontSize: 9, padding: "2px 5px", background: "rgba(0,0,0,0.88)", border: `1px solid ${RED}40`, color: RED }}
+            >✕</button>
+          </div>
         </div>
-      )}
+      ))}
+    </div>
+  );
+}
 
-      {/* Drop zone */}
+// ─── DropZone ─────────────────────────────────────────────────────────────────
+function DropZone({
+  deviceType,
+  uploading,
+  uploadProgress,
+  onFilesSelected,
+}: {
+  deviceType: "mobile" | "desktop";
+  uploading: boolean;
+  uploadProgress: string;
+  onFilesSelected: (files: File[]) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const isMobile = deviceType === "mobile";
+  const accent = isMobile ? MOBILE_ACCENT : DESKTOP_ACCENT;
+  const accentBg = isMobile ? MOBILE_ACCENT_BG : DESKTOP_ACCENT_BG;
+
+  return (
+    <>
       <div
         onClick={() => !uploading && inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => {
-          e.preventDefault(); setDragOver(false);
+          e.preventDefault();
+          setDragOver(false);
           const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
           if (files.length) onFilesSelected(files);
         }}
         style={{
-          border: `1px dashed ${dragOver ? accentColor : BORDER}`,
-          borderRadius: 7, padding: "16px 12px", textAlign: "center",
+          border: `1.5px dashed ${dragOver ? accent : BORDER}`,
+          borderRadius: 10, padding: "28px 20px", textAlign: "center",
           cursor: uploading ? "not-allowed" : "pointer",
-          background: dragOver ? `${accentColor}08` : "transparent",
-          transition: "all 0.2s", opacity: uploading ? 0.6 : 1,
+          background: dragOver ? accentBg : "transparent",
+          transition: "border-color 0.15s, background 0.15s",
+          opacity: uploading ? 0.6 : 1,
         }}
       >
         {uploading ? (
-          <div style={{ fontSize: 10, color: accentColor, letterSpacing: 1 }}>{uploadProgress}</div>
+          <div style={{ fontSize: 12, color: accent, letterSpacing: 0.5 }}>{uploadProgress}</div>
         ) : (
           <>
-            <div style={{ fontSize: 16, marginBottom: 4, color: "#333" }}>↑</div>
-            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1 }}>
-              ADD {isMobile ? "MOBILE" : "DESKTOP"}
+            <div style={{ fontSize: 22, marginBottom: 8, color: "#333" }}>↑</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "#888", marginBottom: 4 }}>
+              {dragOver
+                ? `Drop to upload ${isMobile ? "mobile" : "desktop"} screenshots`
+                : `Add ${isMobile ? "mobile" : "desktop"} screenshots`}
             </div>
-            <div style={{ fontSize: 9, color: "#333", marginTop: 2 }}>
-              Click or drag · Multiple · Max 5MB each
+            <div style={{ fontSize: 11, color: "#444" }}>
+              Click or drag &amp; drop · Multiple allowed · Max 5 MB each
             </div>
           </>
         )}
       </div>
-
       <input
         ref={inputRef}
         type="file"
@@ -348,6 +358,103 @@ function UploadZone({
         }}
         style={{ display: "none" }}
       />
+    </>
+  );
+}
+
+// ─── AutoDetectBanner ─────────────────────────────────────────────────────────
+function AutoDetectBanner({ mobile, desktop }: { mobile: number; desktop: number }) {
+  if (mobile === 0 && desktop === 0) return null;
+
+  let message: string;
+  if (mobile > 0 && desktop > 0) {
+    message = "Both phone + browser mockups will be shown together";
+  } else if (mobile > 0) {
+    message = mobile === 1 ? "1 phone mockup" : `Phone mockup with ${mobile}-image carousel (◀▶)`;
+  } else {
+    message = desktop === 1 ? "1 browser mockup" : `Browser mockup with ${desktop}-image carousel (◀▶)`;
+  }
+
+  return (
+    <div style={{
+      marginTop: 14, padding: "9px 14px",
+      background: "#0a0a0a", border: `1px solid #1a1a1a`,
+      borderRadius: 8, display: "flex", alignItems: "center", gap: 8,
+    }}>
+      <div style={{ fontSize: 11, color: YELLOW, letterSpacing: 0.3, flexShrink: 0 }}>Auto-detect</div>
+      <div style={{ width: 1, height: 10, background: "#222", flexShrink: 0 }} />
+      <div style={{ fontSize: 11, color: "#555" }}>{message}</div>
+    </div>
+  );
+}
+
+// ─── Tab button ───────────────────────────────────────────────────────────────
+function TabButton({
+  label,
+  icon,
+  active,
+  count,
+  accent,
+  accentBg,
+  onClick,
+}: {
+  label: string;
+  icon: string;
+  active: boolean;
+  count: number;
+  accent: string;
+  accentBg: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        ...btnStyle,
+        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+        gap: 7, fontSize: 12, fontWeight: active ? 600 : 400,
+        padding: "9px 16px",
+        background: active ? accentBg : "transparent",
+        border: `1px solid ${active ? accent + "40" : BORDER}`,
+        color: active ? accent : "#555",
+        borderRadius: 8,
+        transition: "all 0.15s",
+      }}
+    >
+      <span style={{ fontSize: 15 }}>{icon}</span>
+      {label}
+      {count > 0 && (
+        <span style={{
+          fontSize: 10, fontWeight: 600, minWidth: 18, height: 16,
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          borderRadius: 99, background: accent + "20", color: accent,
+          padding: "0 5px",
+        }}>
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ─── Hint chips ───────────────────────────────────────────────────────────────
+function HintChips({ deviceType }: { deviceType: "mobile" | "desktop" }) {
+  const isMobile = deviceType === "mobile";
+  const chips = [
+    isMobile ? "Portrait · 9:16" : "Landscape · 4:3",
+    "2+ images → carousel",
+    "Auto-crop on upload",
+  ];
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+      {chips.map(chip => (
+        <div key={chip} style={{
+          fontSize: 10, color: "#555", padding: "3px 9px", borderRadius: 6,
+          background: "#0a0a0a", border: `1px solid #1a1a1a`,
+        }}>
+          {chip}
+        </div>
+      ))}
     </div>
   );
 }
@@ -362,7 +469,6 @@ export function ScreenshotsUpload({
   currentScreenshots: SplitScreenshots | string[];
   onUpdate: (data: SplitScreenshots) => void;
 }) {
-  // Normalise legacy flat array → split format
   const normaliseLegacy = (v: SplitScreenshots | string[]): SplitScreenshots => {
     if (Array.isArray(v)) return { mobile: v, desktop: [] };
     return { mobile: v.mobile ?? [], desktop: v.desktop ?? [] };
@@ -371,11 +477,8 @@ export function ScreenshotsUpload({
   const [screenshots, setScreenshots] = useState<SplitScreenshots>(
     normaliseLegacy(currentScreenshots)
   );
-
-  // Crop queue: files waiting to be cropped before upload
+  const [activeTab, setActiveTab] = useState<"mobile" | "desktop">("mobile");
   const [cropQueue, setCropQueue] = useState<{ file: File; deviceType: "mobile" | "desktop" }[]>([]);
-
-  // Upload state per device
   const [uploading, setUploading] = useState<{ mobile: boolean; desktop: boolean }>({ mobile: false, desktop: false });
   const [uploadProgress, setUploadProgress] = useState<{ mobile: string; desktop: string }>({ mobile: "", desktop: "" });
   const [error, setError] = useState("");
@@ -385,28 +488,26 @@ export function ScreenshotsUpload({
     onUpdate(next);
   };
 
-  // Called when user selects files for a zone — queue them for cropping
   const handleFilesSelected = (files: File[], deviceType: "mobile" | "desktop") => {
     const imageFiles = files.filter(f => f.type.startsWith("image/") && f.size <= 5 * 1024 * 1024);
     const oversized = files.filter(f => f.size > 5 * 1024 * 1024);
-    if (oversized.length) setError(`${oversized.length} file(s) exceed 5MB and were skipped.`);
+    if (oversized.length) setError(`${oversized.length} file(s) exceed 5 MB and were skipped.`);
+    else setError("");
     if (!imageFiles.length) return;
     setCropQueue(imageFiles.map(file => ({ file, deviceType })));
   };
 
-  // Called when user confirms crop for current head of queue
   const handleCropConfirm = async (blob: Blob) => {
     if (!cropQueue.length) return;
     const { deviceType } = cropQueue[0];
-    setCropQueue(q => q.slice(1)); // advance queue
-
+    setCropQueue(q => q.slice(1));
     if (!supabase) return;
+
     setUploading(u => ({ ...u, [deviceType]: true }));
-    setUploadProgress(p => ({ ...p, [deviceType]: "UPLOADING..." }));
+    setUploadProgress(p => ({ ...p, [deviceType]: "Uploading…" }));
     setError("");
 
-    const ext = "webp";
-    const path = `projects/${projectSlug}-${deviceType}-${Date.now()}.${ext}`;
+    const path = `projects/${projectSlug}-${deviceType}-${Date.now()}.webp`;
     const { error: uploadError } = await supabase.storage
       .from("portfolio-images")
       .upload(path, blob, { upsert: true, contentType: "image/webp" });
@@ -431,11 +532,7 @@ export function ScreenshotsUpload({
   const handleCropCancel = () => setCropQueue(q => q.slice(1));
 
   const handleRemove = (deviceType: "mobile" | "desktop", idx: number) => {
-    const next: SplitScreenshots = {
-      ...screenshots,
-      [deviceType]: screenshots[deviceType].filter((_, i) => i !== idx),
-    };
-    update(next);
+    update({ ...screenshots, [deviceType]: screenshots[deviceType].filter((_, i) => i !== idx) });
   };
 
   const handleMove = (deviceType: "mobile" | "desktop", idx: number, dir: -1 | 1) => {
@@ -446,76 +543,86 @@ export function ScreenshotsUpload({
     update({ ...screenshots, [deviceType]: arr });
   };
 
-  // What will be displayed in the mockup preview
-  const totalMobile = screenshots.mobile.length;
-  const totalDesktop = screenshots.desktop.length;
-  const hasBoth = totalMobile > 0 && totalDesktop > 0;
-
   return (
     <div style={{ marginBottom: 24 }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <div style={{ fontSize: 9, color: "#555", letterSpacing: 2 }}>
-          SCREENSHOTS — MOBILE & DESKTOP
+      {/* Section label */}
+      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 14 }}>
+        SCREENSHOTS
+      </div>
+
+      {/* Tab switcher */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 18 }}>
+        <TabButton
+          label="Mobile"
+          icon="📱"
+          active={activeTab === "mobile"}
+          count={screenshots.mobile.length}
+          accent={MOBILE_ACCENT}
+          accentBg={MOBILE_ACCENT_BG}
+          onClick={() => setActiveTab("mobile")}
+        />
+        <TabButton
+          label="Desktop"
+          icon="🖥"
+          active={activeTab === "desktop"}
+          count={screenshots.desktop.length}
+          accent={DESKTOP_ACCENT}
+          accentBg={DESKTOP_ACCENT_BG}
+          onClick={() => setActiveTab("desktop")}
+        />
+      </div>
+
+      {/* Active panel */}
+      {activeTab === "mobile" ? (
+        <div>
+          <HintChips deviceType="mobile" />
+          <ThumbnailGrid
+            deviceType="mobile"
+            screenshots={screenshots.mobile}
+            onRemove={(idx) => handleRemove("mobile", idx)}
+            onMove={(idx, dir) => handleMove("mobile", idx, dir)}
+          />
+          <DropZone
+            deviceType="mobile"
+            uploading={uploading.mobile}
+            uploadProgress={uploadProgress.mobile}
+            onFilesSelected={(files) => handleFilesSelected(files, "mobile")}
+          />
         </div>
-        {(totalMobile > 0 || totalDesktop > 0) && (
-          <div style={{ fontSize: 9, color: "#444" }}>
-            AUTO-DETECT: {
-              hasBoth ? "BOTH MOCKUPS"
-                : totalMobile > 0 ? "MOBILE ONLY"
-                  : "DESKTOP ONLY"
-            }
-          </div>
-        )}
-      </div>
+      ) : (
+        <div>
+          <HintChips deviceType="desktop" />
+          <ThumbnailGrid
+            deviceType="desktop"
+            screenshots={screenshots.desktop}
+            onRemove={(idx) => handleRemove("desktop", idx)}
+            onMove={(idx, dir) => handleMove("desktop", idx, dir)}
+          />
+          <DropZone
+            deviceType="desktop"
+            uploading={uploading.desktop}
+            uploadProgress={uploadProgress.desktop}
+            onFilesSelected={(files) => handleFilesSelected(files, "desktop")}
+          />
+        </div>
+      )}
 
-      {/* Smart display hint */}
-      <div style={{
-        background: "#0a0a0a", border: `1px solid #1a1a1a`,
-        borderRadius: 8, padding: "10px 14px", marginBottom: 14,
-        display: "flex", gap: 16, flexWrap: "wrap",
-      }}>
-        {[
-          { label: "1 mobile", hint: "1 phone mockup" },
-          { label: "2+ mobile", hint: "1 phone + arrows ◀▶" },
-          { label: "1 desktop", hint: "1 browser mockup" },
-          { label: "2+ desktop", hint: "1 browser + arrows ◀▶" },
-          { label: "both", hint: "desktop + mobile shown together" },
-        ].map(({ label, hint }) => (
-          <div key={label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 9, color: YELLOW, letterSpacing: 1 }}>{label.toUpperCase()}</span>
-            <span style={{ fontSize: 9, color: "#333" }}>→</span>
-            <span style={{ fontSize: 9, color: "#555" }}>{hint}</span>
-          </div>
-        ))}
-      </div>
+      {/* Error */}
+      {error && (
+        <div style={{ fontSize: 11, color: RED, marginTop: 10 }}>{error}</div>
+      )}
 
-      {/* Two upload zones side by side */}
-      <div style={{ display: "flex", gap: 12 }}>
-        <UploadZone
-          deviceType="mobile"
-          screenshots={screenshots.mobile}
-          uploading={uploading.mobile}
-          uploadProgress={uploadProgress.mobile}
-          onFilesSelected={(files) => handleFilesSelected(files, "mobile")}
-          onRemove={(idx) => handleRemove("mobile", idx)}
-          onMove={(idx, dir) => handleMove("mobile", idx, dir)}
-        />
-        <div style={{ width: 1, background: BORDER, flexShrink: 0 }} />
-        <UploadZone
-          deviceType="desktop"
-          screenshots={screenshots.desktop}
-          uploading={uploading.desktop}
-          uploadProgress={uploadProgress.desktop}
-          onFilesSelected={(files) => handleFilesSelected(files, "desktop")}
-          onRemove={(idx) => handleRemove("desktop", idx)}
-          onMove={(idx, dir) => handleMove("desktop", idx, dir)}
-        />
-      </div>
+      {/* Auto-detect banner */}
+      <AutoDetectBanner mobile={screenshots.mobile.length} desktop={screenshots.desktop.length} />
 
-      {error && <div style={{ fontSize: 10, color: RED, marginTop: 8 }}>{error}</div>}
+      {/* Crop queue progress */}
+      {cropQueue.length > 1 && (
+        <div style={{ fontSize: 10, color: "#444", marginTop: 8, textAlign: "center", letterSpacing: 0.5 }}>
+          {cropQueue.length - 1} more image{cropQueue.length > 2 ? "s" : ""} queued after this
+        </div>
+      )}
 
-      {/* Crop modal — processes one file at a time from the queue */}
+      {/* Crop modal */}
       {cropQueue.length > 0 && (
         <CropModal
           file={cropQueue[0].file}
@@ -523,13 +630,6 @@ export function ScreenshotsUpload({
           onConfirm={handleCropConfirm}
           onCancel={handleCropCancel}
         />
-      )}
-
-      {/* Queue progress indicator */}
-      {cropQueue.length > 1 && (
-        <div style={{ fontSize: 9, color: "#555", marginTop: 6, letterSpacing: 1, textAlign: "center" }}>
-          {cropQueue.length - 1} MORE IMAGE{cropQueue.length > 2 ? "S" : ""} TO CROP AFTER THIS
-        </div>
       )}
     </div>
   );
