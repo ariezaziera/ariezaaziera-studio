@@ -81,11 +81,11 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {projects.map((p) => {
-            const hasScreenshots = p.screenshots && (
-  Array.isArray(p.screenshots)
-    ? p.screenshots.length > 0
-    : p.screenshots.mobile.length > 0 || p.screenshots.desktop.length > 0
-);
+            const screenshotCount = !p.screenshots ? 0
+              : Array.isArray(p.screenshots)
+                ? p.screenshots.length
+                : p.screenshots.mobile.length + p.screenshots.desktop.length;
+            const hasScreenshots = screenshotCount > 0;
             const hasGithub = !!p.github_url;
             const hasLive = !!p.live_url;
             const hasVideo = !!p.video_url;
@@ -98,7 +98,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                       <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14 }}>{p.title}</div>
                       {p.featured && <span style={{ fontSize: 8, color: YELLOW, background: YELLOW + "15", border: `1px solid ${YELLOW}30`, padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>FEATURED</span>}
-                      {hasScreenshots && <span style={{ fontSize: 8, color: GREEN, background: GREEN + "15", border: `1px solid ${GREEN}30`, padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>{p.screenshots!.length} SHOTS</span>}
+                      {hasScreenshots && <span style={{ fontSize: 8, color: GREEN, background: GREEN + "15", border: `1px solid ${GREEN}30`, padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>{screenshotCount} SHOTS</span>}
                       {hasGithub && <span style={{ fontSize: 8, color: "#aaa", background: "#ffffff10", border: "1px solid #333", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>GH</span>}
                       {hasLive && <span style={{ fontSize: 8, color: "#60A5FA", background: "#60A5FA15", border: "1px solid #60A5FA30", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>LIVE</span>}
                       {hasVideo && <span style={{ fontSize: 8, color: "#C084FC", background: "#C084FC15", border: "1px solid #C084FC30", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>VIDEO</span>}
