@@ -40,9 +40,10 @@ function CaseSection({ label, content, color, index }: { label: string; content:
 }
 
 // ─── MobileMockup ────────────────────────────────────────────────────────────
-// Actual PNG: 1502x2948 → ratio w/h = 0.5095
-// Screen inset: top 11%, bottom 4%, left 6.8%, right 6.8%
-const PHONE_RATIO = 0.5095;
+// Generic.png: 271×441 → ratio w/h = 0.6145
+// No notch — full screen phone (iPhone 14 style)
+// Screen inset: top 3.5%, bottom 3.5%, left 4.5%, right 4.5%
+const PHONE_RATIO = 271 / 441; // 0.6145
 
 function MobileMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
   const { ref, visible } = useReveal(0.05);
@@ -76,31 +77,58 @@ function MobileMockup({ src, color, delay = 0, width }: { src: string; color: st
         filter: `drop-shadow(0 24px 48px rgba(0,0,0,0.55)) drop-shadow(0 0 28px ${color}20)`,
       }}
     >
+      {/* Screen content — inset tepat untuk Generic.png (no notch) */}
       <div style={{
         position: "absolute",
-        top: "11%", bottom: "4%", left: "6.8%", right: "6.8%",
-        borderRadius: "7% / 5%",
+        top: "3.5%",
+        bottom: "3.5%",
+        left: "4.5%",
+        right: "4.5%",
+        borderRadius: "8% / 6%",
         overflow: "hidden",
         background: "#0a0a0a",
         zIndex: 1,
       }}>
         {src ? (
-          <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+          <img
+            src={src}
+            alt="App screenshot"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top center",
+              display: "block",
+              verticalAlign: "top",
+            }}
+          />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#111" }}>
             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333" }}>SCREENSHOT</span>
           </div>
         )}
       </div>
-      <img src="/mockup-mobile.png" alt="iPhone frame"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
+      {/* Phone frame — Generic.png */}
+      <img
+        src="/mockup-mobile.png"
+        alt="Phone frame"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      />
     </div>
   );
 }
 
 // ─── DesktopMockup ───────────────────────────────────────────────────────────
-// Actual PNG: 4096x3090 → ratio w/h = 1.3256
-// Screen inset: top 3.5%, bottom 16.5% (stand), left 2.3%, right 2.3%
+// mockup-desktop.png: 4096×3090 → ratio w/h = 1.3256
+// Screen inset: top 3.2%, bottom 18.8% (stand), left 2.8%, right 2.8%
 const DESKTOP_RATIO = 1.3256;
 
 function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
@@ -135,23 +163,49 @@ function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: s
         filter: `drop-shadow(0 24px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px ${color}15)`,
       }}
     >
+      {/* Screen content — inset tepat untuk desktop mockup */}
       <div style={{
         position: "absolute",
-        top: "3.5%", bottom: "16.5%", left: "2.3%", right: "2.3%",
+        top: "3.2%",
+        bottom: "18.8%",
+        left: "2.8%",
+        right: "2.8%",
         overflow: "hidden",
         background: "#0a0a0a",
         zIndex: 1,
       }}>
         {src ? (
-          <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+          <img
+            src={src}
+            alt="App screenshot"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top center",
+              display: "block",
+            }}
+          />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f" }}>
             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
           </div>
         )}
       </div>
-      <img src="/mockup-desktop.png" alt="Desktop frame"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
+      {/* Desktop frame */}
+      <img
+        src="/mockup-desktop.png"
+        alt="Desktop frame"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      />
     </div>
   );
 }
@@ -172,28 +226,28 @@ function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screen
 
   const isMobileScreen = containerW < 600;
 
-  // ── Desktop layout: side by side ──
-  // Total widths must fit inside containerW with a gap.
-  // Desktop device : Phone device ≈ 70 : 30 split of (containerW - gap)
   const gap = 20;
   const desktopW = isMobileScreen ? containerW : Math.floor((containerW - gap) * 0.70);
   const desktopH = Math.round(desktopW / DESKTOP_RATIO);
 
-  // Phone height must match desktop height → derive phone width from that height
+  // Phone height matches desktop height → derive phone width from that
   const phoneH = desktopH;
   const phoneW = isMobileScreen ? Math.floor(containerW * 0.55) : Math.round(phoneH * PHONE_RATIO);
 
   return (
-    <div ref={wrapperRef} style={{
-      width: "100%",
-      display: "flex",
-      flexDirection: isMobileScreen ? "column" : "row",
-      alignItems: "flex-end",
-      justifyContent: "center",
-      gap,
-    }}>
-      <DesktopMockup src={heroShot}                   color={color} delay={0.1} width={desktopW} />
-      <MobileMockup  src={screenshots[1] ?? heroShot} color={color} delay={0.3} width={phoneW} />
+    <div
+      ref={wrapperRef}
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: isMobileScreen ? "column" : "row",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        gap,
+      }}
+    >
+      <DesktopMockup src={heroShot} color={color} delay={0.1} width={desktopW} />
+      <MobileMockup src={screenshots[1] ?? heroShot} color={color} delay={0.3} width={phoneW} />
     </div>
   );
 }
@@ -217,8 +271,11 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
             key={i}
             onClick={() => setLightbox(src)}
             style={{
-              borderRadius: 8, overflow: "hidden", cursor: "zoom-in",
-              border: `1px solid ${BORDER}`, aspectRatio: "16/9",
+              borderRadius: 8,
+              overflow: "hidden",
+              cursor: "zoom-in",
+              border: `1px solid ${BORDER}`,
+              aspectRatio: "16/9",
               opacity: visible ? 1 : 0,
               transform: visible ? "none" : "translateY(24px) scale(0.96)",
               transition: `all 0.6s ${i * 0.08}s cubic-bezier(0.22,1,0.36,1)`,
@@ -385,10 +442,10 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
   }, []);
 
   const sections = [
-    { label: "Context", content: project.context },
-    { label: "Problem", content: project.problem },
+    { label: "Context",  content: project.context  },
+    { label: "Problem",  content: project.problem  },
     { label: "Solution", content: project.solution },
-    { label: "Outcome", content: project.outcome },
+    { label: "Outcome",  content: project.outcome  },
   ];
 
   return (
@@ -396,63 +453,76 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
       <style>{`
         @keyframes mobileFloat {
           0%, 100% { transform: perspective(900px) translateY(0px); }
-          50% { transform: perspective(900px) translateY(-8px); }
+          50%       { transform: perspective(900px) translateY(-8px); }
         }
         @keyframes desktopFloat {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
+          50%       { transform: translateY(-5px); }
         }
         @keyframes pulseDot {
           0%, 100% { opacity: 0.6; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.4); }
+          50%       { opacity: 1;   transform: scale(1.4); }
         }
         @keyframes playPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.2); }
-          50% { box-shadow: 0 0 0 20px rgba(255,255,255,0); }
+          0%, 100% { box-shadow: 0 0 0 0   rgba(255,255,255,0.2); }
+          50%       { box-shadow: 0 0 0 20px rgba(255,255,255,0);   }
         }
         @keyframes lightboxIn {
           from { opacity: 0; }
-          to { opacity: 1; }
+          to   { opacity: 1; }
         }
         @keyframes lightboxImgIn {
           from { opacity: 0; transform: scale(0.94); }
-          to { opacity: 1; transform: scale(1); }
+          to   { opacity: 1; transform: scale(1);    }
         }
         @keyframes heroSlideUp {
           from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
+          to   { opacity: 1; transform: translateY(0);    }
         }
         @keyframes heroFadeIn {
           from { opacity: 0; }
-          to { opacity: 1; }
+          to   { opacity: 1; }
         }
         @keyframes badgeBounce {
-          0% { opacity: 0; transform: translateY(10px) scale(0.9); }
-          70% { transform: translateY(-3px) scale(1.04); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
+          0%   { opacity: 0; transform: translateY(10px) scale(0.9);  }
+          70%  {             transform: translateY(-3px) scale(1.04); }
+          100% { opacity: 1; transform: translateY(0)    scale(1);    }
         }
         @keyframes glowPulse {
           0%, 100% { opacity: 0.12; }
-          50% { opacity: 0.22; }
+          50%       { opacity: 0.22; }
         }
       `}</style>
 
       {/* Scroll progress bar */}
-      <div style={{ position: "fixed", top: 64, left: 0, height: 2, background: project.color, width: `${scrollPct}%`, zIndex: 99, transition: "width 0.1s linear", boxShadow: `0 0 8px ${project.color}88` }} />
+      <div style={{
+        position: "fixed", top: 64, left: 0, height: 2,
+        background: project.color, width: `${scrollPct}%`,
+        zIndex: 99, transition: "width 0.1s linear",
+        boxShadow: `0 0 8px ${project.color}88`,
+      }} />
 
-      <div style={{ maxWidth: 1100, marginTop: "-50px", margin: "0 auto", padding: "100px clamp(20px,6vw,40px) 80px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "100px clamp(20px,6vw,40px) 80px" }}>
 
         {/* Back button */}
         <button
           onClick={() => setActivePage("projects")}
-          style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 48, padding: 0, display: "flex", alignItems: "center", gap: 8, opacity: heroVisible ? 1 : 0, transform: heroVisible ? "none" : "translateX(-12px)", transition: "all 0.6s 0.05s ease" }}
+          style={{
+            fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)",
+            color: "#555", background: "none", border: "none", cursor: "pointer",
+            letterSpacing: 1, marginBottom: 48, padding: 0,
+            display: "flex", alignItems: "center", gap: 8,
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? "none" : "translateX(-12px)",
+            transition: "all 0.6s 0.05s ease",
+          }}
           onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = project.color; }}
           onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = "#555"; }}
         >
           ← ALL PROJECTS
         </button>
 
-        {/* ── HERO ─────────────────────────────────────────────────────────── */}
+        {/* ── HERO ── */}
         <div style={{ marginBottom: 56 }}>
           <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", opacity: heroVisible ? 1 : 0, animation: heroVisible ? "badgeBounce 0.6s 0.1s both" : "none" }}>
             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: project.color, background: project.color + "15", padding: "4px 10px", borderRadius: 3, border: `1px solid ${project.color}30`, letterSpacing: 1 }}>CASE STUDY</span>
@@ -482,21 +552,29 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           <ProjectLinks githubUrl={project.github_url} liveUrl={project.live_url} color={project.color} visible={heroVisible} />
         </div>
 
-        {/* ── MOCKUP HERO ───────────────────────────────────────────────────── */}
+        {/* ── MOCKUP HERO ── */}
         <div style={{ marginBottom: 64, position: "relative", maxWidth: 900, margin: "0 auto 64px" }}>
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "40%", height: "60%", background: `radial-gradient(circle, ${project.color}15 0%, transparent 70%)`, animation: "glowPulse 3s ease-in-out infinite", pointerEvents: "none", zIndex: 0 }} />
+          {/* Glow background */}
+          <div style={{
+            position: "absolute", top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "40%", height: "60%",
+            background: `radial-gradient(circle, ${project.color}15 0%, transparent 70%)`,
+            animation: "glowPulse 3s ease-in-out infinite",
+            pointerEvents: "none", zIndex: 0,
+          }} />
 
           {mockupType === "mobile" && (
             <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", position: "relative", zIndex: 1 }}>
-              <MobileMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * 0.5095)} />
-              {screenshots[1] && <MobileMockup src={screenshots[1]} color={project.color} delay={0.25} width={Math.round(460 * 0.5095)} />}
-              {screenshots[2] && <MobileMockup src={screenshots[2]} color={project.color} delay={0.4} width={Math.round(460 * 0.5095)} />}
+              <MobileMockup src={heroShot}            color={project.color} delay={0.10} width={Math.round(460 * PHONE_RATIO)} />
+              {screenshots[1] && <MobileMockup src={screenshots[1]} color={project.color} delay={0.25} width={Math.round(460 * PHONE_RATIO)} />}
+              {screenshots[2] && <MobileMockup src={screenshots[2]} color={project.color} delay={0.40} width={Math.round(460 * PHONE_RATIO)} />}
             </div>
           )}
 
           {mockupType === "desktop" && (
             <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}>
-              <DesktopMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * 1.3256)} />
+              <DesktopMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * DESKTOP_RATIO)} />
             </div>
           )}
 
@@ -505,26 +583,36 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           )}
         </div>
 
-        {/* ── VIDEO PROMO ───────────────────────────────────────────────────── */}
+        {/* ── VIDEO PROMO ── */}
         {project.video_url && (
           <div style={{ maxWidth: 900, margin: "0 auto 64px" }}>
             <VideoPromo videoUrl={project.video_url} color={project.color} title={project.title} />
           </div>
         )}
 
-        {/* ── STEP PROGRESS ─────────────────────────────────────────────────── */}
+        {/* ── STEP PROGRESS ── */}
         <div style={{ display: "flex", gap: 4, marginBottom: 48, overflowX: "auto", paddingBottom: 4 }}>
           {steps.map((s, i) => (
             <div key={s} style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", padding: "5px 10px", borderRadius: 3, background: i <= activeStep ? project.color : CARD_BG, color: i <= activeStep ? "#000" : "#555", border: `1px solid ${i <= activeStep ? project.color : BORDER}`, fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap", transition: "all 0.4s ease" }}>
+              <div style={{
+                fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)",
+                padding: "5px 10px", borderRadius: 3,
+                background: i <= activeStep ? project.color : CARD_BG,
+                color:      i <= activeStep ? "#000"          : "#555",
+                border:     `1px solid ${i <= activeStep ? project.color : BORDER}`,
+                fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap",
+                transition: "all 0.4s ease",
+              }}>
                 {s.toUpperCase()}
               </div>
-              {i < steps.length - 1 && <div style={{ width: 16, height: 1, background: i < activeStep ? project.color : BORDER, transition: "background 0.4s", flexShrink: 0 }} />}
+              {i < steps.length - 1 && (
+                <div style={{ width: 16, height: 1, background: i < activeStep ? project.color : BORDER, transition: "background 0.4s", flexShrink: 0 }} />
+              )}
             </div>
           ))}
         </div>
 
-        {/* ── TECH STACK ────────────────────────────────────────────────────── */}
+        {/* ── TECH STACK ── */}
         <div style={{ background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "16px 20px", marginBottom: 48, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: "#555", letterSpacing: 2, flexShrink: 0 }}>TECH</div>
           <div style={{ flex: 1, height: 1, background: BORDER, minWidth: 20 }} />
@@ -539,28 +627,28 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           </div>
         </div>
 
-        {/* ── CASE SECTIONS ─────────────────────────────────────────────────── */}
+        {/* ── CASE SECTIONS ── */}
         {sections.map((sec, i) => (
           <CaseSection key={i} label={sec.label} content={sec.content} color={project.color} index={i} />
         ))}
 
-        {/* ── SCREENSHOT GALLERY ───────────────────────────────────────────── */}
+        {/* ── SCREENSHOT GALLERY ── */}
         {galleryShots.length > 0 && (
           <div style={{ marginTop: 64, marginBottom: 64 }}>
             <ScreenshotGallery screenshots={galleryShots} color={project.color} />
           </div>
         )}
 
-        {/* ── CTA ───────────────────────────────────────────────────────────── */}
-        <div style={{ 
-          marginTop: 64, 
-          marginBottom: 0,   // <-- tambah ni
-          padding: "clamp(24px,5vw,40px)", 
-          background: CARD_BG, 
-          border: `1px solid ${BORDER}`, 
-          borderRadius: 12, 
-          textAlign: "center", 
-          boxShadow: `0 0 60px ${project.color}08` 
+        {/* ── CTA ── */}
+        <div style={{
+          marginTop: 64,
+          marginBottom: 0,
+          padding: "clamp(24px,5vw,40px)",
+          background: CARD_BG,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 12,
+          textAlign: "center",
+          boxShadow: `0 0 60px ${project.color}08`,
         }}>
           <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(18px,4vw,24px)", marginBottom: 12 }}>Interested in working together?</div>
           <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(12px,1.6vw,14px)", color: "#666", marginBottom: 28 }}>Let's build something real.</p>
@@ -584,6 +672,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
             )}
           </div>
         </div>
+
       </div>
     </div>
   );
