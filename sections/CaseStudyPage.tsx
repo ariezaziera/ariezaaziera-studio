@@ -476,7 +476,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
       {/* Scroll progress bar */}
       <div style={{ position: "fixed", top: 64, left: 0, height: 2, background: project.color, width: `${scrollPct}%`, zIndex: 99, transition: "width 0.1s linear", boxShadow: `0 0 8px ${project.color}88` }} />
 
-      <div style={{ maxWidth: 1100, marginTop: "-50px", margin: "0 auto", padding: "100px clamp(20px,6vw,40px) 80px" }}>
+      <div style={{ maxWidth: 1100, marginTop: "-80px", margin: "0 auto", padding: "100px, clamp(20px,6vw,40px) 80px", paddingTop: "80px" }}>
 
         {/* Back button */}
         <button
