@@ -80,10 +80,10 @@ function MobileMockup({ src, color, delay = 0, width }: { src: string; color: st
       {/* Screen content — inset tepat untuk Generic.png (no notch) */}
       <div style={{
         position: "absolute",
-        top: "3.5%",
-        bottom: "3.5%",
-        left: "4.5%",
-        right: "4.5%",
+        top: "1.5%",
+        bottom: "1.5%",
+        left: "8.5%",
+        right: "8.5%",
         borderRadius: "8% / 6%",
         overflow: "hidden",
         background: "#0a0a0a",
@@ -167,7 +167,7 @@ function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: s
       <div style={{
         position: "absolute",
         top: "3.2%",
-        bottom: "18.8%",
+        bottom: "28.8%",
         left: "2.8%",
         right: "2.8%",
         overflow: "hidden",
