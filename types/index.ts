@@ -1,3 +1,5 @@
+import type { SplitScreenshots } from "@/app/admin/components/ScreenshotsUpload";
+
 export interface Project {
   id: number;
   slug: string;
@@ -13,10 +15,20 @@ export interface Project {
   solution: string;
   outcome: string;
   image_url?: string;
-  // New media fields
-  screenshots?: string[];          // Array of image URLs
-  mockup_type?: "mobile" | "desktop" | "both";  // Which device frame to show
-  video_url?: string;              // Promo video URL (YouTube, direct mp4, etc)
-  github_url?: string;             // GitHub repo link
-  live_url?: string;               // Deployed/live URL
+
+  // ── Media ────────────────────────────────────────────
+  // New split format: { mobile: string[], desktop: string[] }
+  // Legacy: flat string[] (treated as mobile-only on read)
+  screenshots?: SplitScreenshots | string[];
+
+  // mockup_type is now auto-derived from screenshots content.
+  // Kept for backward compatibility but no longer manually set.
+  mockup_type?: "mobile" | "desktop" | "both";
+
+  video_url?: string;
+  github_url?: string;
+  live_url?: string;
 }
+
+// Re-export for convenience
+export type { SplitScreenshots };
