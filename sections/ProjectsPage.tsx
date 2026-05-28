@@ -19,7 +19,7 @@ export default function ProjectsPage({ setActivePage, setActiveProject }: Projec
   const filtered = filter === "All" ? projects : projects.filter((p) => p.type === filter);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "100px clamp(20px, 6vw, 40px) 80px", maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", maxWidth: 1100, margin: "0 auto", padding: "clamp(20px,6vw,40px)", paddingTop: "clamp(80px, 10vw, 100px)" }}>
       <button
         onClick={() => setActivePage("home")}
         style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 40, padding: 0, display: "flex", alignItems: "center", gap: 8 }}
