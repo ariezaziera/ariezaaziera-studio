@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { YELLOW, BORDER, GREEN, RED, btnStyle } from "../layout";
+import type { SplitScreenshots } from "@/types/split-screenshots";
 
 // ─── Crop aspect ratios per device ───────────────────────────────────────────
 const CROP_RATIOS = {
