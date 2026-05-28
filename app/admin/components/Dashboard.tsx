@@ -81,7 +81,11 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {projects.map((p) => {
-            const hasScreenshots = p.screenshots && p.screenshots.length > 0;
+            const hasScreenshots = p.screenshots && (
+  Array.isArray(p.screenshots)
+    ? p.screenshots.length > 0
+    : p.screenshots.mobile.length > 0 || p.screenshots.desktop.length > 0
+);
             const hasGithub = !!p.github_url;
             const hasLive = !!p.live_url;
             const hasVideo = !!p.video_url;
