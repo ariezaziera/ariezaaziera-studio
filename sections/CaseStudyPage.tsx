@@ -45,12 +45,12 @@ function CaseSection({ label, content, color, index }: { label: string; content:
 const PHONE_W_RATIO = 0.468;
 const PHONE_SCREEN = { top: "11%", bottom: "4%", left: "6.8%", right: "6.8%" };
 
-function MobileMockup({ src, color, delay = 0, fixedHeight }: { src: string; color: string; delay?: number; fixedHeight?: number }) {
+function MobileMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src: string; color: string; delay?: number; fixedHeight?: number; fixedWidth?: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const h = fixedHeight ?? 480;
-  const w = h * PHONE_W_RATIO;
+  const w = fixedWidth ?? (h * PHONE_W_RATIO);
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -116,12 +116,12 @@ function MobileMockup({ src, color, delay = 0, fixedHeight }: { src: string; col
 const DESKTOP_W_RATIO = 1.415;
 const DESKTOP_SCREEN = { top: "3.5%", bottom: "16.5%", left: "2.3%", right: "2.3%" };
 
-function DesktopMockup({ src, color, delay = 0, fixedHeight }: { src: string; color: string; delay?: number; fixedHeight?: number }) {
+function DesktopMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src: string; color: string; delay?: number; fixedHeight?: number; fixedWidth?: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const h = fixedHeight ?? 480;
-  const w = h * DESKTOP_W_RATIO;
+  const w = fixedWidth ?? (h * DESKTOP_W_RATIO);
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -181,7 +181,6 @@ function DesktopMockup({ src, color, delay = 0, fixedHeight }: { src: string; co
 }
 
 // ─── BothMockup ──────────────────────────────────────────────────────────────
-// Both share the same fixedHeight so they're always equal height on every screen.
 function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screenshots: string[]; color: string }) {
   const [screenW, setScreenW] = useState(1024);
 
@@ -194,28 +193,36 @@ function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screen
 
   const isMobileScreen = screenW < 768;
 
-  // Shared height — scales with viewport, capped sensibly
-  // On mobile stack them so each gets full width; use a smaller height
-  const sharedHeight = isMobileScreen
-    ? Math.min(screenW * 0.75, 360)          // mobile: 75vw, max 360px
-    : Math.min((screenW - 120) * 0.38, 440); // desktop: ~38% of available width, max 440px
+  // Width-first: work within the container (max 1100px - ~80px padding = ~1020px usable)
+  const usableW = Math.min(screenW - 80, 1020);
 
-  // Derive widths from the shared height
-  const desktopW = sharedHeight * DESKTOP_W_RATIO;
-  const phoneW   = sharedHeight * PHONE_W_RATIO;
+  // Desktop: 68% of usable width. Phone: remaining ~26%. On mobile, stack full-width.
+  const desktopW = isMobileScreen ? usableW : Math.floor(usableW * 0.68);
+  const phoneW   = isMobileScreen ? Math.floor(usableW * 0.55) : Math.floor(usableW * 0.26);
+
+  // Heights derived from widths via each device's natural PNG ratio
+  const desktopH = Math.floor(desktopW / DESKTOP_W_RATIO);
+  const phoneH   = Math.floor(phoneW   / PHONE_W_RATIO);
+
+  // Use the smaller height so both align perfectly
+  const sharedH       = Math.min(desktopH, phoneH);
+  const finalDesktopW = Math.floor(sharedH * DESKTOP_W_RATIO);
+  const finalPhoneW   = Math.floor(sharedH * PHONE_W_RATIO);
 
   return (
     <div style={{
       position: "relative",
       zIndex: 1,
+      width: "100%",
+      overflow: "hidden",
       display: "flex",
       flexDirection: isMobileScreen ? "column" : "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: isMobileScreen ? 40 : 24,
+      gap: isMobileScreen ? 40 : 20,
     }}>
-      <DesktopMockup src={heroShot} color={color} delay={0.1} fixedHeight={sharedHeight} />
-      <MobileMockup  src={screenshots[1] ?? heroShot} color={color} delay={0.3} fixedHeight={sharedHeight} />
+      <DesktopMockup src={heroShot}                   color={color} delay={0.1} fixedWidth={finalDesktopW} fixedHeight={sharedH} />
+      <MobileMockup  src={screenshots[1] ?? heroShot} color={color} delay={0.3} fixedWidth={finalPhoneW}   fixedHeight={sharedH} />
     </div>
   );
 }
