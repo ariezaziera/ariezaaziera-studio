@@ -620,25 +620,16 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
   );
 }
 
-function VideoPromo({
-  videoUrl,
-  color,
-  title,
-}: {
-  videoUrl: string;
-  color: string;
-  title: string;
-}) {
+function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: string; title: string }) {
   const { ref, visible } = useReveal(0.05);
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const isYouTube = videoUrl.includes("youtube") || videoUrl.includes("youtu.be");
   const getYtEmbed = (url: string) => {
-    const match = url.match(/(?:v=|youtu.be/)([^&?/]+)/);
+    const match = url.match(/(?:v=|youtu.be\/)([^&?/]+)/);
     return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0` : url;
   };
-
   return (
     <div
       ref={ref}
