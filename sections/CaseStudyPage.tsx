@@ -4,13 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, CARD_BG, BORDER } from "@/constants";
 import type { Project } from "@/types";
+import type { SplitScreenshots } from "@/app/admin/components/ScreenshotsUpload";
 
 interface CaseStudyPageProps {
   project: Project;
   setActivePage: (page: string) => void;
 }
 
-// ─── Scroll-reveal hook ──────────────────────────────────────────────────────
+// ─── Scroll-reveal hook ────────────────────────────────────────────────────────
 function useReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -25,7 +26,14 @@ function useReveal(threshold = 0.1) {
   return { ref, visible };
 }
 
-// ─── CaseSection ─────────────────────────────────────────────────────────────
+// ─── normScreenshots helper ────────────────────────────────────────────────────
+function normScreenshots(raw: SplitScreenshots | string[] | undefined): SplitScreenshots {
+  if (!raw) return { mobile: [], desktop: [] };
+  if (Array.isArray(raw)) return { mobile: raw, desktop: [] };
+  return { mobile: raw.mobile ?? [], desktop: raw.desktop ?? [] };
+}
+
+// ─── CaseSection ──────────────────────────────────────────────────────────────
 function CaseSection({ label, content, color, index }: { label: string; content: string; color: string; index: number }) {
   const { ref, visible } = useReveal();
   return (
@@ -39,16 +47,67 @@ function CaseSection({ label, content, color, index }: { label: string; content:
   );
 }
 
-// ─── MobileMockup ────────────────────────────────────────────────────────────
-// Generic.png: 271×441 → ratio w/h = 0.6145
-// No notch — full screen phone (iPhone 14 style)
-// Screen inset: top 3.5%, bottom 3.5%, left 4.5%, right 4.5%
-const PHONE_RATIO = 271 / 441; // 0.6145
+// ─── Arrow Nav ────────────────────────────────────────────────────────────────
+function ArrowNav({
+  index, total, color, onPrev, onNext, orientation,
+}: {
+  index: number; total: number; color: string;
+  onPrev: () => void; onNext: () => void;
+  orientation: "horizontal" | "vertical";
+}) {
+  if (total <= 1) return null;
 
-function MobileMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
+  const btnBase: React.CSSProperties = {
+    position: "absolute", zIndex: 10,
+    background: "rgba(0,0,0,0.70)", border: `1px solid ${color}40`, color: "#fff",
+    borderRadius: "50%", width: 32, height: 32,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    cursor: "pointer", fontSize: 14, transition: "all 0.2s",
+    userSelect: "none" as const,
+  };
+
+  if (orientation === "horizontal") {
+    return (
+      <>
+        <button onClick={(e) => { e.stopPropagation(); onPrev(); }} disabled={index === 0}
+          style={{ ...btnBase, left: -44, top: "50%", transform: "translateY(-50%)", opacity: index === 0 ? 0.2 : 1 }}>‹</button>
+        <button onClick={(e) => { e.stopPropagation(); onNext(); }} disabled={index === total - 1}
+          style={{ ...btnBase, right: -44, top: "50%", transform: "translateY(-50%)", opacity: index === total - 1 ? 0.2 : 1 }}>›</button>
+        <div style={{ position: "absolute", bottom: -24, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 10 }}>
+          {Array.from({ length: total }).map((_, i) => (
+            <div key={i} style={{ width: i === index ? 16 : 5, height: 5, borderRadius: 3, background: i === index ? color : "#333", transition: "all 0.25s", cursor: "pointer" }}
+              onClick={() => i < index ? onPrev() : onNext()} />
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <button onClick={(e) => { e.stopPropagation(); onPrev(); }} disabled={index === 0}
+        style={{ ...btnBase, top: -44, left: "50%", transform: "translateX(-50%)", opacity: index === 0 ? 0.2 : 1 }}>‹</button>
+      <button onClick={(e) => { e.stopPropagation(); onNext(); }} disabled={index === total - 1}
+        style={{ ...btnBase, bottom: -44, left: "50%", transform: "translateX(-50%)", opacity: index === total - 1 ? 0.2 : 1 }}>›</button>
+      <div style={{ position: "absolute", right: -18, top: "50%", transform: "translateY(-50%)", display: "flex", flexDirection: "column", gap: 5, zIndex: 10 }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} style={{ width: 5, height: i === index ? 16 : 5, borderRadius: 3, background: i === index ? color : "#333", transition: "all 0.25s", cursor: "pointer" }}
+            onClick={() => i < index ? onPrev() : onNext()} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ─── MobileMockup ─────────────────────────────────────────────────────────────
+const PHONE_RATIO = 271 / 441;
+
+function MobileMockup({ srcs, color, delay = 0, width }: { srcs: string[]; color: string; delay?: number; width: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [index, setIndex] = useState(0);
   const height = Math.round(width / PHONE_RATIO);
+  const src = srcs[index] ?? "";
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -58,83 +117,60 @@ function MobileMockup({ src, color, delay = 0, width }: { src: string; color: st
   };
 
   return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-      style={{
-        position: "relative",
-        width,
-        height,
-        flexShrink: 0,
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? `perspective(900px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`
-          : "translateY(60px) scale(0.92)",
-        transition: `opacity 0.8s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.8s ${delay}s cubic-bezier(0.22,1,0.36,1)`,
-        animation: visible ? "mobileFloat 4s ease-in-out infinite" : "none",
-        cursor: "pointer",
-        filter: `drop-shadow(0 24px 48px rgba(0,0,0,0.55)) drop-shadow(0 0 28px ${color}20)`,
-      }}
-    >
-      {/* Screen content — inset tepat untuk Generic.png (no notch) */}
-      <div style={{
-        position: "absolute",
-        top: "1%",
-        bottom: "0.7%",
-        left: "12.85%",
-        right: "12.85%",
-        borderRadius: "10% / 7%",
-        overflow: "hidden",
-        background: "#0a0a0a",
-        zIndex: 1,
-      }}>
-        {src ? (
-          <img
-            src={src}
-            alt="App screenshot"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "top center",
-              display: "block",
-              verticalAlign: "top",
-            }}
-          />
-        ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#111" }}>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333" }}>SCREENSHOT</span>
-          </div>
-        )}
-      </div>
-      {/* Phone frame — Generic.png */}
-      <img
-        src="/mockup-mobile.png"
-        alt="Phone frame"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          pointerEvents: "none",
-          zIndex: 2,
-        }}
+    <div style={{ position: "relative", paddingTop: srcs.length > 1 ? 52 : 0, paddingBottom: srcs.length > 1 ? 36 : 0 }}>
+      <ArrowNav
+        index={index} total={srcs.length} color={color}
+        onPrev={() => setIndex(i => Math.max(0, i - 1))}
+        onNext={() => setIndex(i => Math.min(srcs.length - 1, i + 1))}
+        orientation="vertical"
       />
+      <div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+        style={{
+          position: "relative", width, height, flexShrink: 0,
+          opacity: visible ? 1 : 0,
+          transform: visible
+            ? `perspective(900px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`
+            : "translateY(60px) scale(0.92)",
+          transition: `opacity 0.8s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.8s ${delay}s cubic-bezier(0.22,1,0.36,1)`,
+          animation: visible ? "mobileFloat 4s ease-in-out infinite" : "none",
+          cursor: "pointer",
+          filter: `drop-shadow(0 24px 48px rgba(0,0,0,0.55)) drop-shadow(0 0 28px ${color}20)`,
+        }}
+      >
+        <div style={{
+          position: "absolute", top: "1%", bottom: "0.7%", left: "12.85%", right: "12.85%",
+          borderRadius: "10% / 7%", overflow: "hidden", background: "#0a0a0a", zIndex: 1,
+        }}>
+          {src ? (
+            <img key={src} src={src} alt="App screenshot"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block", verticalAlign: "top", animation: "lightboxImgIn 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+            />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#111" }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333" }}>SCREENSHOT</span>
+            </div>
+          )}
+        </div>
+        <img src="/mockup-mobile.png" alt="Phone frame"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }}
+        />
+      </div>
     </div>
   );
 }
 
-// ─── DesktopMockup ───────────────────────────────────────────────────────────
-// mockup-desktop.png: 4096×3090 → ratio w/h = 1.3256
-// Screen inset: top 3.2%, bottom 18.8% (stand), left 2.8%, right 2.8%
+// ─── DesktopMockup ────────────────────────────────────────────────────────────
 const DESKTOP_RATIO = 1.3256;
 
-function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
+function DesktopMockup({ srcs, color, delay = 0, width }: { srcs: string[]; color: string; delay?: number; width: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [index, setIndex] = useState(0);
   const height = Math.round(width / DESKTOP_RATIO);
+  const src = srcs[index] ?? "";
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -144,74 +180,53 @@ function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: s
   };
 
   return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-      style={{
-        position: "relative",
-        width,
-        height,
-        flexShrink: 0,
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`
-          : "translateY(48px) scale(0.95)",
-        transition: `opacity 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1)`,
-        animation: visible ? "desktopFloat 5s ease-in-out infinite" : "none",
-        cursor: "pointer",
-        filter: `drop-shadow(0 24px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px ${color}15)`,
-      }}
-    >
-      {/* Screen content — inset tepat untuk desktop mockup */}
-      <div style={{
-        position: "absolute",
-        top: "3.2%",
-        bottom: "25%",
-        left: "2.2%",
-        right: "2.2%",
-        overflow: "hidden",
-        background: "#0a0a0a",
-        zIndex: 1,
-      }}>
-        {src ? (
-          <img
-            src={src}
-            alt="App screenshot"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "top center",
-              display: "block",
-            }}
-          />
-        ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f" }}>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
-          </div>
-        )}
-      </div>
-      {/* Desktop frame */}
-      <img
-        src="/mockup-desktop.png"
-        alt="Desktop frame"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          pointerEvents: "none",
-          zIndex: 2,
-        }}
+    <div style={{ position: "relative", paddingLeft: srcs.length > 1 ? 52 : 0, paddingRight: srcs.length > 1 ? 52 : 0 }}>
+      <ArrowNav
+        index={index} total={srcs.length} color={color}
+        onPrev={() => setIndex(i => Math.max(0, i - 1))}
+        onNext={() => setIndex(i => Math.min(srcs.length - 1, i + 1))}
+        orientation="horizontal"
       />
+      <div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+        style={{
+          position: "relative", width, height, flexShrink: 0,
+          opacity: visible ? 1 : 0,
+          transform: visible
+            ? `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`
+            : "translateY(48px) scale(0.95)",
+          transition: `opacity 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1)`,
+          animation: visible ? "desktopFloat 5s ease-in-out infinite" : "none",
+          cursor: "pointer",
+          filter: `drop-shadow(0 24px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px ${color}15)`,
+        }}
+      >
+        <div style={{
+          position: "absolute", top: "3.2%", bottom: "25%", left: "2.2%", right: "2.2%",
+          overflow: "hidden", background: "#0a0a0a", zIndex: 1,
+        }}>
+          {src ? (
+            <img key={src} src={src} alt="App screenshot"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block", animation: "lightboxImgIn 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+            />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f" }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
+            </div>
+          )}
+        </div>
+        <img src="/mockup-desktop.png" alt="Desktop frame"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }}
+        />
+      </div>
     </div>
   );
 }
 
-// ─── BothMockup ──────────────────────────────────────────────────────────────
-function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screenshots: string[]; color: string }) {
+// ─── BothMockup ───────────────────────────────────────────────────────────────
+function BothMockup({ ss, color }: { ss: SplitScreenshots; color: string }) {
   const [containerW, setContainerW] = useState(900);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -225,34 +240,26 @@ function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screen
   }, []);
 
   const isMobileScreen = containerW < 600;
-
   const gap = 20;
   const desktopW = isMobileScreen ? containerW : Math.floor((containerW - gap) * 0.70);
   const desktopH = Math.round(desktopW / DESKTOP_RATIO);
-
-  // Phone height matches desktop height → derive phone width from that
   const phoneH = desktopH;
   const phoneW = isMobileScreen ? Math.floor(containerW * 0.55) : Math.round(phoneH * PHONE_RATIO);
 
   return (
-    <div
-      ref={wrapperRef}
-      style={{
-        width: "100%",
-        display: "flex",
-        flexDirection: isMobileScreen ? "column" : "row",
-        alignItems: isMobileScreen ? "center" : "flex-end",
-        justifyContent: "center",
-        gap,
-      }}
-    >
-      <DesktopMockup src={heroShot} color={color} delay={0.1} width={desktopW} />
-      <MobileMockup src={screenshots[1] ?? heroShot} color={color} delay={0.3} width={phoneW} />
+    <div ref={wrapperRef} style={{
+      width: "100%", display: "flex",
+      flexDirection: isMobileScreen ? "column" : "row",
+      alignItems: isMobileScreen ? "center" : "flex-end",
+      justifyContent: "center", gap,
+    }}>
+      <DesktopMockup srcs={ss.desktop} color={color} delay={0.1} width={desktopW} />
+      <MobileMockup srcs={ss.mobile} color={color} delay={0.3} width={phoneW} />
     </div>
   );
 }
 
-// ─── ScreenshotGallery ───────────────────────────────────────────────────────
+// ─── ScreenshotGallery ────────────────────────────────────────────────────────
 function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; color: string }) {
   const { ref, visible } = useReveal(0.05);
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -267,19 +274,12 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px,100%),1fr))", gap: 12 }}>
         {screenshots.map((src, i) => (
-          <div
-            key={i}
-            onClick={() => setLightbox(src)}
+          <div key={i} onClick={() => setLightbox(src)}
             style={{
-              borderRadius: 8,
-              overflow: "hidden",
-              cursor: "zoom-in",
-              border: `1px solid ${BORDER}`,
-              aspectRatio: "16/9",
-              opacity: visible ? 1 : 0,
+              borderRadius: 8, overflow: "hidden", cursor: "zoom-in", border: `1px solid ${BORDER}`,
+              aspectRatio: "16/9", opacity: visible ? 1 : 0,
               transform: visible ? "none" : "translateY(24px) scale(0.96)",
-              transition: `all 0.6s ${i * 0.08}s cubic-bezier(0.22,1,0.36,1)`,
-              position: "relative",
+              transition: `all 0.6s ${i * 0.08}s cubic-bezier(0.22,1,0.36,1)`, position: "relative",
             }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = color + "66"; e.currentTarget.style.transform = "translateY(-3px) scale(1.02)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "none"; }}
@@ -290,35 +290,17 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
       </div>
 
       {lightbox && (
-        <div
-          onClick={() => setLightbox(null)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 9999,
-            background: "rgba(0,0,0,0.92)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 20, animation: "lightboxIn 0.25s ease", cursor: "zoom-out",
-          }}
-        >
-          <img
-            src={lightbox}
-            alt="Screenshot fullsize"
-            style={{
-              maxWidth: "90vw", maxHeight: "85vh", borderRadius: 12,
-              border: `1px solid ${BORDER}`,
-              boxShadow: `0 32px 80px rgba(0,0,0,0.8), 0 0 60px ${color}20`,
-              animation: "lightboxImgIn 0.3s cubic-bezier(0.22,1,0.36,1)",
-            }}
+        <div onClick={() => setLightbox(null)} style={{
+          position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: 20, animation: "lightboxIn 0.25s ease", cursor: "zoom-out",
+        }}>
+          <img src={lightbox} alt="Screenshot fullsize"
+            style={{ maxWidth: "90vw", maxHeight: "85vh", borderRadius: 12, border: `1px solid ${BORDER}`, boxShadow: `0 32px 80px rgba(0,0,0,0.8), 0 0 60px ${color}20`, animation: "lightboxImgIn 0.3s cubic-bezier(0.22,1,0.36,1)" }}
             onClick={(e) => e.stopPropagation()}
           />
-          <button
-            onClick={() => setLightbox(null)}
-            style={{
-              position: "absolute", top: 20, right: 20,
-              background: "none", border: `1px solid ${BORDER}`,
-              color: "#fff", width: 40, height: 40, borderRadius: "50%",
-              cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "border-color 0.2s",
-            }}
+          <button onClick={() => setLightbox(null)}
+            style={{ position: "absolute", top: 20, right: 20, background: "none", border: `1px solid ${BORDER}`, color: "#fff", width: 40, height: 40, borderRadius: "50%", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", transition: "border-color 0.2s" }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; }}
           >×</button>
@@ -328,7 +310,7 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
   );
 }
 
-// ─── VideoPromo ──────────────────────────────────────────────────────────────
+// ─── VideoPromo ───────────────────────────────────────────────────────────────
 function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: string; title: string }) {
   const { ref, visible } = useReveal(0.05);
   const [playing, setPlaying] = useState(false);
@@ -336,7 +318,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
 
   const isYouTube = videoUrl.includes("youtube") || videoUrl.includes("youtu.be");
   const getYtEmbed = (url: string) => {
-    const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+    const match = url.match(/(?:v=|youtu.be\/)([^&?/]+)/);
     return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0` : url;
   };
 
@@ -358,8 +340,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
             <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${color}08 1px, transparent 1px), linear-gradient(90deg, ${color}08 1px, transparent 1px)`, backgroundSize: "40px 40px", pointerEvents: "none" }} />
             <div style={{ textAlign: "center", zIndex: 1 }}>
               <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(18px,4vw,28px)", marginBottom: 24, opacity: 0.4 }}>{title}</div>
-              <button
-                onClick={() => setPlaying(true)}
+              <button onClick={() => setPlaying(true)}
                 style={{ width: 72, height: 72, borderRadius: "50%", background: color, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", animation: "playPulse 2s ease-in-out infinite", transition: "transform 0.2s" }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.08)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
@@ -375,7 +356,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
   );
 }
 
-// ─── ProjectLinks ─────────────────────────────────────────────────────────────
+// ─── ProjectLinks ──────────────────────────────────────────────────────────────
 function ProjectLinks({ githubUrl, liveUrl, color, visible }: { githubUrl?: string; liveUrl?: string; color: string; visible: boolean }) {
   if (!githubUrl && !liveUrl) return null;
 
@@ -423,10 +404,14 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
   const [heroVisible, setHeroVisible] = useState(false);
   const steps = ["Context", "Problem", "Solution", "Outcome"];
 
-  const mockupType = project.mockup_type ?? "desktop";
-  const screenshots = project.screenshots ?? [];
-  const heroShot = screenshots[0] ?? "";
-  const galleryShots = screenshots.slice(1);
+  const ss = normScreenshots(project.screenshots);
+  const hasMobile = ss.mobile.length > 0;
+  const hasDesktop = ss.desktop.length > 0;
+  const mockupType: "mobile" | "desktop" | "both" =
+    hasMobile && hasDesktop ? "both"
+    : hasDesktop ? "desktop"
+    : "mobile";
+  const galleryShots: string[] = [];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -565,21 +550,19 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           }} />
 
           {mockupType === "mobile" && (
-            <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", position: "relative", zIndex: 1 }}>
-              <MobileMockup src={heroShot}            color={project.color} delay={0.10} width={Math.round(460 * PHONE_RATIO)} />
-              {screenshots[1] && <MobileMockup src={screenshots[1]} color={project.color} delay={0.25} width={Math.round(460 * PHONE_RATIO)} />}
-              {screenshots[2] && <MobileMockup src={screenshots[2]} color={project.color} delay={0.40} width={Math.round(460 * PHONE_RATIO)} />}
+            <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 1 }}>
+              <MobileMockup srcs={ss.mobile} color={project.color} delay={0.10} width={Math.round(460 * PHONE_RATIO)} />
             </div>
           )}
 
           {mockupType === "desktop" && (
             <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}>
-              <DesktopMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * DESKTOP_RATIO)} />
+              <DesktopMockup srcs={ss.desktop} color={project.color} delay={0.1} width={Math.round(460 * DESKTOP_RATIO)} />
             </div>
           )}
 
           {mockupType === "both" && (
-            <BothMockup heroShot={heroShot} screenshots={screenshots} color={project.color} />
+            <BothMockup ss={ss} color={project.color} />
           )}
         </div>
 
@@ -641,13 +624,9 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
 
         {/* ── CTA ── */}
         <div style={{
-          marginTop: 64,
-          marginBottom: 0,
-          padding: "clamp(24px,5vw,40px)",
-          background: CARD_BG,
-          border: `1px solid ${BORDER}`,
-          borderRadius: 12,
-          textAlign: "center",
+          marginTop: 64, marginBottom: 0,
+          padding: "clamp(24px,5vw,40px)", background: CARD_BG,
+          border: `1px solid ${BORDER}`, borderRadius: 12, textAlign: "center",
           boxShadow: `0 0 60px ${project.color}08`,
         }}>
           <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(18px,4vw,24px)", marginBottom: 12 }}>Interested in working together?</div>
