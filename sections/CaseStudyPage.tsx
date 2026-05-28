@@ -49,35 +49,153 @@ function CaseSection({ label, content, color, index }: { label: string; content:
 
 // ─── Arrow Nav ────────────────────────────────────────────────────────────────
 function ArrowNav({
-  index, total, color, onPrev, onNext, orientation,
+  index,
+  total,
+  color,
+  onPrev,
+  onNext,
+  orientation,
 }: {
-  index: number; total: number; color: string;
-  onPrev: () => void; onNext: () => void;
+  index: number;
+  total: number;
+  color: string;
+  onPrev: () => void;
+  onNext: () => void;
   orientation: "horizontal" | "vertical";
 }) {
   if (total <= 1) return null;
 
+  const canPrev = index > 0;
+  const canNext = index < total - 1;
+
   const btnBase: React.CSSProperties = {
-    position: "absolute", zIndex: 10,
-    background: "rgba(0,0,0,0.70)", border: `1px solid ${color}40`, color: "#fff",
-    borderRadius: "50%", width: 32, height: 32,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    cursor: "pointer", fontSize: 14, transition: "all 0.2s",
+    position: "absolute",
+    zIndex: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 999,
+    border: `1px solid ${color}66`,
+    background: "rgba(10,10,10,0.78)",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 12px 28px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03) inset",
+    transition: "transform 0.2s ease, opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease",
     userSelect: "none" as const,
+  };
+
+  const counterBase: React.CSSProperties = {
+    position: "absolute",
+    zIndex: 20,
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 10,
+    letterSpacing: 2,
+    color: "#d6d6d6",
+    background: "rgba(10,10,10,0.68)",
+    border: `1px solid ${BORDER}`,
+    borderRadius: 999,
+    padding: "6px 10px",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 10px 24px rgba(0,0,0,0.22)",
+    whiteSpace: "nowrap",
+    pointerEvents: "none",
+  };
+
+  const hintBase: React.CSSProperties = {
+    position: "absolute",
+    zIndex: 20,
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 9,
+    letterSpacing: 2,
+    color: "#8a8a8a",
+    background: "rgba(0,0,0,0.30)",
+    border: `1px solid ${BORDER}`,
+    borderRadius: 999,
+    padding: "5px 9px",
+    whiteSpace: "nowrap",
+    pointerEvents: "none",
+  };
+
+  const ArrowIcon = ({ dir }: { dir: "prev" | "next" }) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d={dir === "prev" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"}
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
+  const onBtnEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = "scale(1.06)";
+    e.currentTarget.style.borderColor = color;
+    e.currentTarget.style.background = "rgba(12,12,12,0.94)";
+  };
+
+  const onBtnLeave = (e: React.MouseEvent<HTMLButtonElement>, verticalOffset: boolean) => {
+    e.currentTarget.style.transform = verticalOffset ? "translateX(-50%)" : "translateY(-50%)";
+    e.currentTarget.style.borderColor = `${color}66`;
+    e.currentTarget.style.background = "rgba(10,10,10,0.78)";
   };
 
   if (orientation === "horizontal") {
     return (
       <>
-        <button onClick={(e) => { e.stopPropagation(); onPrev(); }} disabled={index === 0}
-          style={{ ...btnBase, left: -44, top: "50%", transform: "translateY(-50%)", opacity: index === 0 ? 0.2 : 1 }}>‹</button>
-        <button onClick={(e) => { e.stopPropagation(); onNext(); }} disabled={index === total - 1}
-          style={{ ...btnBase, right: -44, top: "50%", transform: "translateY(-50%)", opacity: index === total - 1 ? 0.2 : 1 }}>›</button>
-        <div style={{ position: "absolute", bottom: -24, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 10 }}>
-          {Array.from({ length: total }).map((_, i) => (
-            <div key={i} style={{ width: i === index ? 16 : 5, height: 5, borderRadius: 3, background: i === index ? color : "#333", transition: "all 0.25s", cursor: "pointer" }}
-              onClick={() => i < index ? onPrev() : onNext()} />
-          ))}
+        <button
+          type="button"
+          aria-label="Previous screenshot"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev();
+          }}
+          disabled={!canPrev}
+          style={{
+            ...btnBase,
+            left: -20,
+            top: "50%",
+            transform: "translateY(-50%)",
+            opacity: canPrev ? 1 : 0.22,
+            pointerEvents: canPrev ? "auto" : "none",
+          }}
+          onMouseEnter={onBtnEnter}
+          onMouseLeave={(e) => onBtnLeave(e, false)}
+        >
+          <ArrowIcon dir="prev" />
+        </button>
+
+        <button
+          type="button"
+          aria-label="Next screenshot"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          disabled={!canNext}
+          style={{
+            ...btnBase,
+            right: -20,
+            top: "50%",
+            transform: "translateY(-50%)",
+            opacity: canNext ? 1 : 0.22,
+            pointerEvents: canNext ? "auto" : "none",
+          }}
+          onMouseEnter={onBtnEnter}
+          onMouseLeave={(e) => onBtnLeave(e, false)}
+        >
+          <ArrowIcon dir="next" />
+        </button>
+
+        <div style={{ ...counterBase, left: "50%", bottom: -34, transform: "translateX(-50%)" }}>
+          {index + 1} / {total}
+        </div>
+
+        <div style={{ ...hintBase, left: "50%", top: -32, transform: "translateX(-50%)" }}>
+          TAP ARROWS
         </div>
       </>
     );
@@ -85,15 +203,56 @@ function ArrowNav({
 
   return (
     <>
-      <button onClick={(e) => { e.stopPropagation(); onPrev(); }} disabled={index === 0}
-        style={{ ...btnBase, top: -44, left: "50%", transform: "translateX(-50%)", opacity: index === 0 ? 0.2 : 1 }}>‹</button>
-      <button onClick={(e) => { e.stopPropagation(); onNext(); }} disabled={index === total - 1}
-        style={{ ...btnBase, bottom: -44, left: "50%", transform: "translateX(-50%)", opacity: index === total - 1 ? 0.2 : 1 }}>›</button>
-      <div style={{ position: "absolute", right: -18, top: "50%", transform: "translateY(-50%)", display: "flex", flexDirection: "column", gap: 5, zIndex: 10 }}>
-        {Array.from({ length: total }).map((_, i) => (
-          <div key={i} style={{ width: 5, height: i === index ? 16 : 5, borderRadius: 3, background: i === index ? color : "#333", transition: "all 0.25s", cursor: "pointer" }}
-            onClick={() => i < index ? onPrev() : onNext()} />
-        ))}
+      <button
+        type="button"
+        aria-label="Previous screenshot"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrev();
+        }}
+        disabled={!canPrev}
+        style={{
+          ...btnBase,
+          left: "50%",
+          top: -20,
+          transform: "translateX(-50%)",
+          opacity: canPrev ? 1 : 0.22,
+          pointerEvents: canPrev ? "auto" : "none",
+        }}
+        onMouseEnter={onBtnEnter}
+        onMouseLeave={(e) => onBtnLeave(e, true)}
+      >
+        <ArrowIcon dir="prev" />
+      </button>
+
+      <button
+        type="button"
+        aria-label="Next screenshot"
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
+        disabled={!canNext}
+        style={{
+          ...btnBase,
+          left: "50%",
+          bottom: -20,
+          transform: "translateX(-50%)",
+          opacity: canNext ? 1 : 0.22,
+          pointerEvents: canNext ? "auto" : "none",
+        }}
+        onMouseEnter={onBtnEnter}
+        onMouseLeave={(e) => onBtnLeave(e, true)}
+      >
+        <ArrowIcon dir="next" />
+      </button>
+
+      <div style={{ ...counterBase, right: -10, top: "50%", transform: "translateY(-50%) rotate(90deg)" }}>
+        {index + 1} / {total}
+      </div>
+
+      <div style={{ ...hintBase, left: "50%", top: -32, transform: "translateX(-50%)" }}>
+        SWIPE / TAP
       </div>
     </>
   );
