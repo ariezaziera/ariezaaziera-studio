@@ -11,10 +11,7 @@ const CROP_RATIOS = {
 };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-export interface SplitScreenshots {
-  mobile: string[];
-  desktop: string[];
-}
+export type { SplitScreenshots } from "@/types/split-screenshots";
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
 function CropModal({
