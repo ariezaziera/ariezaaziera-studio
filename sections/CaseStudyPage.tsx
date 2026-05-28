@@ -32,9 +32,9 @@ function CaseSection({ label, content, color, index }: { label: string; content:
     <div ref={ref} style={{ marginBottom: 40, opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(28px)", transition: `all 0.7s ${index * 0.12}s cubic-bezier(0.22,1,0.36,1)` }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <div style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0, animation: "pulseDot 2s ease-in-out infinite" }} />
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color, letterSpacing: 2 }}>{label.toUpperCase()}</div>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.5vw,12px)", color, letterSpacing: 2 }}>{label.toUpperCase()}</div>
       </div>
-      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,2.5vw,13px)", color: "#aaa", lineHeight: 1.9, margin: 0, paddingLeft: 18 }}>{content}</p>
+      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(13px,2.5vw,15px)", color: "#aaa", lineHeight: 1.9, margin: 0, paddingLeft: 18 }}>{content}</p>
     </div>
   );
 }
@@ -88,7 +88,7 @@ function MobileMockup({ src, color, delay = 0 }: { src: string; color: string; d
               <div style={{ width: 36, height: 36, borderRadius: 10, background: color + "33", border: `1px solid ${color}55`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ width: 14, height: 14, borderRadius: 4, background: color, opacity: 0.7 }} />
               </div>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333", letterSpacing: 1 }}>SCREENSHOT</span>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(8px,1.2vw,10px)", color: "#333", letterSpacing: 1 }}>SCREENSHOT</span>
             </div>
           )}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "35%", background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)", pointerEvents: "none", borderRadius: "18px 18px 0 0" }} />
@@ -150,7 +150,7 @@ function DesktopMockup({ src, color, delay = 0 }: { src: string; color: string; 
         </div>
         <div style={{ flex: 1, height: 22, borderRadius: 4, background: "#111", border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", padding: "0 10px", gap: 6 }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#27c93f", opacity: 0.6 }} />
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#444", letterSpacing: 0.5 }}>localhost:3000</span>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(8px,1.2vw,10px)", color: "#444", letterSpacing: 0.5 }}>localhost:3000</span>
         </div>
       </div>
       {/* Screen */}
@@ -171,7 +171,7 @@ function DesktopMockup({ src, color, delay = 0 }: { src: string; color: string; 
             <div style={{ width: 64, height: 64, borderRadius: 16, background: color + "22", border: `1px solid ${color}44`, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <div style={{ width: 28, height: 28, borderRadius: 8, background: color, opacity: 0.7 }} />
             </div>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(8px,1.2vw,10px)", color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
           </div>
         )}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "30%", background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)", pointerEvents: "none" }} />
@@ -244,7 +244,7 @@ function ScreenshotGallery({ screenshots, color }: { screenshots: string[]; colo
   return (
     <div ref={ref}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color, letterSpacing: 3, whiteSpace: "nowrap" }}>SCREENSHOTS</div>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.5vw,12px)", color, letterSpacing: 3, whiteSpace: "nowrap" }}>SCREENSHOTS</div>
         <div style={{ flex: 1, height: 1, background: BORDER }} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px,100%),1fr))", gap: 12 }}>
@@ -322,7 +322,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
   return (
     <div ref={ref} style={{ marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transition: "all 0.8s 0.1s cubic-bezier(0.22,1,0.36,1)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color, letterSpacing: 3, whiteSpace: "nowrap" }}>PROMO VIDEO</div>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.5vw,12px)", color, letterSpacing: 3, whiteSpace: "nowrap" }}>PROMO VIDEO</div>
         <div style={{ flex: 1, height: 1, background: BORDER }} />
       </div>
       <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", border: `1px solid ${BORDER}`, aspectRatio: "16/9", background: "#0a0a0a", boxShadow: `0 24px 60px rgba(0,0,0,0.5), 0 0 80px ${color}10` }}>
@@ -345,7 +345,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="#000" style={{ marginLeft: 4 }}><path d="M5 3l14 9-14 9V3z" /></svg>
               </button>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2, marginTop: 16 }}>CLICK TO PLAY</div>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(9px,1.3vw,11px)", color: "#555", letterSpacing: 2, marginTop: 16 }}>CLICK TO PLAY</div>
             </div>
           </div>
         )}
@@ -360,7 +360,7 @@ function ProjectLinks({ githubUrl, liveUrl, color, visible }: { githubUrl?: stri
 
   const btnBase: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: 10,
-    fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+    fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", fontWeight: 700, letterSpacing: 1.5,
     padding: "13px 22px", borderRadius: 6, cursor: "pointer",
     textDecoration: "none", transition: "all 0.25s cubic-bezier(0.22,1,0.36,1)",
   };
@@ -481,7 +481,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
         {/* Back button */}
         <button
           onClick={() => setActivePage("projects")}
-          style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 48, padding: 0, display: "flex", alignItems: "center", gap: 8, opacity: heroVisible ? 1 : 0, transform: heroVisible ? "none" : "translateX(-12px)", transition: "all 0.6s 0.05s ease" }}
+          style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", color: "#555", background: "none", border: "none", cursor: "pointer", letterSpacing: 1, marginBottom: 48, padding: 0, display: "flex", alignItems: "center", gap: 8, opacity: heroVisible ? 1 : 0, transform: heroVisible ? "none" : "translateX(-12px)", transition: "all 0.6s 0.05s ease" }}
           onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = project.color; }}
           onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = "#555"; }}
         >
@@ -491,10 +491,10 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 56 }}>
           <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", opacity: heroVisible ? 1 : 0, animation: heroVisible ? "badgeBounce 0.6s 0.1s both" : "none" }}>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: project.color, background: project.color + "15", padding: "4px 10px", borderRadius: 3, border: `1px solid ${project.color}30`, letterSpacing: 1 }}>CASE STUDY</span>
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", padding: "4px 10px", borderRadius: 3, border: `1px solid ${BORDER}`, letterSpacing: 1 }}>{project.type.toUpperCase()}</span>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: project.color, background: project.color + "15", padding: "4px 10px", borderRadius: 3, border: `1px solid ${project.color}30`, letterSpacing: 1 }}>CASE STUDY</span>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: "#555", padding: "4px 10px", borderRadius: 3, border: `1px solid ${BORDER}`, letterSpacing: 1 }}>{project.type.toUpperCase()}</span>
             {project.live_url && (
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#27c93f", background: "#27c93f15", padding: "4px 10px", borderRadius: 3, border: "1px solid #27c93f30", letterSpacing: 1, display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: "#27c93f", background: "#27c93f15", padding: "4px 10px", borderRadius: 3, border: "1px solid #27c93f30", letterSpacing: 1, display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#27c93f", animation: "pulseDot 1.5s ease-in-out infinite", display: "inline-block" }} />
                 LIVE
               </span>
@@ -505,14 +505,14 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
             {project.title}<span style={{ color: project.color }}>.</span>
           </h1>
 
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(12px,2.5vw,14px)", color: "#888", lineHeight: 1.7, margin: "0 0 20px", opacity: heroVisible ? 1 : 0, animation: heroVisible ? "heroSlideUp 0.8s 0.25s both" : "none" }}>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(13px,2.5vw,15px)", color: "#888", lineHeight: 1.7, margin: "0 0 20px", opacity: heroVisible ? 1 : 0, animation: heroVisible ? "heroSlideUp 0.8s 0.25s both" : "none" }}>
             {project.tagline}
           </p>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 32, opacity: heroVisible ? 1 : 0, animation: heroVisible ? "heroFadeIn 0.6s 0.35s both" : "none" }}>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2 }}>ROLE</div>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: "#555", letterSpacing: 2 }}>ROLE</div>
             <div style={{ flex: 1, height: 1, background: BORDER, maxWidth: 24 }} />
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: project.color }}>{project.role}</div>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", color: project.color }}>{project.role}</div>
           </div>
 
           <ProjectLinks githubUrl={project.github_url} liveUrl={project.live_url} color={project.color} visible={heroVisible} />
@@ -552,7 +552,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
         <div style={{ display: "flex", gap: 4, marginBottom: 48, overflowX: "auto", paddingBottom: 4 }}>
           {steps.map((s, i) => (
             <div key={s} style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, padding: "5px 10px", borderRadius: 3, background: i <= activeStep ? project.color : CARD_BG, color: i <= activeStep ? "#000" : "#555", border: `1px solid ${i <= activeStep ? project.color : BORDER}`, fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap", transition: "all 0.4s ease" }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", padding: "5px 10px", borderRadius: 3, background: i <= activeStep ? project.color : CARD_BG, color: i <= activeStep ? "#000" : "#555", border: `1px solid ${i <= activeStep ? project.color : BORDER}`, fontWeight: 700, letterSpacing: 1, whiteSpace: "nowrap", transition: "all 0.4s ease" }}>
                 {s.toUpperCase()}
               </div>
               {i < steps.length - 1 && <div style={{ width: 16, height: 1, background: i < activeStep ? project.color : BORDER, transition: "background 0.4s", flexShrink: 0 }} />}
@@ -562,12 +562,12 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
 
         {/* ── TECH STACK ────────────────────────────────────────────────────── */}
         <div style={{ background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "16px 20px", marginBottom: 48, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2, flexShrink: 0 }}>TECH</div>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: "#555", letterSpacing: 2, flexShrink: 0 }}>TECH</div>
           <div style={{ flex: 1, height: 1, background: BORDER, minWidth: 20 }} />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {project.tech.map((t: string) => (
               <span key={t}
-                style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: project.color, background: project.color + "15", padding: "4px 10px", borderRadius: 3, border: `1px solid ${project.color}30`, transition: "transform 0.2s" }}
+                style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(10px,1.4vw,12px)", color: project.color, background: project.color + "15", padding: "4px 10px", borderRadius: 3, border: `1px solid ${project.color}30`, transition: "transform 0.2s" }}
                 onMouseEnter={(e: ReactMouseEvent<HTMLSpanElement>) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={(e: ReactMouseEvent<HTMLSpanElement>) => { e.currentTarget.style.transform = ""; }}
               >{t}</span>
@@ -599,11 +599,11 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
           boxShadow: `0 0 60px ${project.color}08` 
         }}>
           <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: "clamp(18px,4vw,24px)", marginBottom: 12 }}>Interested in working together?</div>
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#666", marginBottom: 28 }}>Let's build something real.</p>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(12px,1.6vw,14px)", color: "#666", marginBottom: 28 }}>Let's build something real.</p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <button
               onClick={() => { setActivePage("home"); setTimeout(() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }), 100); }}
-              style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 700, letterSpacing: 2, background: project.color, color: "#000", border: "none", padding: "12px 28px", borderRadius: 4, cursor: "pointer", transition: "all 0.2s" }}
+              style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", fontWeight: 700, letterSpacing: 2, background: project.color, color: "#000", border: "none", padding: "12px 28px", borderRadius: 4, cursor: "pointer", transition: "all 0.2s" }}
               onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 24px ${project.color}40`; }}
               onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}
             >
@@ -611,7 +611,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
             </button>
             {project.live_url && (
               <a href={project.live_url} target="_blank" rel="noopener noreferrer"
-                style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 700, letterSpacing: 2, background: "transparent", color: "#fff", border: `1px solid ${BORDER}`, padding: "12px 28px", borderRadius: 4, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}
+                style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(11px,1.5vw,13px)", fontWeight: 700, letterSpacing: 2, background: "transparent", color: "#fff", border: `1px solid ${BORDER}`, padding: "12px 28px", borderRadius: 4, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}
                 onMouseEnter={(e: ReactMouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.borderColor = project.color; e.currentTarget.style.color = project.color; }}
                 onMouseLeave={(e: ReactMouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = "#fff"; }}
               >
