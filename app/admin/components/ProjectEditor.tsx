@@ -6,10 +6,29 @@ import type { Project } from "@/types";
 import { YELLOW, BORDER, CARD, GREEN, RED, inputStyle, btnStyle } from "../layout";
 import { Field } from "./Field";
 import { SectionDivider } from "./SectionDivider";
-import { MockupTypeSelector } from "./MockupTypeSelector";
 import { ScreenshotsUpload } from "./ScreenshotsUpload";
+import type { SplitScreenshots } from "./ScreenshotsUpload";
 import { ImageUpload } from "./ImageUpload";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Normalise whatever is in DB (flat array or split object) into SplitScreenshots */
+function normScreenshots(raw: Project["screenshots"]): SplitScreenshots {
+  if (!raw) return { mobile: [], desktop: [] };
+  if (Array.isArray(raw)) return { mobile: raw, desktop: [] };
+  return { mobile: raw.mobile ?? [], desktop: raw.desktop ?? [] };
+}
+
+/** Derive mockup_type from split screenshots */
+function deriveMockupType(ss: SplitScreenshots): "mobile" | "desktop" | "both" {
+  const hasMobile = ss.mobile.length > 0;
+  const hasDesktop = ss.desktop.length > 0;
+  if (hasMobile && hasDesktop) return "both";
+  if (hasDesktop) return "desktop";
+  return "mobile";
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export function ProjectEditor({
   project,
   onSave,
@@ -21,32 +40,37 @@ export function ProjectEditor({
 }) {
   const [form, setForm] = useState({
     ...project,
-    screenshots: project.screenshots || [],
-    mockup_type: project.mockup_type || "desktop",
+    screenshots: normScreenshots(project.screenshots),
     video_url: project.video_url || "",
     github_url: project.github_url || "",
     live_url: project.live_url || "",
+    image_url: project.image_url || "",
   });
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  // Track original media values to detect unsaved changes
+  // Detect unsaved media changes
   const originalMedia = useMemo(() => ({
-    screenshots: JSON.stringify(project.screenshots || []),
+    screenshots: JSON.stringify(normScreenshots(project.screenshots)),
     image_url: project.image_url || "",
   }), [project]);
 
   const hasUnsavedMedia =
     JSON.stringify(form.screenshots) !== originalMedia.screenshots ||
-    (form.image_url || "") !== originalMedia.image_url;
+    form.image_url !== originalMedia.image_url;
 
-  const set = (key: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
+  const set = (key: keyof typeof form) => (v: string) =>
+    setForm((f) => ({ ...f, [key]: v }));
 
   const handleSave = async () => {
     if (!supabase) return;
     setSaving(true);
     setSaveError("");
+
+    const mockupType = deriveMockupType(form.screenshots);
+
     const { error } = await supabase
       .from("projects")
       .update({
@@ -65,32 +89,44 @@ export function ProjectEditor({
         color: form.color,
         type: form.type,
         image_url: form.image_url || null,
-        screenshots: form.screenshots || [],
-        mockup_type: form.mockup_type || "desktop",
+        // Store as JSONB split object in DB
+        screenshots: form.screenshots,
+        // Auto-derived — no longer manually set
+        mockup_type: mockupType,
         video_url: form.video_url || null,
         github_url: form.github_url || null,
         live_url: form.live_url || null,
       })
       .eq("id", project.id);
+
     setSaving(false);
-    if (error) { setSaveError(error.message); }
-    else {
+    if (error) {
+      setSaveError(error.message);
+    } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      onSave({ ...form });
+      onSave({ ...form, mockup_type: mockupType });
     }
   };
 
   const techString = Array.isArray(form.tech) ? form.tech.join(", ") : form.tech;
+  const mockupPreview = deriveMockupType(form.screenshots);
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 200, overflowY: "auto", padding: "40px 24px" }}>
-      <div style={{ maxWidth: 680, margin: "0 auto", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 32 }}>
-
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
+      zIndex: 200, overflowY: "auto", padding: "40px 24px",
+    }}>
+      <div style={{
+        maxWidth: 720, margin: "0 auto", background: CARD,
+        border: `1px solid ${BORDER}`, borderRadius: 12, padding: 32,
+      }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>{project.title}</div>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>
+              {project.title}
+            </div>
             <div style={{ fontSize: 10, color: "#555", letterSpacing: 1, marginTop: 4 }}>EDITING PROJECT</div>
           </div>
           <button onClick={onClose} style={{ ...btnStyle, padding: "6px 14px", fontSize: 10 }}>✕ CLOSE</button>
@@ -102,14 +138,9 @@ export function ProjectEditor({
         {/* Unsaved media warning */}
         {hasUnsavedMedia && (
           <div style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 10,
-            background: "#F5C54210",
-            border: `1px solid ${YELLOW}40`,
-            borderRadius: 8,
-            padding: "12px 14px",
-            marginBottom: 16,
+            display: "flex", alignItems: "flex-start", gap: 10,
+            background: "#F5C54210", border: `1px solid ${YELLOW}40`,
+            borderRadius: 8, padding: "12px 14px", marginBottom: 16,
           }}>
             <div style={{ fontSize: 14, lineHeight: 1, marginTop: 1 }}>⚠</div>
             <div>
@@ -117,21 +148,40 @@ export function ProjectEditor({
                 UNSAVED MEDIA CHANGES
               </div>
               <div style={{ fontSize: 10, color: "#888", lineHeight: 1.6 }}>
-                Screenshots or image changes won't take effect until you hit <span style={{ color: "#fff" }}>SAVE CHANGES</span> below. Closing without saving will discard them.
+                Screenshots or image changes won't take effect until you hit{" "}
+                <span style={{ color: "#fff" }}>SAVE CHANGES</span> below.
               </div>
             </div>
           </div>
         )}
 
-        <MockupTypeSelector
-          value={form.mockup_type}
-          onChange={(v) => setForm((f) => ({ ...f, mockup_type: v as "mobile" | "desktop" | "both" }))}
-        />
+        {/* Mockup type auto-indicator */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, marginBottom: 16,
+          padding: "8px 14px", background: "#0a0a0a", borderRadius: 7,
+          border: `1px solid #1a1a1a`,
+        }}>
+          <div style={{ fontSize: 9, color: "#555", letterSpacing: 1 }}>AUTO-DETECTED MOCKUP</div>
+          <div style={{ flex: 1, height: 1, background: BORDER }} />
+          <div style={{
+            fontSize: 9, letterSpacing: 1, fontWeight: 700,
+            color: mockupPreview === "both" ? GREEN
+              : mockupPreview === "mobile" ? "#C084FC" : "#60A5FA",
+          }}>
+            {mockupPreview === "both" ? "📱 MOBILE + 🖥 DESKTOP"
+              : mockupPreview === "mobile" ? "📱 MOBILE ONLY"
+                : "🖥 DESKTOP ONLY"}
+          </div>
+        </div>
+
         <ScreenshotsUpload
           projectSlug={project.slug}
           currentScreenshots={form.screenshots}
-          onUpdate={(urls) => setForm((f) => ({ ...f, screenshots: urls }))}
+          onUpdate={(ss: SplitScreenshots) =>
+            setForm((f) => ({ ...f, screenshots: ss }))
+          }
         />
+
         <ImageUpload
           label="LEGACY HERO IMAGE (optional — overridden by screenshots)"
           storagePath={`projects/${project.slug}`}
@@ -148,17 +198,20 @@ export function ProjectEditor({
         {/* Preview links */}
         <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
           {form.github_url && (
-            <a href={form.github_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: YELLOW, background: YELLOW + "12", border: `1px solid ${YELLOW}30`, padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
+            <a href={form.github_url} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 10, color: YELLOW, background: YELLOW + "12", border: `1px solid ${YELLOW}30`, padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
               GITHUB ↗
             </a>
           )}
           {form.live_url && (
-            <a href={form.live_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: GREEN, background: GREEN + "12", border: `1px solid ${GREEN}30`, padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
+            <a href={form.live_url} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 10, color: GREEN, background: GREEN + "12", border: `1px solid ${GREEN}30`, padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
               LIVE SITE ↗
             </a>
           )}
           {form.video_url && (
-            <a href={form.video_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: "#60A5FA", background: "#60A5FA12", border: "1px solid #60A5FA30", padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
+            <a href={form.video_url} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 10, color: "#60A5FA", background: "#60A5FA12", border: "1px solid #60A5FA30", padding: "4px 10px", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>
               VIDEO ↗
             </a>
           )}
@@ -206,7 +259,6 @@ export function ProjectEditor({
 
         {saveError && <div style={{ fontSize: 11, color: RED, marginTop: 12 }}>{saveError}</div>}
 
-        {/* Repeat warning near save button if unsaved media */}
         {hasUnsavedMedia && (
           <div style={{ fontSize: 10, color: YELLOW, marginTop: 16, letterSpacing: 0.5 }}>
             ⚠ Media changes pending — save below to apply.
@@ -214,12 +266,15 @@ export function ProjectEditor({
         )}
 
         <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-          <button onClick={handleSave} disabled={saving} style={{ ...btnStyle, background: YELLOW, color: "#000", flex: 1, opacity: saving ? 0.6 : 1 }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ ...btnStyle, background: YELLOW, color: "#000", flex: 1, opacity: saving ? 0.6 : 1 }}
+          >
             {saving ? "SAVING..." : saved ? "✓ SAVED" : "SAVE CHANGES"}
           </button>
           <button onClick={onClose} style={{ ...btnStyle, flex: 0 }}>CANCEL</button>
         </div>
-
       </div>
     </div>
   );
