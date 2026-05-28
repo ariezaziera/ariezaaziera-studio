@@ -40,17 +40,14 @@ function CaseSection({ label, content, color, index }: { label: string; content:
 }
 
 // ─── MobileMockup ────────────────────────────────────────────────────────────
-// iPhone PNG natural ratio: width/height ≈ 0.468
-// Screen inset (measured from PNG): top ~11%, bottom ~4%, left ~6.8%, right ~6.8%
-const PHONE_W_RATIO = 0.468;
-const PHONE_SCREEN = { top: "11%", bottom: "4%", left: "6.8%", right: "6.8%" };
+// Actual PNG: 1502x2948 → ratio w/h = 0.5095
+// Screen inset: top 11%, bottom 4%, left 6.8%, right 6.8%
+const PHONE_RATIO = 0.5095;
 
-function MobileMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src: string; color: string; delay?: number; fixedHeight?: number; fixedWidth?: number }) {
+function MobileMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const h = fixedHeight ?? 480;
-  const w = fixedWidth ?? (h * PHONE_W_RATIO);
+  const height = Math.round(width / PHONE_RATIO);
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -66,8 +63,8 @@ function MobileMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src:
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}
       style={{
         position: "relative",
-        width: w,
-        height: h,
+        width,
+        height,
         flexShrink: 0,
         opacity: visible ? 1 : 0,
         transform: visible
@@ -79,13 +76,9 @@ function MobileMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src:
         filter: `drop-shadow(0 24px 48px rgba(0,0,0,0.55)) drop-shadow(0 0 28px ${color}20)`,
       }}
     >
-      {/* Screenshot layer — sits behind the PNG */}
       <div style={{
         position: "absolute",
-        top: PHONE_SCREEN.top,
-        bottom: PHONE_SCREEN.bottom,
-        left: PHONE_SCREEN.left,
-        right: PHONE_SCREEN.right,
+        top: "11%", bottom: "4%", left: "6.8%", right: "6.8%",
         borderRadius: "7% / 5%",
         overflow: "hidden",
         background: "#0a0a0a",
@@ -94,34 +87,26 @@ function MobileMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src:
         {src ? (
           <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, background: "#111" }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: color + "33", border: `1px solid ${color}55` }} />
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333", letterSpacing: 1 }}>SCREENSHOT</span>
+          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#111" }}>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#333" }}>SCREENSHOT</span>
           </div>
         )}
       </div>
-      {/* Real device frame on top */}
-      <img
-        src="/mockup-mobile.png"
-        alt="iPhone frame"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }}
-      />
+      <img src="/mockup-mobile.png" alt="iPhone frame"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
     </div>
   );
 }
 
 // ─── DesktopMockup ───────────────────────────────────────────────────────────
-// Pro Display XDR PNG ratio: width/height ≈ 1.415
-// Screen inset (measured): top ~3.5%, bottom ~16.5% (stand area), left ~2.3%, right ~2.3%
-const DESKTOP_W_RATIO = 1.415;
-const DESKTOP_SCREEN = { top: "3.5%", bottom: "16.5%", left: "2.3%", right: "2.3%" };
+// Actual PNG: 4096x3090 → ratio w/h = 1.3256
+// Screen inset: top 3.5%, bottom 16.5% (stand), left 2.3%, right 2.3%
+const DESKTOP_RATIO = 1.3256;
 
-function DesktopMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src: string; color: string; delay?: number; fixedHeight?: number; fixedWidth?: number }) {
+function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: string; delay?: number; width: number }) {
   const { ref, visible } = useReveal(0.05);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const h = fixedHeight ?? 480;
-  const w = fixedWidth ?? (h * DESKTOP_W_RATIO);
+  const height = Math.round(width / DESKTOP_RATIO);
 
   const handleMouseMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -137,8 +122,8 @@ function DesktopMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}
       style={{
         position: "relative",
-        width: w,
-        height: h,
+        width,
+        height,
         flexShrink: 0,
         opacity: visible ? 1 : 0,
         transform: visible
@@ -150,13 +135,9 @@ function DesktopMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src
         filter: `drop-shadow(0 24px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px ${color}15)`,
       }}
     >
-      {/* Screenshot layer */}
       <div style={{
         position: "absolute",
-        top: DESKTOP_SCREEN.top,
-        bottom: DESKTOP_SCREEN.bottom,
-        left: DESKTOP_SCREEN.left,
-        right: DESKTOP_SCREEN.right,
+        top: "3.5%", bottom: "16.5%", left: "2.3%", right: "2.3%",
         overflow: "hidden",
         background: "#0a0a0a",
         zIndex: 1,
@@ -164,65 +145,55 @@ function DesktopMockup({ src, color, delay = 0, fixedHeight, fixedWidth }: { src
         {src ? (
           <img src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12, background: "#0f0f0f" }}>
-            <div style={{ width: 56, height: 56, borderRadius: 14, background: color + "22", border: `1px solid ${color}44` }} />
+          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f" }}>
             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#333", letterSpacing: 2 }}>SCREENSHOT</span>
           </div>
         )}
       </div>
-      {/* Real device frame on top */}
-      <img
-        src="/mockup-desktop.png"
-        alt="Desktop frame"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }}
-      />
+      <img src="/mockup-desktop.png" alt="Desktop frame"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
     </div>
   );
 }
 
 // ─── BothMockup ──────────────────────────────────────────────────────────────
 function BothMockup({ heroShot, screenshots, color }: { heroShot: string; screenshots: string[]; color: string }) {
-  const [screenW, setScreenW] = useState(1024);
+  const [containerW, setContainerW] = useState(900);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const update = () => setScreenW(window.innerWidth);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    const el = wrapperRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(() => setContainerW(el.offsetWidth));
+    obs.observe(el);
+    setContainerW(el.offsetWidth);
+    return () => obs.disconnect();
   }, []);
 
-  const isMobileScreen = screenW < 768;
+  const isMobileScreen = containerW < 600;
 
-  // Width-first: work within the container (max 1100px - ~80px padding = ~1020px usable)
-  const usableW = Math.min(screenW - 80, 1020);
+  // ── Desktop layout: side by side ──
+  // Total widths must fit inside containerW with a gap.
+  // Desktop device : Phone device ≈ 70 : 30 split of (containerW - gap)
+  const gap = 20;
+  const desktopW = isMobileScreen ? containerW : Math.floor((containerW - gap) * 0.70);
+  const desktopH = Math.round(desktopW / DESKTOP_RATIO);
 
-  // Desktop: 68% of usable width. Phone: remaining ~26%. On mobile, stack full-width.
-  const desktopW = isMobileScreen ? usableW : Math.floor(usableW * 0.68);
-  const phoneW   = isMobileScreen ? Math.floor(usableW * 0.55) : Math.floor(usableW * 0.26);
-
-  // Heights derived from widths via each device's natural PNG ratio
-  const desktopH = Math.floor(desktopW / DESKTOP_W_RATIO);
-  const phoneH   = Math.floor(phoneW   / PHONE_W_RATIO);
-
-  // Use the smaller height so both align perfectly
-  const sharedH       = Math.min(desktopH, phoneH);
-  const finalDesktopW = Math.floor(sharedH * DESKTOP_W_RATIO);
-  const finalPhoneW   = Math.floor(sharedH * PHONE_W_RATIO);
+  // Phone height must match desktop height → derive phone width from that height
+  const phoneH = desktopH;
+  const phoneW = isMobileScreen ? Math.floor(containerW * 0.55) : Math.round(phoneH * PHONE_RATIO);
 
   return (
-    <div style={{
-      position: "relative",
-      zIndex: 1,
+    <div ref={wrapperRef} style={{
       width: "100%",
-      overflow: "hidden",
       display: "flex",
       flexDirection: isMobileScreen ? "column" : "row",
-      alignItems: "center",
+      alignItems: "flex-end",
       justifyContent: "center",
-      gap: isMobileScreen ? 40 : 20,
+      gap,
     }}>
-      <DesktopMockup src={heroShot}                   color={color} delay={0.1} fixedWidth={finalDesktopW} fixedHeight={sharedH} />
-      <MobileMockup  src={screenshots[1] ?? heroShot} color={color} delay={0.3} fixedWidth={finalPhoneW}   fixedHeight={sharedH} />
+      <DesktopMockup src={heroShot}                   color={color} delay={0.1} width={desktopW} />
+      <MobileMockup  src={screenshots[1] ?? heroShot} color={color} delay={0.3} width={phoneW} />
     </div>
   );
 }
@@ -517,15 +488,15 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
 
           {mockupType === "mobile" && (
             <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", position: "relative", zIndex: 1 }}>
-              <MobileMockup src={heroShot} color={project.color} delay={0.1} fixedHeight={460} />
-              {screenshots[1] && <MobileMockup src={screenshots[1]} color={project.color} delay={0.25} fixedHeight={460} />}
-              {screenshots[2] && <MobileMockup src={screenshots[2]} color={project.color} delay={0.4} fixedHeight={460} />}
+              <MobileMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * 0.5095)} />
+              {screenshots[1] && <MobileMockup src={screenshots[1]} color={project.color} delay={0.25} width={Math.round(460 * 0.5095)} />}
+              {screenshots[2] && <MobileMockup src={screenshots[2]} color={project.color} delay={0.4} width={Math.round(460 * 0.5095)} />}
             </div>
           )}
 
           {mockupType === "desktop" && (
             <div style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}>
-              <DesktopMockup src={heroShot} color={project.color} delay={0.1} fixedHeight={460} />
+              <DesktopMockup src={heroShot} color={project.color} delay={0.1} width={Math.round(460 * 1.3256)} />
             </div>
           )}
 
