@@ -1,4 +1,4 @@
-import type { SplitScreenshots } from "@/app/admin/components/ScreenshotsUpload";
+import type { SplitScreenshots } from "./split-screenshots";
 
 export interface Project {
   id: number;
