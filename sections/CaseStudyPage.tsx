@@ -81,9 +81,9 @@ function MobileMockup({ src, color, delay = 0, width }: { src: string; color: st
       <div style={{
         position: "absolute",
         top: "1%",
-        bottom: "1%",
-        left: "11.5%",
-        right: "11.5%",
+        bottom: "0.8%",
+        left: "13%",
+        right: "13%",
         borderRadius: "8% / 6%",
         overflow: "hidden",
         background: "#0a0a0a",
@@ -167,7 +167,7 @@ function DesktopMockup({ src, color, delay = 0, width }: { src: string; color: s
       <div style={{
         position: "absolute",
         top: "3.2%",
-        bottom: "22%",
+        bottom: "20%",
         left: "2.5%",
         right: "2.5%",
         overflow: "hidden",
