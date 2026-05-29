@@ -268,21 +268,33 @@ function CropModal({
             }}
           />
           {cropW > 0 && (
-            <div style={{
-              position: "absolute",
-              left: boxX, top: boxY,
-              width: boxW, height: boxH,
-              border: `2px solid ${accent}`,
-              boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
-              pointerEvents: "none",
-            }}>
-              {[1, 2].map(n => (
-                <div key={`h${n}`} style={{ position: "absolute", left: 0, right: 0, top: `${(n / 3) * 100}%`, height: 1, background: `${accent}30` }} />
-              ))}
-              {[1, 2].map(n => (
-                <div key={`v${n}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${(n / 3) * 100}%`, width: 1, background: `${accent}30` }} />
-              ))}
-            </div>
+            <>
+              {/* Dark overlays around crop box */}
+              {/* Top */}
+              <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: boxY, background: "rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+              {/* Bottom */}
+              <div style={{ position: "absolute", left: 0, right: 0, top: boxY + boxH, bottom: 0, background: "rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+              {/* Left */}
+              <div style={{ position: "absolute", left: 0, width: boxX, top: boxY, height: boxH, background: "rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+              {/* Right */}
+              <div style={{ position: "absolute", left: boxX + boxW, right: 0, top: boxY, height: boxH, background: "rgba(0,0,0,0.5)", pointerEvents: "none" }} />
+          
+              {/* Crop border + grid lines */}
+              <div style={{
+                position: "absolute",
+                left: boxX, top: boxY,
+                width: boxW, height: boxH,
+                border: `2px solid ${accent}`,
+                pointerEvents: "none",
+              }}>
+                {[1, 2].map(n => (
+                  <div key={`h${n}`} style={{ position: "absolute", left: 0, right: 0, top: `${(n / 3) * 100}%`, height: 1, background: `${accent}30` }} />
+                ))}
+                {[1, 2].map(n => (
+                  <div key={`v${n}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${(n / 3) * 100}%`, width: 1, background: `${accent}30` }} />
+                ))}
+              </div>
+            </>
           )}
         </div>
 
