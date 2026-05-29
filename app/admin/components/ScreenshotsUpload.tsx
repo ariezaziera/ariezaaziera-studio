@@ -95,7 +95,7 @@ function CropModal({
   const fullPreviewH = Math.round(imgNaturalH * scaleW);
 
   // FIX 2: Cap height — leave 180px for header + buttons
-  const maxPreviewH = Math.max(100, vh - 180);
+  const maxPreviewH = Math.max(100, vh - 200);
   const previewH = Math.min(fullPreviewH || 300, maxPreviewH);
 
   // FIX 3: Recalc effective scale + width if height was clamped
@@ -193,73 +193,8 @@ function CropModal({
             </div>
           </div>
         </div>
-
-        {/* Crop canvas */}
-        <div
-          style={{
-            position: "relative",
-            width: previewW,   // FIX: was effectivePreviewW (broken calc)
-            height: previewH,  // FIX: was clampedPreviewH
-            overflow: "hidden", borderRadius: 10, border: `1px solid #1e1e1e`,
-            cursor: dragging ? "grabbing" : "grab", userSelect: "none",
-            margin: "0 auto 10px", background: "#080808",
-            touchAction: "none",
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={() => setDragging(false)}
-          onMouseLeave={() => setDragging(false)}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={() => setDragging(false)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            ref={imgRef}
-            src={imgSrc}
-            alt="Crop preview"
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              initCrop(img.naturalWidth, img.naturalHeight);
-            }}
-            style={{
-              width: previewW,   // FIX: was effectivePreviewW
-              height: previewH,  // FIX: was clampedPreviewH
-              objectFit: "fill",
-              display: "block",
-              pointerEvents: "none",
-              filter: "brightness(0.3)",
-            }}
-          />
-          {cropW > 0 && (
-            <div style={{
-              position: "absolute",
-              left: boxX, top: boxY,
-              width: boxW, height: boxH,
-              border: `2px solid ${accent}`,
-              boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
-              pointerEvents: "none",
-            }}>
-              {[1, 2].map(n => (
-                <div key={`h${n}`} style={{ position: "absolute", left: 0, right: 0, top: `${(n / 3) * 100}%`, height: 1, background: `${accent}30` }} />
-              ))}
-              {[1, 2].map(n => (
-                <div key={`v${n}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${(n / 3) * 100}%`, width: 1, background: `${accent}30` }} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 16, letterSpacing: 0.5 }}>
-          {cropW} × {cropH}px
-          {queueTotal > 1 && (
-            <span style={{ marginLeft: 10, color: "#444" }}>
-              {queueIndex + 1} / {queueTotal}
-            </span>
-          )}
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
+        
+        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
           {queueIndex < queueTotal - 1 ? (
             // Not last image — show "Crop & Next" button
             <button
@@ -292,6 +227,72 @@ function CropModal({
           >
             Cancel
           </button>
+        </div>
+
+        {/* Crop canvas */}
+        <div
+          style={{
+            position: "relative",
+            width: previewW,   // FIX: was effectivePreviewW (broken calc)
+            height: previewH,  // FIX: was clampedPreviewH
+            overflow: "visible", border: `1px solid #1e1e1e`,
+            cursor: dragging ? "grabbing" : "grab", userSelect: "none",
+            margin: "0 auto 10px", background: "#080808",
+            touchAction: "none",
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={() => setDragging(false)}
+          onMouseLeave={() => setDragging(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={() => setDragging(false)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={imgRef}
+            src={imgSrc}
+            alt="Crop preview"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              initCrop(img.naturalWidth, img.naturalHeight);
+            }}
+            style={{
+              width: previewW,   // FIX: was effectivePreviewW
+              height: previewH,  // FIX: was clampedPreviewH
+              objectFit: "fill",
+              display: "block",
+              pointerEvents: "none",
+              filter: "brightness(0.3)",
+              borderRadius: 10,
+            }}
+          />
+          {cropW > 0 && (
+            <div style={{
+              position: "absolute",
+              left: boxX, top: boxY,
+              width: boxW, height: boxH,
+              border: `2px solid ${accent}`,
+              boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
+              pointerEvents: "none",
+            }}>
+              {[1, 2].map(n => (
+                <div key={`h${n}`} style={{ position: "absolute", left: 0, right: 0, top: `${(n / 3) * 100}%`, height: 1, background: `${accent}30` }} />
+              ))}
+              {[1, 2].map(n => (
+                <div key={`v${n}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${(n / 3) * 100}%`, width: 1, background: `${accent}30` }} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 16, letterSpacing: 0.5 }}>
+          {cropW} × {cropH}px
+          {queueTotal > 1 && (
+            <span style={{ marginLeft: 10, color: "#444" }}>
+              {queueIndex + 1} / {queueTotal}
+            </span>
+          )}
         </div>
       </div>
     </div>
