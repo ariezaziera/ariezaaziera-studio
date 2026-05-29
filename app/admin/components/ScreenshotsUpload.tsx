@@ -7,8 +7,8 @@ import type { SplitScreenshots } from "@/types/split-screenshots";
 
 // ─── Crop aspect ratios per device ───────────────────────────────────────────
 const CROP_RATIOS = {
-  mobile: 9 / 19.5,  // modern phone ratio ~718x1556
-  desktop: 1.3256,   // landscape 4:3-ish
+  mobile: 271 / 441,  // matches mockup portrait dimensions
+  desktop: 1.3256,    // landscape 4:3-ish
 };
 
 export type { SplitScreenshots } from "@/types/split-screenshots";
@@ -19,36 +19,29 @@ const DESKTOP_ACCENT = "#60A5FA";
 const MOBILE_ACCENT_BG = "rgba(167,139,250,0.10)";
 const DESKTOP_ACCENT_BG = "rgba(96,165,250,0.10)";
 
-// ─── useViewportSize hook ─────────────────────────────────────────────────────
-function useViewportSize() {
-  const [size, setSize] = useState({
-    w: typeof window !== "undefined" ? window.innerWidth : 480,
-    h: typeof window !== "undefined" ? window.innerHeight : 800,
-  });
+// ─── useViewportWidth hook ────────────────────────────────────────────────────
+function useViewportWidth() {
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 480
+  );
   useEffect(() => {
-    const handler = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    const handler = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  return size;
+  return width;
 }
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
 function CropModal({
   file,
   deviceType,
-  queueIndex,
-  queueTotal,
   onConfirm,
-  onSkip,
   onCancel,
 }: {
   file: File;
   deviceType: "mobile" | "desktop";
-  queueIndex: number;
-  queueTotal: number;
   onConfirm: (blob: Blob) => void;
-  onSkip: () => void;
   onCancel: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -63,10 +56,11 @@ function CropModal({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOrigin, setDragOrigin] = useState({ x: 0, y: 0 });
 
-  const { w: vw, h: vh } = useViewportSize();
+  const viewportWidth = useViewportWidth();
 
-  // FIX 1: Responsive — 32px padding each side, max 520px
-  const PREVIEW_W = Math.min(520, vw - 64);
+  // Responsive preview width: fits within viewport with 48px padding on each side
+  const PREVIEW_W = Math.min(480, viewportWidth - 96);
+
   const targetRatio = CROP_RATIOS[deviceType];
   const accent = deviceType === "mobile" ? MOBILE_ACCENT : DESKTOP_ACCENT;
 
@@ -91,16 +85,20 @@ function CropModal({
     [targetRatio]
   );
 
-  const scaleW = imgNaturalW > 0 ? PREVIEW_W / imgNaturalW : 1;
-  const fullPreviewH = Math.round(imgNaturalH * scaleW);
+  const scale = imgNaturalW > 0 ? PREVIEW_W / imgNaturalW : 1;
+  const previewH = Math.round(imgNaturalH * scale);
 
-  // FIX 2: Cap height — leave 180px for header + buttons
-  const maxPreviewH = Math.max(100, vh - 180);
-  const previewH = Math.min(fullPreviewH || 300, maxPreviewH);
+  // Cap preview height — use 0.65 of viewport and subtract more for header+buttons
+  // so the confirm button is always visible without scrolling
+  const maxPreviewH = typeof window !== "undefined"
+    ? Math.round(window.innerHeight * 0.65) - 200
+    : 360;
+  const clampedPreviewH = Math.min(previewH || 270, maxPreviewH);
 
-  // FIX 3: Recalc effective scale + width if height was clamped
-  const effectiveScale = fullPreviewH > 0 ? (previewH / fullPreviewH) * scaleW : scaleW;
-  const previewW = imgNaturalW > 0 ? Math.round(imgNaturalW * effectiveScale) : PREVIEW_W;
+  // Recalculate effective scale if height was clamped
+  const effectiveScale = previewH > 0 && clampedPreviewH < previewH
+    ? clampedPreviewH / previewH * scale
+    : scale;
 
   const clampCrop = (x: number, y: number) => ({
     x: Math.max(0, Math.min(imgNaturalW - cropW, x)),
@@ -116,9 +114,11 @@ function CropModal({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragging) return;
+    const dx = (e.clientX - dragStart.x) / effectiveScale;
+    const dy = (e.clientY - dragStart.y) / effectiveScale;
     const { x, y } = clampCrop(
-      Math.round(dragOrigin.x + (e.clientX - dragStart.x) / effectiveScale),
-      Math.round(dragOrigin.y + (e.clientY - dragStart.y) / effectiveScale)
+      Math.round(dragOrigin.x + dx),
+      Math.round(dragOrigin.y + dy)
     );
     setCropX(x);
     setCropY(y);
@@ -126,19 +126,21 @@ function CropModal({
 
   // Touch drag
   const handleTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0];
+    const touch = e.touches[0];
     setDragging(true);
-    setDragStart({ x: t.clientX, y: t.clientY });
+    setDragStart({ x: touch.clientX, y: touch.clientY });
     setDragOrigin({ x: cropX, y: cropY });
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!dragging) return;
     e.preventDefault();
-    const t = e.touches[0];
+    const touch = e.touches[0];
+    const dx = (touch.clientX - dragStart.x) / effectiveScale;
+    const dy = (touch.clientY - dragStart.y) / effectiveScale;
     const { x, y } = clampCrop(
-      Math.round(dragOrigin.x + (t.clientX - dragStart.x) / effectiveScale),
-      Math.round(dragOrigin.y + (t.clientY - dragStart.y) / effectiveScale)
+      Math.round(dragOrigin.x + dx),
+      Math.round(dragOrigin.y + dy)
     );
     setCropX(x);
     setCropY(y);
@@ -156,40 +158,45 @@ function CropModal({
     canvas.toBlob((blob) => { if (blob) onConfirm(blob); }, "image/webp", 0.92);
   };
 
-  const boxX = Math.round(cropX * effectiveScale);
-  const boxY = Math.round(cropY * effectiveScale);
-  const boxW = Math.round(cropW * effectiveScale);
-  const boxH = Math.round(cropH * effectiveScale);
+  const cropPreviewX = Math.round(cropX * effectiveScale);
+  const cropPreviewY = Math.round(cropY * effectiveScale);
+  const cropPreviewW = Math.round(cropW * effectiveScale);
+  const cropPreviewH = Math.round(cropH * effectiveScale);
+
+  // Effective preview width when height is clamped
+  const effectivePreviewW = previewH > 0 && clampedPreviewH < previewH
+    ? Math.round(PREVIEW_W * (clampedPreviewH / previewH))
+    : PREVIEW_W;
 
   return (
     <div style={{
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
       zIndex: 999,
-      display: "flex", alignItems: "flex-start", justifyContent: "center",
+      display: "flex", alignItems: "center", justifyContent: "center",
       overflowY: "auto",
-      padding: "4vh 16px 24px",
+      padding: "12px 16px",
     }}>
       <div style={{
         background: "#0f0f0f", border: `1px solid #1e1e1e`,
-        borderRadius: 14, padding: 20,
+        borderRadius: 14, padding: 16,
         width: "100%",
-        maxWidth: 560,  // FIX: was Math.max(effectivePreviewW + 40, 320)
+        maxWidth: Math.max(effectivePreviewW + 32, 300),
       }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
           <div style={{
-            width: 28, height: 28, borderRadius: 7, background: `${accent}18`,
+            width: 24, height: 24, borderRadius: 6, background: `${accent}18`,
             border: `1px solid ${accent}30`, display: "flex", alignItems: "center",
-            justifyContent: "center", fontSize: 14, flexShrink: 0,
+            justifyContent: "center", fontSize: 12, flexShrink: 0,
           }}>
             ✂️
           </div>
           <div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14, color: "#fff" }}>
               Crop to fit
             </div>
-            <div style={{ fontSize: 11, color: "#555", marginTop: 1 }}>
-              {deviceType === "mobile" ? "Portrait · 9:19.5" : "Landscape · 4:3"} — drag to reposition
+            <div style={{ fontSize: 10, color: "#555", marginTop: 1 }}>
+              {deviceType === "mobile" ? "Portrait · 271×441" : "Landscape · 4:3"} — drag to reposition
             </div>
           </div>
         </div>
@@ -198,11 +205,11 @@ function CropModal({
         <div
           style={{
             position: "relative",
-            width: previewW,   // FIX: was effectivePreviewW (broken calc)
-            height: previewH,  // FIX: was clampedPreviewH
-            overflow: "hidden", borderRadius: 10, border: `1px solid #1e1e1e`,
+            width: effectivePreviewW,
+            height: clampedPreviewH,
+            overflow: "hidden", borderRadius: 8, border: `1px solid #1e1e1e`,
             cursor: dragging ? "grabbing" : "grab", userSelect: "none",
-            margin: "0 auto 10px", background: "#080808",
+            margin: "0 auto 6px", background: "#080808",
             touchAction: "none",
           }}
           onMouseDown={handleMouseDown}
@@ -223,8 +230,8 @@ function CropModal({
               initCrop(img.naturalWidth, img.naturalHeight);
             }}
             style={{
-              width: previewW,   // FIX: was effectivePreviewW
-              height: previewH,  // FIX: was clampedPreviewH
+              width: effectivePreviewW,
+              height: clampedPreviewH,
               objectFit: "fill",
               display: "block",
               pointerEvents: "none",
@@ -234,8 +241,8 @@ function CropModal({
           {cropW > 0 && (
             <div style={{
               position: "absolute",
-              left: boxX, top: boxY,
-              width: boxW, height: boxH,
+              left: cropPreviewX, top: cropPreviewY,
+              width: cropPreviewW, height: cropPreviewH,
               border: `2px solid ${accent}`,
               boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
               pointerEvents: "none",
@@ -250,42 +257,17 @@ function CropModal({
           )}
         </div>
 
-        <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 16, letterSpacing: 0.5 }}>
+        <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 10, letterSpacing: 0.5 }}>
           {cropW} × {cropH}px
-          {queueTotal > 1 && (
-            <span style={{ marginLeft: 10, color: "#444" }}>
-              {queueIndex + 1} / {queueTotal}
-            </span>
-          )}
         </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          {queueIndex < queueTotal - 1 ? (
-            // Not last image — show "Crop & Next" button
-            <button
-              onClick={handleConfirm}
-              style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
-            >
-              Crop &amp; Next →
-            </button>
-          ) : (
-            // Last image — show "Confirm crop"
-            <button
-              onClick={handleConfirm}
-              style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
-            >
-              Confirm crop
-            </button>
-          )}
-          {queueIndex < queueTotal - 1 && (
-            <button
-              onClick={onSkip}
-              style={{ ...btnStyle, fontSize: 12 }}
-              title="Skip this image"
-            >
-              Skip
-            </button>
-          )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={handleConfirm}
+            style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
+          >
+            Confirm crop
+          </button>
           <button
             onClick={() => { URL.revokeObjectURL(imgSrc); onCancel(); }}
             style={{ ...btnStyle, fontSize: 12 }}
@@ -533,7 +515,7 @@ function TabButton({
 function HintChips({ deviceType }: { deviceType: "mobile" | "desktop" }) {
   const isMobile = deviceType === "mobile";
   const chips = [
-    isMobile ? "Portrait · 9:19.5" : "Landscape · 4:3",
+    isMobile ? "Portrait · 271×441" : "Landscape · 4:3",
     "2+ images → carousel",
     "Auto-crop on upload",
   ];
@@ -571,7 +553,6 @@ export function ScreenshotsUpload({
   );
   const [activeTab, setActiveTab] = useState<"mobile" | "desktop">("mobile");
   const [cropQueue, setCropQueue] = useState<{ file: File; deviceType: "mobile" | "desktop" }[]>([]);
-  const [cropQueueTotal, setCropQueueTotal] = useState(0);
   const [uploading, setUploading] = useState<{ mobile: boolean; desktop: boolean }>({ mobile: false, desktop: false });
   const [uploadProgress, setUploadProgress] = useState<{ mobile: string; desktop: string }>({ mobile: "", desktop: "" });
   const [error, setError] = useState("");
@@ -587,19 +568,13 @@ export function ScreenshotsUpload({
     if (oversized.length) setError(`${oversized.length} file(s) exceed 5 MB and were skipped.`);
     else setError("");
     if (!imageFiles.length) return;
-    setCropQueueTotal(imageFiles.length);
     setCropQueue(imageFiles.map(file => ({ file, deviceType })));
   };
 
   const handleCropConfirm = async (blob: Blob) => {
     if (!cropQueue.length) return;
-
-    // FIX: capture deviceType before mutating queue
     const { deviceType } = cropQueue[0];
-
-    // FIX: advance queue immediately so next modal opens right away
     setCropQueue(q => q.slice(1));
-
     if (!supabase) return;
 
     setUploading(u => ({ ...u, [deviceType]: true }));
@@ -619,17 +594,11 @@ export function ScreenshotsUpload({
     }
 
     const { data } = supabase.storage.from("portfolio-images").getPublicUrl(path);
-
-    // FIX: functional update to avoid stale closure across multiple queued uploads
-    setScreenshots(prev => {
-      const next: SplitScreenshots = {
-        ...prev,
-        [deviceType]: [...prev[deviceType], data.publicUrl],
-      };
-      onUpdate(next);
-      return next;
-    });
-
+    const next: SplitScreenshots = {
+      ...screenshots,
+      [deviceType]: [...screenshots[deviceType], data.publicUrl],
+    };
+    update(next);
     setUploading(u => ({ ...u, [deviceType]: false }));
     setUploadProgress(p => ({ ...p, [deviceType]: "" }));
   };
@@ -720,17 +689,20 @@ export function ScreenshotsUpload({
       {/* Auto-detect banner */}
       <AutoDetectBanner mobile={screenshots.mobile.length} desktop={screenshots.desktop.length} />
 
+      {/* Crop queue progress */}
+      {cropQueue.length > 1 && (
+        <div style={{ fontSize: 10, color: "#444", marginTop: 8, textAlign: "center", letterSpacing: 0.5 }}>
+          {cropQueue.length - 1} more image{cropQueue.length > 2 ? "s" : ""} queued after this
+        </div>
+      )}
+
       {/* Crop modal */}
       {cropQueue.length > 0 && (
         <CropModal
-          key={cropQueue[0].file.name + cropQueue[0].file.lastModified + cropQueue.length}
           file={cropQueue[0].file}
           deviceType={cropQueue[0].deviceType}
-          queueIndex={cropQueueTotal - cropQueue.length}
-          queueTotal={cropQueueTotal}
           onConfirm={handleCropConfirm}
-          onSkip={handleCropCancel}
-          onCancel={() => setCropQueue([])}
+          onCancel={handleCropCancel}
         />
       )}
     </div>
