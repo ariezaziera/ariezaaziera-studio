@@ -7,8 +7,8 @@ import type { SplitScreenshots } from "@/types/split-screenshots";
 
 // ─── Crop aspect ratios per device ───────────────────────────────────────────
 const CROP_RATIOS = {
-  mobile: 271 / 441,  // portrait 9:16-ish
-  desktop: 1.3256,    // landscape 4:3-ish
+  mobile: 9 / 19.5,  // modern phone ratio ~718x1556
+  desktop: 1.3256,   // landscape 4:3-ish
 };
 
 export type { SplitScreenshots } from "@/types/split-screenshots";
@@ -19,17 +19,18 @@ const DESKTOP_ACCENT = "#60A5FA";
 const MOBILE_ACCENT_BG = "rgba(167,139,250,0.10)";
 const DESKTOP_ACCENT_BG = "rgba(96,165,250,0.10)";
 
-// ─── useViewportWidth hook ────────────────────────────────────────────────────
-function useViewportWidth() {
-  const [width, setWidth] = useState<number>(
-    typeof window !== "undefined" ? window.innerWidth : 480
-  );
+// ─── useViewportSize hook ─────────────────────────────────────────────────────
+function useViewportSize() {
+  const [size, setSize] = useState({
+    w: typeof window !== "undefined" ? window.innerWidth : 480,
+    h: typeof window !== "undefined" ? window.innerHeight : 800,
+  });
   useEffect(() => {
-    const handler = () => setWidth(window.innerWidth);
+    const handler = () => setSize({ w: window.innerWidth, h: window.innerHeight });
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-  return width;
+  return size;
 }
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
@@ -56,11 +57,10 @@ function CropModal({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOrigin, setDragOrigin] = useState({ x: 0, y: 0 });
 
-  const viewportWidth = useViewportWidth();
+  const { w: vw, h: vh } = useViewportSize();
 
-  // Responsive preview width: fits within viewport with 48px padding on each side
-  const PREVIEW_W = Math.min(480, viewportWidth - 96);
-
+  // FIX 1: Responsive — 32px padding each side, max 520px
+  const PREVIEW_W = Math.min(520, vw - 64);
   const targetRatio = CROP_RATIOS[deviceType];
   const accent = deviceType === "mobile" ? MOBILE_ACCENT : DESKTOP_ACCENT;
 
@@ -85,19 +85,16 @@ function CropModal({
     [targetRatio]
   );
 
-  const scale = imgNaturalW > 0 ? PREVIEW_W / imgNaturalW : 1;
-  const previewH = Math.round(imgNaturalH * scale);
+  const scaleW = imgNaturalW > 0 ? PREVIEW_W / imgNaturalW : 1;
+  const fullPreviewH = Math.round(imgNaturalH * scaleW);
 
-  // Cap preview height so modal fits on screen (leave room for header + buttons ~160px)
-  const maxPreviewH = typeof window !== "undefined"
-    ? Math.round(window.innerHeight * 0.9) - 160
-    : 500;
-  const clampedPreviewH = Math.min(previewH || 270, maxPreviewH);
+  // FIX 2: Cap height — leave 180px for header + buttons
+  const maxPreviewH = Math.max(100, vh - 180);
+  const previewH = Math.min(fullPreviewH || 300, maxPreviewH);
 
-  // Recalculate effective scale if height was clamped
-  const effectiveScale = previewH > 0 && clampedPreviewH < previewH
-    ? clampedPreviewH / previewH * scale
-    : scale;
+  // FIX 3: Recalc effective scale + width if height was clamped
+  const effectiveScale = fullPreviewH > 0 ? (previewH / fullPreviewH) * scaleW : scaleW;
+  const previewW = imgNaturalW > 0 ? Math.round(imgNaturalW * effectiveScale) : PREVIEW_W;
 
   const clampCrop = (x: number, y: number) => ({
     x: Math.max(0, Math.min(imgNaturalW - cropW, x)),
@@ -113,11 +110,9 @@ function CropModal({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragging) return;
-    const dx = (e.clientX - dragStart.x) / effectiveScale;
-    const dy = (e.clientY - dragStart.y) / effectiveScale;
     const { x, y } = clampCrop(
-      Math.round(dragOrigin.x + dx),
-      Math.round(dragOrigin.y + dy)
+      Math.round(dragOrigin.x + (e.clientX - dragStart.x) / effectiveScale),
+      Math.round(dragOrigin.y + (e.clientY - dragStart.y) / effectiveScale)
     );
     setCropX(x);
     setCropY(y);
@@ -125,21 +120,19 @@ function CropModal({
 
   // Touch drag
   const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
+    const t = e.touches[0];
     setDragging(true);
-    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setDragStart({ x: t.clientX, y: t.clientY });
     setDragOrigin({ x: cropX, y: cropY });
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!dragging) return;
     e.preventDefault();
-    const touch = e.touches[0];
-    const dx = (touch.clientX - dragStart.x) / effectiveScale;
-    const dy = (touch.clientY - dragStart.y) / effectiveScale;
+    const t = e.touches[0];
     const { x, y } = clampCrop(
-      Math.round(dragOrigin.x + dx),
-      Math.round(dragOrigin.y + dy)
+      Math.round(dragOrigin.x + (t.clientX - dragStart.x) / effectiveScale),
+      Math.round(dragOrigin.y + (t.clientY - dragStart.y) / effectiveScale)
     );
     setCropX(x);
     setCropY(y);
@@ -157,15 +150,10 @@ function CropModal({
     canvas.toBlob((blob) => { if (blob) onConfirm(blob); }, "image/webp", 0.92);
   };
 
-  const cropPreviewX = Math.round(cropX * effectiveScale);
-  const cropPreviewY = Math.round(cropY * effectiveScale);
-  const cropPreviewW = Math.round(cropW * effectiveScale);
-  const cropPreviewH = Math.round(cropH * effectiveScale);
-
-  // Effective preview width when height is clamped
-  const effectivePreviewW = previewH > 0 && clampedPreviewH < previewH
-    ? Math.round(PREVIEW_W * (clampedPreviewH / previewH))
-    : PREVIEW_W;
+  const boxX = Math.round(cropX * effectiveScale);
+  const boxY = Math.round(cropY * effectiveScale);
+  const boxW = Math.round(cropW * effectiveScale);
+  const boxH = Math.round(cropH * effectiveScale);
 
   return (
     <div style={{
@@ -173,13 +161,13 @@ function CropModal({
       zIndex: 999,
       display: "flex", alignItems: "flex-start", justifyContent: "center",
       overflowY: "auto",
-      padding: "5vh 16px 24px",
+      padding: "4vh 16px 24px",
     }}>
       <div style={{
         background: "#0f0f0f", border: `1px solid #1e1e1e`,
         borderRadius: 14, padding: 20,
         width: "100%",
-        maxWidth: Math.max(effectivePreviewW + 40, 320),
+        maxWidth: 560,  // FIX: was Math.max(effectivePreviewW + 40, 320)
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
@@ -195,7 +183,7 @@ function CropModal({
               Crop to fit
             </div>
             <div style={{ fontSize: 11, color: "#555", marginTop: 1 }}>
-              {deviceType === "mobile" ? "Portrait · 9:16" : "Landscape · 4:3"} — drag to reposition
+              {deviceType === "mobile" ? "Portrait · 9:19.5" : "Landscape · 4:3"} — drag to reposition
             </div>
           </div>
         </div>
@@ -204,8 +192,8 @@ function CropModal({
         <div
           style={{
             position: "relative",
-            width: effectivePreviewW,
-            height: clampedPreviewH,
+            width: previewW,   // FIX: was effectivePreviewW (broken calc)
+            height: previewH,  // FIX: was clampedPreviewH
             overflow: "hidden", borderRadius: 10, border: `1px solid #1e1e1e`,
             cursor: dragging ? "grabbing" : "grab", userSelect: "none",
             margin: "0 auto 10px", background: "#080808",
@@ -229,8 +217,8 @@ function CropModal({
               initCrop(img.naturalWidth, img.naturalHeight);
             }}
             style={{
-              width: effectivePreviewW,
-              height: clampedPreviewH,
+              width: previewW,   // FIX: was effectivePreviewW
+              height: previewH,  // FIX: was clampedPreviewH
               objectFit: "fill",
               display: "block",
               pointerEvents: "none",
@@ -240,8 +228,8 @@ function CropModal({
           {cropW > 0 && (
             <div style={{
               position: "absolute",
-              left: cropPreviewX, top: cropPreviewY,
-              width: cropPreviewW, height: cropPreviewH,
+              left: boxX, top: boxY,
+              width: boxW, height: boxH,
               border: `2px solid ${accent}`,
               boxShadow: `0 0 0 9999px rgba(0,0,0,0.5)`,
               pointerEvents: "none",
@@ -514,7 +502,7 @@ function TabButton({
 function HintChips({ deviceType }: { deviceType: "mobile" | "desktop" }) {
   const isMobile = deviceType === "mobile";
   const chips = [
-    isMobile ? "Portrait · 9:16" : "Landscape · 4:3",
+    isMobile ? "Portrait · 9:19.5" : "Landscape · 4:3",
     "2+ images → carousel",
     "Auto-crop on upload",
   ];
@@ -572,8 +560,13 @@ export function ScreenshotsUpload({
 
   const handleCropConfirm = async (blob: Blob) => {
     if (!cropQueue.length) return;
+
+    // FIX: capture deviceType before mutating queue
     const { deviceType } = cropQueue[0];
+
+    // FIX: advance queue immediately so next modal opens right away
     setCropQueue(q => q.slice(1));
+
     if (!supabase) return;
 
     setUploading(u => ({ ...u, [deviceType]: true }));
@@ -593,11 +586,17 @@ export function ScreenshotsUpload({
     }
 
     const { data } = supabase.storage.from("portfolio-images").getPublicUrl(path);
-    const next: SplitScreenshots = {
-      ...screenshots,
-      [deviceType]: [...screenshots[deviceType], data.publicUrl],
-    };
-    update(next);
+
+    // FIX: functional update to avoid stale closure across multiple queued uploads
+    setScreenshots(prev => {
+      const next: SplitScreenshots = {
+        ...prev,
+        [deviceType]: [...prev[deviceType], data.publicUrl],
+      };
+      onUpdate(next);
+      return next;
+    });
+
     setUploading(u => ({ ...u, [deviceType]: false }));
     setUploadProgress(p => ({ ...p, [deviceType]: "" }));
   };
