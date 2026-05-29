@@ -8,7 +8,7 @@ import type { SplitScreenshots } from "@/types/split-screenshots";
 // ─── Crop aspect ratios per device ───────────────────────────────────────────
 const CROP_RATIOS = {
   mobile: 9 / 19.5,  // modern phone ratio ~718x1556
-  desktop: 16 / 10,   // landscape 4:3-ish
+  desktop: 16 / 9.5,   // landscape 4:3-ish
 };
 
 export type { SplitScreenshots } from "@/types/split-screenshots";
