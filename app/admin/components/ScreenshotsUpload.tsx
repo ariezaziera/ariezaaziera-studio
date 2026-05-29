@@ -37,12 +37,18 @@ function useViewportSize() {
 function CropModal({
   file,
   deviceType,
+  queueIndex,
+  queueTotal,
   onConfirm,
+  onSkip,
   onCancel,
 }: {
   file: File;
   deviceType: "mobile" | "desktop";
+  queueIndex: number;
+  queueTotal: number;
   onConfirm: (blob: Blob) => void;
+  onSkip: () => void;
   onCancel: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -246,15 +252,40 @@ function CropModal({
 
         <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 16, letterSpacing: 0.5 }}>
           {cropW} × {cropH}px
+          {queueTotal > 1 && (
+            <span style={{ marginLeft: 10, color: "#444" }}>
+              {queueIndex + 1} / {queueTotal}
+            </span>
+          )}
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={handleConfirm}
-            style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
-          >
-            Confirm crop
-          </button>
+          {queueIndex < queueTotal - 1 ? (
+            // Not last image — show "Crop & Next" button
+            <button
+              onClick={handleConfirm}
+              style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
+            >
+              Crop &amp; Next →
+            </button>
+          ) : (
+            // Last image — show "Confirm crop"
+            <button
+              onClick={handleConfirm}
+              style={{ ...btnStyle, flex: 1, background: accent, color: "#000", border: `1px solid ${accent}`, fontSize: 12, fontWeight: 600 }}
+            >
+              Confirm crop
+            </button>
+          )}
+          {queueIndex < queueTotal - 1 && (
+            <button
+              onClick={onSkip}
+              style={{ ...btnStyle, fontSize: 12 }}
+              title="Skip this image"
+            >
+              Skip
+            </button>
+          )}
           <button
             onClick={() => { URL.revokeObjectURL(imgSrc); onCancel(); }}
             style={{ ...btnStyle, fontSize: 12 }}
@@ -540,6 +571,7 @@ export function ScreenshotsUpload({
   );
   const [activeTab, setActiveTab] = useState<"mobile" | "desktop">("mobile");
   const [cropQueue, setCropQueue] = useState<{ file: File; deviceType: "mobile" | "desktop" }[]>([]);
+  const [cropQueueTotal, setCropQueueTotal] = useState(0);
   const [uploading, setUploading] = useState<{ mobile: boolean; desktop: boolean }>({ mobile: false, desktop: false });
   const [uploadProgress, setUploadProgress] = useState<{ mobile: string; desktop: string }>({ mobile: "", desktop: "" });
   const [error, setError] = useState("");
@@ -555,6 +587,7 @@ export function ScreenshotsUpload({
     if (oversized.length) setError(`${oversized.length} file(s) exceed 5 MB and were skipped.`);
     else setError("");
     if (!imageFiles.length) return;
+    setCropQueueTotal(imageFiles.length);
     setCropQueue(imageFiles.map(file => ({ file, deviceType })));
   };
 
@@ -687,20 +720,17 @@ export function ScreenshotsUpload({
       {/* Auto-detect banner */}
       <AutoDetectBanner mobile={screenshots.mobile.length} desktop={screenshots.desktop.length} />
 
-      {/* Crop queue progress */}
-      {cropQueue.length > 1 && (
-        <div style={{ fontSize: 10, color: "#444", marginTop: 8, textAlign: "center", letterSpacing: 0.5 }}>
-          {cropQueue.length - 1} more image{cropQueue.length > 2 ? "s" : ""} queued after this
-        </div>
-      )}
-
       {/* Crop modal */}
       {cropQueue.length > 0 && (
         <CropModal
+          key={cropQueue[0].file.name + cropQueue[0].file.lastModified + cropQueue.length}
           file={cropQueue[0].file}
           deviceType={cropQueue[0].deviceType}
+          queueIndex={cropQueueTotal - cropQueue.length}
+          queueTotal={cropQueueTotal}
           onConfirm={handleCropConfirm}
-          onCancel={handleCropCancel}
+          onSkip={handleCropCancel}
+          onCancel={() => setCropQueue([])}
         />
       )}
     </div>
