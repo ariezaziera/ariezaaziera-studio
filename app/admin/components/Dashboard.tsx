@@ -14,6 +14,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -26,6 +27,42 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
       setLoading(false);
     });
   }, []);
+
+  const handleAddProject = async () => {
+    if (!supabase) return;
+    setCreating(true);
+    const slug = `project-${Date.now()}`;
+    const newProject = {
+      slug,
+      title: "New Project",
+      tagline: "Short project description",
+      type: "Product",
+      tech: [],
+      color: "#F5C542",
+      featured: false,
+      role: "",
+      context: "",
+      problem: "",
+      solution: "",
+      outcome: "",
+      screenshots: { mobile: [], desktop: [] },
+      mockup_type: "desktop",
+      github_url: null,
+      live_url: null,
+      video_url: null,
+      image_url: null,
+    };
+    const { data, error } = await supabase
+      .from("projects")
+      .insert(newProject)
+      .select()
+      .single();
+    setCreating(false);
+    if (!error && data) {
+      setProjects((ps) => [...ps, data as Project]);
+      setEditingProject(data as Project);
+    }
+  };
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -77,6 +114,13 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
           <div style={{ fontSize: 10, color: YELLOW, letterSpacing: 3 }}>02 — PROJECTS</div>
           <div style={{ flex: 1, height: 1, background: BORDER }} />
           <div style={{ fontSize: 10, color: "#555" }}>{projects.length} TOTAL</div>
+          <button
+            onClick={handleAddProject}
+            disabled={creating}
+            style={{ ...btnStyle, background: YELLOW, color: "#000", fontSize: 10, padding: "6px 14px", opacity: creating ? 0.6 : 1 }}
+          >
+            {creating ? "CREATING..." : "+ ADD PROJECT"}
+          </button>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -118,6 +162,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
           project={editingProject}
           onSave={(updated) => { setProjects((ps) => ps.map((p) => p.id === updated.id ? updated : p)); setEditingProject(null); }}
           onClose={() => setEditingProject(null)}
+          onDelete={(id) => { setProjects((ps) => ps.filter((p) => p.id !== id)); }}
         />
       )}
       {editingProfile && profile && (
