@@ -322,7 +322,7 @@ export function ProjectEditor({
         {/* NEW: Status selector */}
         <StatusSelector
           value={form.status}
-          onChange={(v) => setForm((f) => ({ ...f, status: v }))}
+          onChange={(v) => setForm((f) => ({ ...f, status: v as "live" | "in-dev" | "archived" | "completed" }))}
         />
 
         {/* Color + featured */}
