@@ -57,7 +57,7 @@ function DotGrid() {
 }
 
 // ─── NEW: Mouse-following radial spotlight ────────────────────────────────────
-function Spotlight({ containerRef }: { containerRef: React.RefObject<HTMLElement> }) {
+function Spotlight({ containerRef }: { containerRef: React.RefObject<HTMLElement | null> }) {
   const [pos, setPos] = useState({ x: -999, y: -999 });
 
   useEffect(() => {
