@@ -25,7 +25,7 @@ export default function AboutSection() {
 
   const stats = [
     { num: "3+", label: "Years building" },
-    { num: `${projects.length}`, label: "Products shipped" },
+    { num: `${projects.length}+`, label: "Products shipped" },
     { num: "60%", label: "Ops time saved (OrderCalc)" },
     { num: "40%", label: "Drop-off reduced (OptimaBank)" },
   ];
