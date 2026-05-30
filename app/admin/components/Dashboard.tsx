@@ -7,6 +7,7 @@ import type { Profile } from "@/lib/data";
 import { YELLOW, BORDER, CARD, GREEN, RED, btnStyle } from "../layout";
 import { ProjectEditor } from "./ProjectEditor";
 import { ProfileEditor } from "./ProfileEditor";
+import { AddProjectModal } from "./AddProjectModal";
 
 export function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -14,10 +15,14 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingProfile, setEditingProfile] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     Promise.all([
       supabase.from("projects").select("*").order("id"),
       supabase.from("profile").select("*").single(),
@@ -28,40 +33,13 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     });
   }, []);
 
-  const handleAddProject = async () => {
-    if (!supabase) return;
-    setCreating(true);
-    const slug = `project-${Date.now()}`;
-    const newProject = {
-      slug,
-      title: "New Project",
-      tagline: "Short project description",
-      type: "Product",
-      tech: [],
-      color: "#F5C542",
-      featured: false,
-      role: "",
-      context: "",
-      problem: "",
-      solution: "",
-      outcome: "",
-      screenshots: { mobile: [], desktop: [] },
-      mockup_type: "desktop",
-      github_url: null,
-      live_url: null,
-      video_url: null,
-      image_url: null,
-    };
-    const { data, error } = await supabase
-      .from("projects")
-      .insert(newProject)
-      .select()
-      .single();
-    setCreating(false);
-    if (!error && data) {
-      setProjects((ps) => [...ps, data as Project]);
-      setEditingProject(data as Project);
+  const handleAddProject = () => {
+    setAddError("");
+    if (!supabase) {
+      setAddError("Supabase not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env.local file.");
+      return;
     }
+    setShowAddModal(true);
   };
 
   if (loading) return (
@@ -72,6 +50,20 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
 
   return (
     <div style={{ minHeight: "100vh", padding: "40px clamp(16px, 5vw, 48px)" }}>
+
+      {/* Supabase not configured warning */}
+      {!supabase && (
+        <div style={{
+          marginBottom: 32, padding: "14px 18px",
+          background: "#F5C54210", border: "1px solid #F5C54240",
+          borderRadius: 10, fontSize: 11, color: "#F5C542", lineHeight: 1.8,
+        }}>
+          <div style={{ fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>⚠ SUPABASE NOT CONFIGURED</div>
+          <div style={{ color: "#888" }}>
+            Admin CMS requires Supabase. Add <code style={{ background: "#ffffff10", padding: "1px 6px", borderRadius: 3 }}>NEXT_PUBLIC_SUPABASE_URL</code> and <code style={{ background: "#ffffff10", padding: "1px 6px", borderRadius: 3 }}>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to your <code style={{ background: "#ffffff10", padding: "1px 6px", borderRadius: 3 }}>.env.local</code> file and restart the dev server.
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 48 }}>
         <div>
@@ -116,12 +108,21 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
           <div style={{ fontSize: 10, color: "#555" }}>{projects.length} TOTAL</div>
           <button
             onClick={handleAddProject}
-            disabled={creating}
-            style={{ ...btnStyle, background: YELLOW, color: "#000", fontSize: 10, padding: "6px 14px", opacity: creating ? 0.6 : 1 }}
+            style={{ ...btnStyle, background: YELLOW, color: "#000", fontSize: 10, padding: "6px 14px" }}
           >
-            {creating ? "CREATING..." : "+ ADD PROJECT"}
+            + ADD PROJECT
           </button>
         </div>
+
+        {addError && (
+          <div style={{
+            marginBottom: 16, padding: "12px 16px",
+            background: "#ff000010", border: "1px solid #ff000040",
+            borderRadius: 8, fontSize: 11, color: "#ff6b6b", lineHeight: 1.6,
+          }}>
+            ⚠ {addError}
+          </div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {projects.map((p) => {
@@ -157,6 +158,16 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         </div>
       </div>
 
+      {showAddModal && (
+        <AddProjectModal
+          onCreated={(p) => {
+            setProjects((ps) => [...ps, p]);
+            setShowAddModal(false);
+            setEditingProject(p);
+          }}
+          onClose={() => setShowAddModal(false)}
+        />
+      )}
       {editingProject && (
         <ProjectEditor
           project={editingProject}
