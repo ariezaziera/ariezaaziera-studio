@@ -33,10 +33,12 @@ export function ProjectEditor({
   project,
   onSave,
   onClose,
+  onDelete,
 }: {
   project: Project;
   onSave: (p: Project) => void;
   onClose: () => void;
+  onDelete?: (id: number) => void;
 }) {
   const [form, setForm] = useState({
     ...project,
@@ -50,6 +52,8 @@ export function ProjectEditor({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Detect unsaved media changes
   const originalMedia = useMemo(() => ({
@@ -106,6 +110,17 @@ export function ProjectEditor({
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       onSave({ ...form, mockup_type: mockupType });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!supabase || !onDelete) return;
+    setDeleting(true);
+    const { error } = await supabase.from("projects").delete().eq("id", project.id);
+    setDeleting(false);
+    if (!error) {
+      onDelete(project.id);
+      onClose();
     }
   };
 
@@ -275,6 +290,35 @@ export function ProjectEditor({
           </button>
           <button onClick={onClose} style={{ ...btnStyle, flex: 0 }}>CANCEL</button>
         </div>
+
+        {onDelete && (
+          <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${BORDER}` }}>
+            {!confirmDelete ? (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                style={{ ...btnStyle, fontSize: 10, color: RED, borderColor: RED + "44", width: "100%" }}
+              >
+                DELETE PROJECT
+              </button>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ fontSize: 11, color: RED, letterSpacing: 0.5, textAlign: "center" }}>
+                  Are you sure? This cannot be undone.
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    style={{ ...btnStyle, background: RED, color: "#fff", flex: 1, opacity: deleting ? 0.6 : 1 }}
+                  >
+                    {deleting ? "DELETING..." : "YES, DELETE"}
+                  </button>
+                  <button onClick={() => setConfirmDelete(false)} style={{ ...btnStyle, flex: 1 }}>CANCEL</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
