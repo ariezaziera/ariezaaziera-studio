@@ -6,6 +6,7 @@ export interface Project {
   title: string;
   tagline: string;
   type: string;
+  status?: "live" | "in-dev" | "archived" | "completed";
   tech: string[];
   color: string;
   featured: boolean;
