@@ -426,11 +426,11 @@ export default function LandingSection({
                 style={{
                   fontFamily: "'DM Mono', monospace",
                   fontSize: 8,
-                  color: "#444",
+                  color: "#c0c0c0",
                   letterSpacing: 1.5,
                 }}
               >
-                KL, MY
+                (JB)MY, SG
               </span>
               <span
                 style={{
