@@ -28,6 +28,83 @@ function deriveMockupType(ss: SplitScreenshots): "mobile" | "desktop" | "both" {
   return "mobile";
 }
 
+// ─── NEW: Status config ───────────────────────────────────────────────────────
+const STATUS_OPTIONS: Array<{
+  value: string;
+  label: string;
+  color: string;
+  dot: string;
+  desc: string;
+}> = [
+  { value: "live",      label: "LIVE",       color: "#4ADE80", dot: "#4ADE80", desc: "Deployed & publicly accessible" },
+  { value: "in-dev",    label: "IN DEV",     color: "#F5C518", dot: "#F5C518", desc: "Still being built" },
+  { value: "completed", label: "COMPLETED",  color: "#60A5FA", dot: "#60A5FA", desc: "Done, not necessarily public" },
+  { value: "archived",  label: "ARCHIVED",   color: "#555",    dot: "#555",    desc: "No longer maintained" },
+];
+
+function StatusSelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const current = STATUS_OPTIONS.find((s) => s.value === value) ?? STATUS_OPTIONS[0];
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>
+        PROJECT STATUS
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {STATUS_OPTIONS.map((opt) => {
+          const active = value === opt.value;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => onChange(opt.value)}
+              title={opt.desc}
+              style={{
+                display: "flex", alignItems: "center", gap: 7,
+                padding: "7px 14px",
+                borderRadius: 6,
+                border: `1px solid ${active ? opt.color + "55" : "#1e1e1e"}`,
+                background: active ? opt.color + "12" : "#0a0a0a",
+                cursor: "pointer",
+                transition: "all 0.18s",
+              }}
+            >
+              <span style={{
+                width: 7, height: 7, borderRadius: "50%",
+                background: opt.dot,
+                opacity: active ? 1 : 0.3,
+                boxShadow: active ? `0 0 6px ${opt.dot}` : "none",
+                flexShrink: 0,
+                transition: "all 0.18s",
+              }} />
+              <span style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: 9, letterSpacing: 1.5,
+                color: active ? opt.color : "#444",
+                transition: "color 0.18s",
+              }}>
+                {opt.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {/* Description of selected */}
+      <div style={{
+        marginTop: 8, fontSize: 10, color: "#444",
+        fontFamily: "'DM Mono', monospace", letterSpacing: 0.5,
+      }}>
+        → {current.desc}
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProjectEditor({
   project,
@@ -47,6 +124,7 @@ export function ProjectEditor({
     github_url: project.github_url || "",
     live_url: project.live_url || "",
     image_url: project.image_url || "",
+    status: project.status || "live",
   });
 
   const [saving, setSaving] = useState(false);
@@ -92,6 +170,7 @@ export function ProjectEditor({
         featured: form.featured,
         color: form.color,
         type: form.type,
+        status: form.status,
         image_url: form.image_url || null,
         // Store as JSONB split object in DB
         screenshots: form.screenshots,
@@ -239,6 +318,12 @@ export function ProjectEditor({
         <Field label="ROLE" value={form.role} onChange={set("role")} />
         <Field label="TYPE" value={form.type} onChange={set("type")} />
         <Field label="TECH (comma separated)" value={techString} onChange={set("tech" as keyof typeof form)} />
+
+        {/* NEW: Status selector */}
+        <StatusSelector
+          value={form.status}
+          onChange={(v) => setForm((f) => ({ ...f, status: v }))}
+        />
 
         {/* Color + featured */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "start", marginBottom: 16 }}>
