@@ -53,7 +53,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
           onClick={() => setActivePage("home")}
           style={{ background: "none", border: "none", cursor: "pointer", padding: 0, zIndex: 101 }}
         >
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 18, color: "#fff", letterSpacing: -0.5 }}>
+          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 18, letterSpacing: -0.5 }}>
             AA<span style={{ color: YELLOW }}>.</span>
           </span>
         </button>
