@@ -208,7 +208,7 @@ function Typewriter({ text, active, delay = 0 }: { text: string; active: boolean
 // ─── NEW: Glitch text effect ───────────────────────────────────────────────────
 function GlitchText({ children, color }: { children: string; color?: string }) {
   const [glitching, setGlitching] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => {
     const schedule = () => {
       timerRef.current = setTimeout(() => {
