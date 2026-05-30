@@ -14,19 +14,48 @@ import CaseStudyPage from "@/sections/CaseStudyPage";
 export default function App() {
   const [activePage, setActivePage] = useState("home");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeSection] = useState("home");
+  const [activeSection, setActiveSection] = useState("home");
   const [isMobile, setIsMobile] = useState(false);
   const [introComplete, setIntroComplete] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
 
   const handleIntroComplete = () => {
     setIntroComplete(true);
-    // Slight delay before fading in content for a clean handoff
     setTimeout(() => setContentVisible(true), 80);
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [activePage]);
+
+  // ── IntersectionObserver for activeSection ──────────────────────────────────
+  useEffect(() => {
+    if (activePage !== "home") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-40% 0px -40% 0px", // fires when section is in middle 20% of viewport
+        threshold: 0,
+      }
+    );
+
+    // Small delay to let HomePage render first
+    const t = setTimeout(() => {
+      const sections = document.querySelectorAll("section[id]");
+      sections.forEach((s) => observer.observe(s));
+    }, 300);
+
+    return () => {
+      clearTimeout(t);
+      observer.disconnect();
+    };
   }, [activePage]);
 
   useEffect(() => {
@@ -72,13 +101,11 @@ export default function App() {
         }
       `}</style>
 
-      {/* Intro screen — sits on top, unmounts after transition */}
       {!introComplete && <IntroScreen onComplete={handleIntroComplete} />}
 
       {!isMobile && <Cursor />}
       <Noise />
 
-      {/* Nav + content fade in after intro */}
       <div
         style={{
           opacity: contentVisible ? 1 : 0,
