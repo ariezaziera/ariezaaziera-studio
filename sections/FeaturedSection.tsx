@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, BORDER } from "@/constants";
 import type { Project } from "@/types";
@@ -11,39 +11,108 @@ interface FeaturedSectionProps {
   setActiveProject: (project: Project) => void;
 }
 
-// ─── NEW: Ambient floating orbs behind the grid ───────────────────────────────
+// ─── Ambient floating orbs ────────────────────────────────────────────────────
 function AmbientOrbs() {
   const orbs = [
-    { size: 340, x: "8%",  y: "15%", color: YELLOW,    delay: 0,   dur: 18 },
-    { size: 260, x: "72%", y: "60%", color: "#60A5FA",  delay: 4,   dur: 22 },
-    { size: 200, x: "45%", y: "80%", color: "#4ADE80",  delay: 8,   dur: 16 },
-    { size: 180, x: "85%", y: "10%", color: YELLOW,    delay: 2,   dur: 20 },
+    { size: 340, x: "8%",  y: "15%", color: YELLOW,   delay: 0,  dur: 18 },
+    { size: 260, x: "72%", y: "60%", color: "#60A5FA", delay: 4,  dur: 22 },
+    { size: 200, x: "45%", y: "80%", color: "#4ADE80", delay: 8,  dur: 16 },
+    { size: 180, x: "85%", y: "10%", color: YELLOW,   delay: 2,  dur: 20 },
   ];
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
       {orbs.map((o, i) => (
         <div key={i} style={{
-          position: "absolute",
-          left: o.x, top: o.y,
-          width: o.size, height: o.size,
-          borderRadius: "50%",
-          background: o.color,
-          opacity: 0.022,
-          filter: "blur(80px)",
+          position: "absolute", left: o.x, top: o.y,
+          width: o.size, height: o.size, borderRadius: "50%",
+          background: o.color, opacity: 0.022, filter: "blur(80px)",
           animation: `orbFloat${i} ${o.dur}s ${o.delay}s ease-in-out infinite alternate`,
         }} />
       ))}
       <style>{`
-        @keyframes orbFloat0 { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,-40px) scale(1.15); } }
-        @keyframes orbFloat1 { from { transform: translate(0,0) scale(1); } to { transform: translate(-25px,35px) scale(0.9); } }
-        @keyframes orbFloat2 { from { transform: translate(0,0) scale(1); } to { transform: translate(20px,-20px) scale(1.1); } }
-        @keyframes orbFloat3 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,25px) scale(0.95); } }
+        @keyframes orbFloat0 { from{transform:translate(0,0) scale(1)} to{transform:translate(30px,-40px) scale(1.15)} }
+        @keyframes orbFloat1 { from{transform:translate(0,0) scale(1)} to{transform:translate(-25px,35px) scale(0.9)} }
+        @keyframes orbFloat2 { from{transform:translate(0,0) scale(1)} to{transform:translate(20px,-20px) scale(1.1)} }
+        @keyframes orbFloat3 { from{transform:translate(0,0) scale(1)} to{transform:translate(-30px,25px) scale(0.95)} }
       `}</style>
     </div>
   );
 }
 
-// ─── NEW: Grain noise texture overlay ────────────────────────────────────────
+// ─── NEW: Drifting particle field ─────────────────────────────────────────────
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    let raf: number;
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const count = 55;
+    type Particle = { x: number; y: number; vx: number; vy: number; r: number; alpha: number; color: string };
+    const palette = [YELLOW, "#60A5FA", "#4ADE80", "#a78bfa", "#f472b6"];
+    const particles: Particle[] = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
+      r: Math.random() * 1.2 + 0.3,
+      alpha: Math.random() * 0.25 + 0.05,
+      color: palette[Math.floor(Math.random() * palette.length)],
+    }));
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+      }
+      // Draw faint connecting lines for nearby particles
+      ctx.globalAlpha = 1;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 70) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = particles[i].color;
+            ctx.globalAlpha = (1 - dist / 70) * 0.05;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+  }, []);
+  return (
+    <canvas ref={canvasRef} style={{
+      position: "absolute", inset: 0, width: "100%", height: "100%",
+      pointerEvents: "none", zIndex: 1, opacity: 1,
+    }} />
+  );
+}
+
+// ─── Grain noise texture overlay ──────────────────────────────────────────────
 function GrainOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -62,26 +131,135 @@ function GrainOverlay() {
   return (
     <canvas ref={canvasRef} style={{
       position: "absolute", inset: 0, width: "100%", height: "100%",
-      pointerEvents: "none", zIndex: 1, opacity: 0.35,
-      backgroundRepeat: "repeat",
+      pointerEvents: "none", zIndex: 2, opacity: 0.35,
       mixBlendMode: "overlay",
     }} />
   );
 }
 
-// ─── NEW: Animated count-up number hook ──────────────────────────────────────
+// ─── NEW: Magnetic cursor blob ─────────────────────────────────────────────────
+function CursorBlob({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }) {
+  const blobRef = useRef<HTMLDivElement>(null);
+  const pos = useRef({ x: -200, y: -200 });
+  const current = useRef({ x: -200, y: -200 });
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    let raf: number;
+    const onMove = (e: MouseEvent) => {
+      const rect = section.getBoundingClientRect();
+      pos.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+    section.addEventListener("mousemove", onMove);
+    const animate = () => {
+      current.current.x += (pos.current.x - current.current.x) * 0.08;
+      current.current.y += (pos.current.y - current.current.y) * 0.08;
+      if (blobRef.current) {
+        blobRef.current.style.transform = `translate(${current.current.x - 120}px, ${current.current.y - 120}px)`;
+      }
+      raf = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => { section.removeEventListener("mousemove", onMove); cancelAnimationFrame(raf); };
+  }, [sectionRef]);
+  return (
+    <div ref={blobRef} style={{
+      position: "absolute", top: 0, left: 0,
+      width: 240, height: 240, borderRadius: "50%",
+      background: `radial-gradient(circle, ${YELLOW}18 0%, transparent 70%)`,
+      pointerEvents: "none", zIndex: 1,
+      filter: "blur(40px)",
+      transition: "opacity 0.3s",
+    }} />
+  );
+}
+
+// ─── NEW: Typewriter text ──────────────────────────────────────────────────────
+function Typewriter({ text, active, delay = 0 }: { text: string; active: boolean; delay?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (!active) return;
+    let i = 0;
+    const timeout = setTimeout(() => {
+      const iv = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) { clearInterval(iv); setDone(true); }
+      }, 55);
+      return () => clearInterval(iv);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [active, text, delay]);
+  return (
+    <span>
+      {displayed}
+      {!done && active && (
+        <span style={{
+          display: "inline-block", width: 2, height: "0.9em",
+          background: YELLOW, marginLeft: 1, verticalAlign: "middle",
+          animation: "cursorBlink 0.7s steps(1) infinite",
+        }} />
+      )}
+    </span>
+  );
+}
+
+// ─── NEW: Glitch text effect ───────────────────────────────────────────────────
+function GlitchText({ children, color }: { children: string; color?: string }) {
+  const [glitching, setGlitching] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    const schedule = () => {
+      timerRef.current = setTimeout(() => {
+        setGlitching(true);
+        setTimeout(() => { setGlitching(false); schedule(); }, 300);
+      }, 3000 + Math.random() * 4000);
+    };
+    schedule();
+    return () => clearTimeout(timerRef.current);
+  }, []);
+  return (
+    <span style={{ position: "relative", display: "inline-block" }}>
+      {children}
+      {glitching && (
+        <>
+          <span style={{
+            position: "absolute", inset: 0,
+            color: "#ff3333", clipPath: "inset(30% 0 40% 0)",
+            transform: "translateX(-3px)",
+            animation: "glitchShift 0.15s steps(2) infinite",
+            mixBlendMode: "screen", pointerEvents: "none",
+          }}>{children}</span>
+          <span style={{
+            position: "absolute", inset: 0,
+            color: "#33ffff", clipPath: "inset(60% 0 10% 0)",
+            transform: "translateX(3px)",
+            animation: "glitchShift2 0.15s steps(2) infinite",
+            mixBlendMode: "screen", pointerEvents: "none",
+          }}>{children}</span>
+        </>
+      )}
+      {color && (
+        <span style={{ color }}>{/* color prop applied by parent */}</span>
+      )}
+    </span>
+  );
+}
+
+// ─── NEW: Stats counter strip ──────────────────────────────────────────────────
 function useCountUp(target: number, active: boolean, delay = 0) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     if (!active) return;
     const timeout = setTimeout(() => {
       let start = 0;
-      const step = Math.ceil(target / 20);
+      const step = Math.ceil(target / 24);
       const iv = setInterval(() => {
         start = Math.min(start + step, target);
         setVal(start);
         if (start >= target) clearInterval(iv);
-      }, 40);
+      }, 38);
       return () => clearInterval(iv);
     }, delay);
     return () => clearTimeout(timeout);
@@ -89,7 +267,63 @@ function useCountUp(target: number, active: boolean, delay = 0) {
   return val;
 }
 
-// ─── NEW: Project status pill — reads project.status from DB ─────────────────
+function StatsStrip({ projects, visible }: { projects: Project[]; visible: boolean }) {
+  const totalTech = [...new Set(projects.flatMap(p => p.tech))].length;
+  const liveCount = projects.filter(p => (p as any).status === "live").length;
+
+  const countProjects = useCountUp(projects.length, visible, 100);
+  const countTech = useCountUp(totalTech, visible, 250);
+  const countLive = useCountUp(liveCount || projects.length, visible, 400);
+
+  const stats = [
+    { value: countProjects, label: "PROJECTS", suffix: "" },
+    { value: countTech,     label: "TECH USED", suffix: "+" },
+    { value: countLive,     label: "LIVE NOW",  suffix: "" },
+  ];
+  return (
+    <div style={{
+      display: "flex", gap: 0,
+      border: `1px solid ${BORDER}`,
+      borderRadius: 12, overflow: "hidden",
+      marginBottom: 40,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "none" : "translateY(12px)",
+      transition: "opacity 0.6s 0.3s, transform 0.6s 0.3s",
+      position: "relative", zIndex: 2,
+    }}>
+      {stats.map((s, i) => (
+        <div key={i} style={{
+          flex: 1, padding: "18px 0", textAlign: "center",
+          borderRight: i < stats.length - 1 ? `1px solid ${BORDER}` : "none",
+          position: "relative", overflow: "hidden",
+        }}>
+          {/* Hover shimmer background */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: `linear-gradient(135deg, ${YELLOW}08, transparent)`,
+          }} />
+          <div style={{
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 28, fontWeight: 700,
+            color: YELLOW, letterSpacing: -1,
+            lineHeight: 1,
+          }}>
+            {s.value}{s.suffix}
+          </div>
+          <div style={{
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 8, color: "#444",
+            letterSpacing: 2, marginTop: 4,
+          }}>
+            {s.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Status pill ───────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   "live":      { label: "LIVE",      color: "#4ADE80" },
   "in-dev":    { label: "IN DEV",    color: YELLOW },
@@ -124,7 +358,7 @@ function StatusPill({ status }: { status?: string }) {
   );
 }
 
-// ─── NEW: Shimmer scan line (used inside card on hover) ───────────────────────
+// ─── Shimmer scan line ─────────────────────────────────────────────────────────
 function ScanLine({ active }: { active: boolean }) {
   return (
     <div style={{
@@ -141,7 +375,61 @@ function ScanLine({ active }: { active: boolean }) {
   );
 }
 
-// ─── NEW: Hover metric strip ──────────────────────────────────────────────────
+// ─── NEW: Holographic shimmer overlay ─────────────────────────────────────────
+function HoloShimmer({ active, mousePos }: { active: boolean; mousePos: { x: number; y: number } }) {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, pointerEvents: "none",
+      borderRadius: "inherit",
+      background: active
+        ? `conic-gradient(from ${mousePos.x * 2.5}deg at ${mousePos.x}% ${mousePos.y}%,
+            #ff000008, #ff7f0008, #ffff0008, #00ff0008,
+            #0000ff08, #8b00ff08, #ff000008)`
+        : "none",
+      mixBlendMode: "screen",
+      opacity: active ? 1 : 0,
+      transition: "opacity 0.3s",
+    }} />
+  );
+}
+
+// ─── NEW: Floating tag cloud ───────────────────────────────────────────────────
+function FloatingTagCloud({ tags }: { tags: string[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [positions, setPositions] = useState<Array<{ x: number; y: number; delay: number; dur: number }>>([]);
+  useEffect(() => {
+    setPositions(tags.map((_, i) => ({
+      x: 5 + (i * 13) % 82,
+      y: 5 + (i * 17) % 70,
+      delay: i * 0.3,
+      dur: 6 + (i % 4) * 2,
+    })));
+  }, [tags.length]);
+  return (
+    <div ref={containerRef} style={{
+      position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden",
+    }}>
+      {tags.slice(0, 12).map((tag, i) => (
+        positions[i] ? (
+          <div key={tag} style={{
+            position: "absolute",
+            left: `${positions[i].x}%`,
+            top: `${positions[i].y}%`,
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 8, color: "#ffffff06",
+            letterSpacing: 2, whiteSpace: "nowrap",
+            animation: `tagFloat${i % 4} ${positions[i].dur}s ${positions[i].delay}s ease-in-out infinite alternate`,
+            userSelect: "none",
+          }}>
+            {tag.toUpperCase()}
+          </div>
+        ) : null
+      ))}
+    </div>
+  );
+}
+
+// ─── Hover metric strip ────────────────────────────────────────────────────────
 function MetricStrip({ project, visible }: { project: Project; visible: boolean }) {
   const metrics = (project as any).metrics as Array<{ label: string; value: string }> | undefined;
   if (!metrics?.length) return null;
@@ -149,8 +437,7 @@ function MetricStrip({ project, visible }: { project: Project; visible: boolean 
     <div style={{
       display: "flex", gap: 0,
       borderTop: "1px solid #1a1a1a",
-      marginTop: 16,
-      paddingTop: 14,
+      marginTop: 16, paddingTop: 14,
       opacity: visible ? 1 : 0,
       maxHeight: visible ? 60 : 0,
       overflow: "hidden",
@@ -166,24 +453,60 @@ function MetricStrip({ project, visible }: { project: Project; visible: boolean 
           <div style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 700, fontSize: 15,
-            color: (project as any).color || YELLOW,
-            letterSpacing: -0.5,
-          }}>
-            {m.value}
-          </div>
+            color: (project as any).color || YELLOW, letterSpacing: -0.5,
+          }}>{m.value}</div>
           <div style={{
             fontFamily: "'DM Mono', monospace",
             fontSize: 8, color: "#3a3a3a",
             letterSpacing: 1, marginTop: 2,
-          }}>
-            {m.label}
-          </div>
+          }}>{m.label}</div>
         </div>
       ))}
     </div>
   );
 }
 
+// ─── NEW: Animated border beam ─────────────────────────────────────────────────
+function BorderBeam({ active, color }: { active: boolean; color: string }) {
+  return (
+    <div style={{
+      position: "absolute", inset: -1, borderRadius: "inherit",
+      pointerEvents: "none", overflow: "hidden",
+      opacity: active ? 1 : 0,
+      transition: "opacity 0.3s",
+    }}>
+      <div style={{
+        position: "absolute",
+        width: "60%", height: "2px",
+        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+        animation: active ? "beamRun 2.2s linear infinite" : "none",
+        top: 0, left: 0,
+      }} />
+      <div style={{
+        position: "absolute",
+        width: "2px", height: "60%",
+        background: `linear-gradient(180deg, transparent, ${color}, transparent)`,
+        animation: active ? "beamRunV 2.2s linear 1.1s infinite" : "none",
+        right: 0, top: 0,
+      }} />
+    </div>
+  );
+}
+
+// ─── NEW: Depth noise background for cards ────────────────────────────────────
+function CardNoise({ color }: { color: string }) {
+  return (
+    <div style={{
+      position: "absolute", inset: 0, borderRadius: "inherit", pointerEvents: "none",
+      background: `
+        radial-gradient(ellipse 80% 50% at 100% 100%, ${color}06, transparent),
+        radial-gradient(ellipse 50% 80% at 0% 0%, ${color}04, transparent)
+      `,
+    }} />
+  );
+}
+
+// ─── Main FeaturedCard ─────────────────────────────────────────────────────────
 function FeaturedCard({ project, onClick, index, large = false }: {
   project: Project;
   onClick: (p: Project) => void;
@@ -195,8 +518,6 @@ function FeaturedCard({ project, onClick, index, large = false }: {
   const [hovered, setHovered] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-
-  // NEW: count-up for corner number
   const countedIndex = useCountUp(index + 1, visible, index * 120);
 
   useEffect(() => {
@@ -218,6 +539,8 @@ function FeaturedCard({ project, onClick, index, large = false }: {
     setTilt({ x: tx, y: ty });
   };
 
+  const allTags = project.tech;
+
   return (
     <div
       ref={ref}
@@ -234,13 +557,20 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         cursor: "pointer",
         overflow: "hidden",
         transform: visible
-          ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateY(${hovered ? -6 : 0}px)`
+          ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateY(${hovered ? -8 : 0}px) scale(${hovered ? 1.012 : 1})`
           : `translateY(40px)`,
         opacity: visible ? 1 : 0,
-        transition: `opacity 0.7s ${index * 0.12}s ease, transform 0.4s ease, border-color 0.3s`,
+        transition: `opacity 0.7s ${index * 0.12}s ease, transform 0.4s ease, border-color 0.3s, box-shadow 0.3s`,
         gridColumn: large ? "span 2" : "span 1",
+        boxShadow: hovered ? `0 24px 60px ${project.color}18, 0 8px 24px rgba(0,0,0,0.6)` : "none",
       }}
     >
+      {/* Floating tag cloud background */}
+      <FloatingTagCloud tags={allTags} />
+
+      {/* Depth noise corners */}
+      <CardNoise color={project.color} />
+
       {/* Spotlight glow that follows mouse */}
       <div style={{
         position: "absolute", inset: 0, pointerEvents: "none",
@@ -248,6 +578,9 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         transition: hovered ? "none" : "opacity 0.4s",
         opacity: hovered ? 1 : 0,
       }} />
+
+      {/* NEW: Holographic shimmer */}
+      <HoloShimmer active={hovered} mousePos={mousePos} />
 
       {/* Top accent bar */}
       <div style={{
@@ -257,7 +590,10 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         transition: "opacity 0.3s",
       }} />
 
-      {/* Corner number — NEW: uses count-up value */}
+      {/* NEW: Animated border beam */}
+      <BorderBeam active={hovered} color={project.color} />
+
+      {/* Corner number */}
       <div style={{
         position: "absolute", top: large ? 28 : 20, right: large ? 28 : 20,
         fontFamily: "'DM Mono', monospace", fontSize: large ? 48 : 36,
@@ -269,7 +605,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         {String(countedIndex).padStart(2, "0")}
       </div>
 
-      {/* NEW: scan line sweep on hover */}
+      {/* Scan line sweep on hover */}
       <ScanLine active={hovered} />
 
       {/* Type badge */}
@@ -279,13 +615,14 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         color: project.color, border: `1px solid ${project.color}30`,
         background: project.color + "10",
         padding: "4px 10px", borderRadius: 20,
+        position: "relative", zIndex: 2,
       }}>
         <div style={{ width: 5, height: 5, borderRadius: "50%", background: project.color }} />
         {project.type.toUpperCase()}
       </div>
 
-      {/* NEW: status pill — reads from project.status */}
-      <div style={{ marginBottom: large ? 8 : 4 }}>
+      {/* Status pill */}
+      <div style={{ marginBottom: large ? 8 : 4, position: "relative", zIndex: 2 }}>
         <StatusPill status={project.status} />
       </div>
 
@@ -294,11 +631,10 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         fontFamily: "'Space Grotesk', sans-serif",
         fontWeight: 800,
         fontSize: large ? "clamp(28px, 4vw, 38px)" : "clamp(18px, 3vw, 22px)",
-        color: "#fff",
-        margin: `0 0 ${large ? 10 : 8}px`,
-        letterSpacing: -1,
-        lineHeight: 1.1,
+        color: "#fff", margin: `0 0 ${large ? 10 : 8}px`,
+        letterSpacing: -1, lineHeight: 1.1,
         transition: "color 0.2s",
+        position: "relative", zIndex: 2,
       }}>
         {project.title}
       </h3>
@@ -311,28 +647,27 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         margin: `0 0 ${large ? 28 : 20}px`,
         lineHeight: 1.7,
         maxWidth: large ? 420 : "100%",
+        position: "relative", zIndex: 2,
       }}>
         {project.tagline}
       </p>
 
       {/* Tech chips */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: large ? 32 : 22 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: large ? 32 : 22, position: "relative", zIndex: 2 }}>
         {project.tech.slice(0, large ? 6 : 3).map((t: string) => (
           <span key={t} style={{
             fontFamily: "'DM Mono', monospace", fontSize: 9,
-            color: "#666",
-            background: "#ffffff08",
+            color: "#666", background: "#ffffff08",
             padding: "3px 10px", borderRadius: 4,
             border: "1px solid #ffffff0d",
+            transition: "color 0.2s, border-color 0.2s",
+            ...(hovered ? { color: "#888", borderColor: project.color + "22" } : {}),
           }}>
             {t}
           </span>
         ))}
         {project.tech.length > (large ? 6 : 3) && (
-          <span style={{
-            fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#444",
-            padding: "3px 8px",
-          }}>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#444", padding: "3px 8px" }}>
             +{project.tech.length - (large ? 6 : 3)} more
           </span>
         )}
@@ -343,10 +678,9 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         display: "flex", alignItems: "center", gap: 8,
         fontFamily: "'DM Mono', monospace", fontSize: 10,
         color: project.color, fontWeight: 700, letterSpacing: 1.5,
+        position: "relative", zIndex: 2,
       }}>
-        <span style={{ opacity: hovered ? 1 : 0.45, transition: "opacity 0.2s" }}>
-          VIEW CASE STUDY
-        </span>
+        <span style={{ opacity: hovered ? 1 : 0.45, transition: "opacity 0.2s" }}>VIEW CASE STUDY</span>
         <span style={{
           display: "inline-block",
           transform: `translateX(${hovered ? 6 : 0}px)`,
@@ -355,14 +689,16 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         }}>→</span>
       </div>
 
-      {/* NEW: metric strip revealed on hover */}
+      {/* Metric strip */}
       <MetricStrip project={project} visible={hovered} />
     </div>
   );
 }
 
+// ─── Main section ──────────────────────────────────────────────────────────────
 export default function FeaturedSection({ setActivePage, setActiveProject }: FeaturedSectionProps) {
   const featuredProjects = useFeaturedProjects();
+  const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -376,42 +712,58 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
   }, []);
 
   return (
-    <section id="projects-featured" style={{ padding: "80px clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto", position: "relative" }}>
+    <section
+      id="projects-featured"
+      ref={sectionRef}
+      style={{ padding: "80px clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto", position: "relative" }}
+    >
       <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        @keyframes statusPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50%       { opacity: 0.5; transform: scale(0.8); }
-        }
+        @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+        @keyframes statusPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes glitchShift  { 0%{transform:translateX(-3px) skewX(-2deg)} 100%{transform:translateX(2px) skewX(1deg)} }
+        @keyframes glitchShift2 { 0%{transform:translateX(3px)  skewX(2deg)}  100%{transform:translateX(-2px) skewX(-1deg)} }
+        @keyframes beamRun  { from{left:-60%;width:60%} to{left:160%;width:60%} }
+        @keyframes beamRunV { from{top:-60%;height:60%} to{top:160%;height:60%} }
+        @keyframes tagFloat0 { from{transform:translate(0,0)} to{transform:translate(6px,-8px)} }
+        @keyframes tagFloat1 { from{transform:translate(0,0)} to{transform:translate(-5px,7px)} }
+        @keyframes tagFloat2 { from{transform:translate(0,0)} to{transform:translate(8px,5px)} }
+        @keyframes tagFloat3 { from{transform:translate(0,0)} to{transform:translate(-7px,-6px)} }
+        @keyframes countPop  { 0%{transform:scale(1)} 30%{transform:scale(1.18)} 100%{transform:scale(1)} }
         @media (max-width: 640px) {
-          .featured-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .featured-grid > div[style*="span 2"] {
-            grid-column: span 1 !important;
-          }
+          .featured-grid { grid-template-columns: 1fr !important; }
+          .featured-grid > div[style*="span 2"] { grid-column: span 1 !important; }
         }
       `}</style>
 
-      {/* NEW: ambient orbs */}
+      {/* Layers: orbs → particles → grain */}
       <AmbientOrbs />
-
-      {/* NEW: grain overlay */}
+      <ParticleField />
       <GrainOverlay />
+
+      {/* Magnetic cursor */}
+      <CursorBlob sectionRef={sectionRef as React.RefObject<HTMLElement>} />
 
       {/* Header */}
       <div ref={headerRef} style={{ position: "relative", zIndex: 2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3, whiteSpace: "nowrap" }}>03 — PROOF</div>
-          <div style={{ flex: 1, height: 1, background: BORDER }} />
+          <div style={{
+            fontFamily: "'DM Mono', monospace", fontSize: 10,
+            color: YELLOW, letterSpacing: 3, whiteSpace: "nowrap",
+          }}>
+            <Typewriter text="03 — PROOF" active={headerVisible} delay={200} />
+          </div>
+          <div style={{
+            flex: 1, height: 1,
+            background: `linear-gradient(90deg, ${BORDER}, transparent)`,
+            opacity: headerVisible ? 1 : 0,
+            transition: "opacity 0.8s 0.8s",
+          }} />
         </div>
 
         <div style={{
           display: "flex", justifyContent: "space-between", alignItems: "flex-end",
-          marginBottom: 40, flexWrap: "wrap", gap: 16,
+          marginBottom: 24, flexWrap: "wrap", gap: 16,
           opacity: headerVisible ? 1 : 0,
           transform: headerVisible ? "none" : "translateY(16px)",
           transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -420,7 +772,10 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
             fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
             fontSize: "clamp(22px, 5vw, 36px)", margin: 0, letterSpacing: -1,
           }}>
-            Featured <span style={{ color: YELLOW }}>Work</span>
+            <GlitchText>Featured</GlitchText>{" "}
+            <span style={{ color: YELLOW }}>
+              <GlitchText>Work</GlitchText>
+            </span>
           </h2>
           <button
             onClick={() => setActivePage("projects")}
@@ -428,14 +783,26 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
               fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#666",
               background: "none", border: `1px solid ${BORDER}`,
               padding: "8px 16px", borderRadius: 3, cursor: "pointer",
-              letterSpacing: 1, transition: "color 0.2s, border-color 0.2s", whiteSpace: "nowrap",
+              letterSpacing: 1, transition: "color 0.2s, border-color 0.2s, box-shadow 0.2s",
+              whiteSpace: "nowrap",
             }}
-            onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = YELLOW; e.currentTarget.style.borderColor = YELLOW; }}
-            onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = "#666"; e.currentTarget.style.borderColor = BORDER; }}
+            onMouseEnter={(e: ReactMouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.color = YELLOW;
+              e.currentTarget.style.borderColor = YELLOW;
+              e.currentTarget.style.boxShadow = `0 0 12px ${YELLOW}30`;
+            }}
+            onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => {
+              e.currentTarget.style.color = "#666";
+              e.currentTarget.style.borderColor = BORDER;
+              e.currentTarget.style.boxShadow = "none";
+            }}
           >
             VIEW ALL →
           </button>
         </div>
+
+        {/* Stats counter strip */}
+        <StatsStrip projects={featuredProjects} visible={headerVisible} />
       </div>
 
       {/* Bento grid */}
@@ -445,8 +812,7 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
           gap: 12,
-          position: "relative",
-          zIndex: 2,
+          position: "relative", zIndex: 2,
         }}
       >
         {featuredProjects.map((p, i) => (
@@ -463,7 +829,8 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
       {/* Marquee ticker */}
       <div style={{
         marginTop: 40, overflow: "hidden",
-        borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`,
+        borderTop: `1px solid ${BORDER}`,
+        borderBottom: `1px solid ${BORDER}`,
         padding: "12px 0",
         maskImage: "linear-gradient(90deg, transparent, black 10%, black 90%, transparent)",
         WebkitMaskImage: "linear-gradient(90deg, transparent, black 10%, black 90%, transparent)",
