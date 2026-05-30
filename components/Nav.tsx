@@ -62,7 +62,10 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
         <div style={{ display: "flex", gap: 8 }} className="desktop-nav">
           {navLinks.map((l) => {
             const key = l.toLowerCase();
-            const isActive = activePage === key || (activePage === "home" && activeSection === key);
+            const isActive =
+              (l === "Projects" && activePage === "projects") ||
+              (l === "Home" && activePage === "home" && activeSection === "home") ||
+              (activePage === "home" && activeSection === key);
             return (
               <button
                 key={l}
