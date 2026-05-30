@@ -426,7 +426,7 @@ export default function LandingSection({
                 style={{
                   fontFamily: "'DM Mono', monospace",
                   fontSize: 8,
-                  color: "#c0c0c0",
+                  color: "#d4d4d4",
                   letterSpacing: 1.5,
                 }}
               >
