@@ -332,7 +332,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           <p
             style={{
               fontFamily: "'DM Mono', monospace",
-              fontSize: "clamp(10px, 2vw, 13px)",
+              fontSize: "clamp(7px, 2vw, 13px)",
               color: TAGLINE,
               letterSpacing: 3,
               marginTop: 8,
