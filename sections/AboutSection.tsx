@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, CARD_BG, BORDER } from "@/constants";
-import { useProfile } from "@/lib/hooks";
+import { useProfile, useProjects } from "@/lib/hooks";
 
 export default function AboutSection() {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const profile = useProfile();
+  const projects = useProjects();
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -24,13 +25,13 @@ export default function AboutSection() {
 
   const stats = [
     { num: "3+", label: "Years building" },
-    { num: "6+", label: "Products shipped" },
+    { num: `${projects.length}`, label: "Products shipped" },
     { num: "60%", label: "Ops time saved (OrderCalc)" },
     { num: "40%", label: "Drop-off reduced (OptimaBank)" },
   ];
 
   return (
-    <section id="about" ref={ref} style={{ padding: "80px clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto" }}>
+    <section id="about" ref={ref} style={{ padding: "clamp(40px, 8vw, 80px) clamp(20px, 6vw, 40px)", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 48 }}>
         <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: YELLOW, letterSpacing: 3, whiteSpace: "nowrap" }}>02 — ABOUT</div>
         <div style={{ flex: 1, height: 1, background: BORDER }} />
@@ -83,7 +84,7 @@ export default function AboutSection() {
         @media (max-width: 640px) {
           .about-grid {
             grid-template-columns: 1fr !important;
-            gap: 48px !important;
+            gap: 32px !important;
           }
         }
       `}</style>
