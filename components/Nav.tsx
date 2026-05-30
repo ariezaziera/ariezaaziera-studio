@@ -70,7 +70,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
                 style={{
                   background: "none", border: "none", cursor: "pointer",
                   fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 500,
-                  color: isActive ? YELLOW : "#666",
+                  color: isActive ? YELLOW : "#fff",
                   letterSpacing: 1.5, padding: "6px 12px",
                   position: "relative",
                   transition: "color 0.2s",
