@@ -89,37 +89,36 @@ function useCountUp(target: number, active: boolean, delay = 0) {
   return val;
 }
 
-// ─── NEW: Project status pill ─────────────────────────────────────────────────
-const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  "SaaS":     { label: "LIVE",       color: "#4ADE80" },
-  "Web App":  { label: "DEPLOYED",   color: "#4ADE80" },
-  "Mobile":   { label: "PUBLISHED",  color: "#60A5FA" },
-  "Design":   { label: "COMPLETED",  color: YELLOW },
-  "API":      { label: "RUNNING",    color: "#4ADE80" },
+// ─── NEW: Project status pill — reads project.status from DB ─────────────────
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  "live":      { label: "LIVE",      color: "#4ADE80" },
+  "in-dev":    { label: "IN DEV",    color: YELLOW },
+  "completed": { label: "COMPLETED", color: "#60A5FA" },
+  "archived":  { label: "ARCHIVED",  color: "#555" },
 };
 
-function StatusPill({ type }: { type: string }) {
-  const status = STATUS_MAP[type] ?? { label: "LIVE", color: "#4ADE80" };
+function StatusPill({ status }: { status?: string }) {
+  const cfg = STATUS_CONFIG[status ?? "live"] ?? STATUS_CONFIG["live"];
   return (
     <div style={{
       display: "inline-flex", alignItems: "center", gap: 6,
       padding: "3px 10px", borderRadius: 999,
-      border: `1px solid ${status.color}22`,
-      background: status.color + "0d",
+      border: `1px solid ${cfg.color}22`,
+      background: cfg.color + "0d",
       marginBottom: 10,
     }}>
       <span style={{
         width: 5, height: 5, borderRadius: "50%",
-        background: status.color,
-        boxShadow: `0 0 5px ${status.color}`,
+        background: cfg.color,
+        boxShadow: `0 0 5px ${cfg.color}`,
         animation: "statusPulse 2s ease-in-out infinite",
         display: "block",
       }} />
       <span style={{
         fontFamily: "'DM Mono', monospace", fontSize: 8,
-        color: status.color, letterSpacing: 1.5,
+        color: cfg.color, letterSpacing: 1.5,
       }}>
-        {status.label}
+        {cfg.label}
       </span>
     </div>
   );
@@ -285,9 +284,9 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         {project.type.toUpperCase()}
       </div>
 
-      {/* NEW: status pill */}
+      {/* NEW: status pill — reads from project.status */}
       <div style={{ marginBottom: large ? 8 : 4 }}>
-        <StatusPill type={project.type} />
+        <StatusPill status={project.status} />
       </div>
 
       {/* Title */}
