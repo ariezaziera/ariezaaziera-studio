@@ -220,7 +220,7 @@ export default function ContactSection() {
     <section
       id="contact"
       ref={ref}
-      style={{ padding: "80px clamp(20px, 6vw, 40px) 60px", maxWidth: 900, margin: "0 auto", position: "relative" }}
+      style={{ padding: "80px clamp(20px, 6vw, 40px) 60px", maxWidth: 900, margin: "0 auto", position: "relative", overflow: "hidden" }}
     >
       {/* ── Section label ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 56 }}>
