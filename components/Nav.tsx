@@ -19,20 +19,28 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on page change
   useEffect(() => { setMenuOpen(false); }, [activePage]);
 
   const handleNav = (l: string) => {
-    const key = l.toLowerCase();
-    if (l === "Projects") setActivePage("projects");
-    else if (l === "Home") setActivePage("home");
-    else {
+    if (l === "Projects") {
+      setActivePage("projects");
+    } else if (l === "Home") {
+      setActivePage("home");
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+    } else {
+      // About, Contact — go home then scroll to section
       setActivePage("home");
       setTimeout(() => {
-        document.getElementById(key)?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(l.toLowerCase())?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
     setMenuOpen(false);
+  };
+
+  const getIsActive = (l: string) => {
+    if (l === "Projects") return activePage === "projects";
+    if (l === "Home") return activePage === "home" && (activeSection === "home" || activeSection === "hero" || activeSection === "");
+    return activePage === "home" && activeSection === l.toLowerCase();
   };
 
   return (
@@ -61,11 +69,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
         {/* Desktop nav */}
         <div style={{ display: "flex", gap: 8 }} className="desktop-nav">
           {navLinks.map((l) => {
-            const key = l.toLowerCase();
-            const isActive =
-              (l === "Projects" && activePage === "projects") ||
-              (l === "Home" && activePage === "home" && activeSection === "home") ||
-              (activePage === "home" && activeSection === key);
+            const isActive = getIsActive(l);
             return (
               <button
                 key={l}
@@ -81,14 +85,17 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
               >
                 {l.toUpperCase()}
                 {isActive && (
-                  <div style={{ position: "absolute", bottom: 2, left: 12, right: 12, height: 1, background: YELLOW }} />
+                  <div style={{
+                    position: "absolute", bottom: 2, left: 12, right: 12,
+                    height: 1, background: YELLOW,
+                  }} />
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* Hamburger button — mobile only */}
+        {/* Hamburger — mobile only */}
         <button
           onClick={() => setMenuOpen((o) => !o)}
           className="hamburger-btn"
@@ -106,7 +113,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
         </button>
       </nav>
 
-      {/* Mobile menu overlay */}
+      {/* Mobile menu */}
       <div
         className="mobile-menu"
         style={{
@@ -124,8 +131,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
         }}
       >
         {navLinks.map((l) => {
-          const key = l.toLowerCase();
-          const isActive = activePage === key || (activePage === "home" && activeSection === key);
+          const isActive = getIsActive(l);
           return (
             <button
               key={l}
