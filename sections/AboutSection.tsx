@@ -570,7 +570,7 @@ function SkillBars({ visible }: { visible: boolean }) {
         {bars.map((b, i) => (
           <div key={b.label}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c0c0c0 }}>{b.label}</span>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c0c0c0" }}>{b.label}</span>
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#d4d4d4" }}>{b.pct}%</span>
             </div>
             <div style={{ height: 3, background: "#151515", borderRadius: 2, overflow: "hidden" }}>
