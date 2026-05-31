@@ -534,7 +534,7 @@ function StatCard({ stat, index, visible }: { stat: { num: string; label: string
       </div>
       <div style={{
         fontFamily: "'DM Mono', monospace", fontSize: 9,
-        color: "#555", letterSpacing: 1, lineHeight: 1.5,
+        color: "#d4d4d4", letterSpacing: 1, lineHeight: 1.5,
       }}>
         {stat.label}
       </div>
