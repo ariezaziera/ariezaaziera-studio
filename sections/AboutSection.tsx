@@ -270,7 +270,7 @@ function TimelineTicker({ visible }: { visible: boolean }) {
             </span>
             <span style={{
               fontFamily: "'DM Mono', monospace", fontSize: 10,
-              color: "#3a3a3a",
+              color: "#c0c0c0",
             }}>
               {item.event}
             </span>
