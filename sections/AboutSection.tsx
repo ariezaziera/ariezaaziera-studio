@@ -196,13 +196,13 @@ function LiveBadge({ visible }: { visible: boolean }) {
         }} />
       </span>
       <span style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#3a3a3a",
+        fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#d4d4d4",
         letterSpacing: 1,
       }}>
         NOW —
       </span>
       <span style={{
-        fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#686868",
+        fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c0c0c0",
         opacity: fade ? 1 : 0,
         transition: "opacity 0.3s",
         minWidth: 130,
@@ -411,7 +411,7 @@ export default function AboutSection() {
           {blurbs.map((text: string, i: number) => (
             <p key={i} style={{
               fontFamily: "'DM Mono', monospace", fontSize: 12,
-              color: "#666", lineHeight: 1.9, margin: "0 0 16px",
+              color: "#d4d4d4", lineHeight: 1.9, margin: "0 0 16px",
               opacity: visible ? 1 : 0,
               transform: visible ? "none" : "translateY(16px)",
               transition: `opacity 0.6s ${0.1 + i * 0.1}s ease, transform 0.6s ${0.1 + i * 0.1}s ease`,
@@ -424,7 +424,7 @@ export default function AboutSection() {
           <div style={{ marginTop: 32 }}>
             <div style={{
               fontFamily: "'DM Mono', monospace", fontSize: 9,
-              color: "#444", letterSpacing: 2, marginBottom: 14,
+              color: "#c0c0c0", letterSpacing: 2, marginBottom: 14,
               opacity: visible ? 1 : 0, transition: "opacity 0.5s 0.3s",
             }}>
               STACK
