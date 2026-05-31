@@ -435,7 +435,7 @@ export default function AboutSection() {
                   key={s}
                   style={{
                     fontFamily: "'DM Mono', monospace", fontSize: 10,
-                    color: "#aaa",
+                    color: "#c8c8c8",
                     padding: "6px 12px",
                     border: `1px solid #222`,
                     borderRadius: 4,
