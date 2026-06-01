@@ -243,7 +243,7 @@ export default function ContactSection() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 32 }}>
             <OrbitDecor />
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 3, lineHeight: 2 }}>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8", letterSpacing: 3, lineHeight: 2 }}>
               STATUS: AVAILABLE<br />
               <span style={{ color: YELLOW }}>◉ ACTIVE</span>
             </div>
@@ -257,7 +257,7 @@ export default function ContactSection() {
             <GlitchText style={{ color: YELLOW }}>together.</GlitchText>
           </h2>
 
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: "#666", lineHeight: 1.8, marginBottom: 32 }}>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: "#d4d4d4", lineHeight: 1.8, marginBottom: 32 }}>
             <Typewriter
               text="Open to freelance projects, full-time roles, and interesting collabs. If you have something real to build — let's talk."
               speed={28}
