@@ -312,7 +312,7 @@ function StatsStrip({ projects, visible }: { projects: Project[]; visible: boole
           </div>
           <div style={{
             fontFamily: "'DM Mono', monospace",
-            fontSize: 8, color: "#444",
+            fontSize: 8, color: "#c8c8c8",
             letterSpacing: 2, marginTop: 4,
           }}>
             {s.label}
@@ -643,7 +643,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
       <p style={{
         fontFamily: "'DM Mono', monospace",
         fontSize: large ? 12 : 11,
-        color: "#555",
+        color: "#d4d4d4",
         margin: `0 0 ${large ? 28 : 20}px`,
         lineHeight: 1.7,
         maxWidth: large ? 420 : "100%",
@@ -657,7 +657,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         {project.tech.slice(0, large ? 6 : 3).map((t: string) => (
           <span key={t} style={{
             fontFamily: "'DM Mono', monospace", fontSize: 9,
-            color: "#666", background: "#ffffff08",
+            color: "#c0c0c0", background: "#ffffff08",
             padding: "3px 10px", borderRadius: 4,
             border: "1px solid #ffffff0d",
             transition: "color 0.2s, border-color 0.2s",
@@ -667,7 +667,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
           </span>
         ))}
         {project.tech.length > (large ? 6 : 3) && (
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#444", padding: "3px 8px" }}>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8", padding: "3px 8px" }}>
             +{project.tech.length - (large ? 6 : 3)} more
           </span>
         )}
@@ -680,7 +680,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         color: project.color, fontWeight: 700, letterSpacing: 1.5,
         position: "relative", zIndex: 2,
       }}>
-        <span style={{ opacity: hovered ? 1 : 0.45, transition: "opacity 0.2s" }}>VIEW CASE STUDY</span>
+        <span style={{ opacity: hovered ? 1 : 0.75, transition: "opacity 0.2s" }}>VIEW CASE STUDY</span>
         <span style={{
           display: "inline-block",
           transform: `translateX(${hovered ? 6 : 0}px)`,
@@ -792,7 +792,7 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
               e.currentTarget.style.boxShadow = `0 0 12px ${YELLOW}30`;
             }}
             onMouseLeave={(e: ReactMouseEvent<HTMLButtonElement>) => {
-              e.currentTarget.style.color = "#666";
+              e.currentTarget.style.color = "#c0c0c0";
               e.currentTarget.style.borderColor = BORDER;
               e.currentTarget.style.boxShadow = "none";
             }}
