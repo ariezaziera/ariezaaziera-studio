@@ -780,7 +780,7 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
           <button
             onClick={() => setActivePage("projects")}
             style={{
-              fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#666",
+              fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c0c0c0",
               background: "none", border: `1px solid ${BORDER}`,
               padding: "8px 16px", borderRadius: 3, cursor: "pointer",
               letterSpacing: 1, transition: "color 0.2s, border-color 0.2s, box-shadow 0.2s",
@@ -847,7 +847,7 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
                 p.tech.map((t: string, ti: number) => (
                   <span key={`${ri}-${p.id}-${ti}`} style={{
                     fontFamily: "'DM Mono', monospace", fontSize: 10,
-                    color: "#333", letterSpacing: 2, padding: "0 20px",
+                    color: "#c8c8c8", letterSpacing: 2, padding: "0 20px",
                     display: "flex", alignItems: "center", gap: 20, whiteSpace: "nowrap",
                   }}>
                     {t}
