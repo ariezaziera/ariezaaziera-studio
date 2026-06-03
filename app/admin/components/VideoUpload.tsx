@@ -36,7 +36,7 @@ export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: Vide
     const path = `${storagePath}/preview.${ext}`;
 
     const { error: upErr } = await supabase.storage
-      .from("project-assets")
+      .from("portfolio-images")
       .upload(path, file, { upsert: true });
 
     if (upErr) {
@@ -46,7 +46,7 @@ export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: Vide
     }
 
     const { data } = supabase.storage
-      .from("project-assets")
+      .from("portfolio-images")
       .getPublicUrl(path);
 
     const url = data.publicUrl;
