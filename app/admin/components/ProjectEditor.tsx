@@ -9,6 +9,7 @@ import { SectionDivider } from "./SectionDivider";
 import { ScreenshotsUpload } from "./ScreenshotsUpload";
 import type { SplitScreenshots } from "./ScreenshotsUpload";
 import { ImageUpload } from "./ImageUpload";
+import { VideoUpload } from "./VideoUpload";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
