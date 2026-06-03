@@ -16,6 +16,7 @@ export interface Project {
   solution: string;
   outcome: string;
   image_url?: string;
+  preview_url?: string;
 
   // ── Media ────────────────────────────────────────────
   // New split format: { mobile: string[], desktop: string[] }
