@@ -252,7 +252,7 @@ function HoloFilterBtn({
         padding: "8px 18px", borderRadius: 4,
         background: active ? `${color}18` : hovered ? `${color}0a` : "transparent",
         border: `1px solid ${active || hovered ? color : BORDER}`,
-        color: active ? color : hovered ? `${color}cc` : "#555",
+        color: active ? color : hovered ? `${color}cc` : "#c8c8c8",
         fontFamily: "'DM Mono', monospace", fontSize: 10,
         letterSpacing: 2, fontWeight: active ? 700 : 400,
         cursor: "pointer", outline: "none",
@@ -493,7 +493,7 @@ function StatsBar({ total, filtered, filter }: { total: number; filtered: number
       ].map((s, i) => (
         <div key={i} style={{ position: "relative", zIndex: 1 }}>
           <div style={{
-            fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#444",
+            fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#c0c0c0",
             letterSpacing: 2, marginBottom: 4,
           }}>{s.label}</div>
           <div style={{
@@ -664,7 +664,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
       style={{
         display: "flex", alignItems: "center", gap: 10,
         fontFamily: "'DM Mono', monospace", fontSize: 10,
-        color: hovered ? YELLOW : "#555",
+        color: hovered ? YELLOW : "#c8c8c8",
         background: hovered ? `${YELLOW}0a` : "none",
         border: `1px solid ${hovered ? YELLOW + "44" : "transparent"}`,
         cursor: "pointer", letterSpacing: 2,
@@ -803,7 +803,7 @@ export default function ProjectsPage({ setActivePage, setActiveProject }: Projec
             animation: "pgFadeUp 0.5s ease both",
           }}>
             <div style={{ fontSize: 48, marginBottom: 16, animation: "pgFloat 3s ease-in-out infinite" }}>◈</div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#333", letterSpacing: 3 }}>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#c8c8c8", letterSpacing: 3 }}>
               NO PROJECTS FOUND FOR <span style={{ color: YELLOW }}>"{filter.toUpperCase()}"</span>
             </div>
           </div>

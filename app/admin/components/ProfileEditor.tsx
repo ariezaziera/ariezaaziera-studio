@@ -61,7 +61,7 @@ export function ProfileEditor({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
           <div>
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>Profile</div>
-            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1, marginTop: 4 }}>EDITING PROFILE</div>
+            <div style={{ fontSize: 10, color: "#c8c8c8", letterSpacing: 1, marginTop: 4 }}>EDITING PROFILE</div>
           </div>
           <button onClick={onClose} style={{ ...btnStyle, padding: "6px 14px", fontSize: 10 }}>✕ CLOSE</button>
         </div>

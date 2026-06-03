@@ -226,7 +226,7 @@ function GlitchText({ children, color }: { children: string; color?: string }) {
         <>
           <span style={{
             position: "absolute", inset: 0,
-            color: "#ff3333", clipPath: "inset(30% 0 40% 0)",
+            color: "#ffc8c8c83", clipPath: "inset(30% 0 40% 0)",
             transform: "translateX(-3px)",
             animation: "glitchShift 0.15s steps(2) infinite",
             mixBlendMode: "screen", pointerEvents: "none",
@@ -323,7 +323,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   "live":      { label: "LIVE",      color: "#4ADE80" },
   "in-dev":    { label: "IN DEV",    color: YELLOW },
   "completed": { label: "COMPLETED", color: "#60A5FA" },
-  "archived":  { label: "ARCHIVED",  color: "#555" },
+  "archived":  { label: "ARCHIVED",  color: "#c8c8c8" },
 };
 
 function StatusPill({ status }: { status?: string }) {

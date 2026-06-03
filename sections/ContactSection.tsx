@@ -58,7 +58,7 @@ function Counter({ to, label }: { to: number; label: string }) {
       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(22px, 4vw, 36px)", fontWeight: 700, color: YELLOW, letterSpacing: -1 }}>
         {val}+
       </div>
-      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 3, marginTop: 4 }}>{label}</div>
+      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8", letterSpacing: 3, marginTop: 4 }}>{label}</div>
     </div>
   );
 }
@@ -301,7 +301,7 @@ export default function ContactSection() {
                       fontSize: 16, color: YELLOW, flexShrink: 0,
                     }}>{l.icon}</div>
                     <div>
-                      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 4 }}>{l.label}</div>
+                      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 4 }}>{l.label}</div>
                       <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#aaa" }}>{l.value}</div>
                     </div>
                   </div>
@@ -321,7 +321,7 @@ export default function ContactSection() {
               display: "flex", alignItems: "center", gap: 12,
             }}>
               <div className="pulse-dot" />
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#555", lineHeight: 1.6 }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c8c8c8", lineHeight: 1.6 }}>
                 RESPONSE TIME<br />
                 <span style={{ color: YELLOW }}>{"< 24 HOURS"}</span>
               </div>
@@ -336,10 +336,10 @@ export default function ContactSection() {
         display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12,
         opacity: visible ? 1 : 0, transition: "opacity 0.6s 0.7s ease",
       }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#333" }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c8c8c8" }}>
           © 2025 ARIEZA AZIERA — BUILT WITH CARE
         </div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#333" }}>
+        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c8c8c8" }}>
           FRONTEND DEVELOPER &amp; PRODUCT BUILDER
         </div>
       </div>

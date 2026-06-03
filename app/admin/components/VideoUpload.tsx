@@ -68,7 +68,7 @@ export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: Vide
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 8 }}>
         {label}
       </div>
 
@@ -102,15 +102,15 @@ export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: Vide
                 border: `1px solid ${YELLOW}33`,
               }}
             />
-            <div style={{ fontSize: 9, color: "#555", letterSpacing: 1 }}>Click to replace</div>
+            <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 1 }}>Click to replace</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
             <div style={{ fontSize: 22, opacity: 0.3 }}>▶</div>
-            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1 }}>
+            <div style={{ fontSize: 10, color: "#c8c8c8", letterSpacing: 1 }}>
               Drop MP4 here or click to upload
             </div>
-            <div style={{ fontSize: 9, color: "#333", letterSpacing: 0.5 }}>
+            <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 0.5 }}>
               Max 30MB · MP4 recommended · Keep under 10 seconds
             </div>
           </div>
@@ -131,7 +131,7 @@ export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: Vide
       {previewUrl && (
         <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
           <div style={{
-            flex: 1, fontSize: 9, color: "#444",
+            flex: 1, fontSize: 9, color: "#c0c0c0",
             fontFamily: "'DM Mono', monospace",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>

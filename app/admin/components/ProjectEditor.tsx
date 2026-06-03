@@ -40,7 +40,7 @@ const STATUS_OPTIONS: Array<{
   { value: "live",      label: "LIVE",       color: "#4ADE80", dot: "#4ADE80", desc: "Deployed & publicly accessible" },
   { value: "in-dev",    label: "IN DEV",     color: "#F5C518", dot: "#F5C518", desc: "Still being built" },
   { value: "completed", label: "COMPLETED",  color: "#60A5FA", dot: "#60A5FA", desc: "Done, not necessarily public" },
-  { value: "archived",  label: "ARCHIVED",   color: "#555",    dot: "#555",    desc: "No longer maintained" },
+  { value: "archived",  label: "ARCHIVED",   color: "#c8c8c8",    dot: "#c8c8c8",    desc: "No longer maintained" },
 ];
 
 function StatusSelector({
@@ -54,7 +54,7 @@ function StatusSelector({
 
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 8 }}>
         PROJECT STATUS
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -86,7 +86,7 @@ function StatusSelector({
               <span style={{
                 fontFamily: "'DM Mono', monospace",
                 fontSize: 9, letterSpacing: 1.5,
-                color: active ? opt.color : "#444",
+                color: active ? opt.color : "#c0c0c0",
                 transition: "color 0.18s",
               }}>
                 {opt.label}
@@ -97,7 +97,7 @@ function StatusSelector({
       </div>
       {/* Description of selected */}
       <div style={{
-        marginTop: 8, fontSize: 10, color: "#444",
+        marginTop: 8, fontSize: 10, color: "#c0c0c0",
         fontFamily: "'DM Mono', monospace", letterSpacing: 0.5,
       }}>
         → {current.desc}
@@ -224,7 +224,7 @@ export function ProjectEditor({
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>
               {project.title}
             </div>
-            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1, marginTop: 4 }}>EDITING PROJECT</div>
+            <div style={{ fontSize: 10, color: "#c8c8c8", letterSpacing: 1, marginTop: 4 }}>EDITING PROJECT</div>
           </div>
           <button onClick={onClose} style={{ ...btnStyle, padding: "6px 14px", fontSize: 10 }}>✕ CLOSE</button>
         </div>
@@ -258,7 +258,7 @@ export function ProjectEditor({
           padding: "8px 14px", background: "#0a0a0a", borderRadius: 7,
           border: `1px solid #1a1a1a`,
         }}>
-          <div style={{ fontSize: 9, color: "#555", letterSpacing: 1 }}>AUTO-DETECTED MOCKUP</div>
+          <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 1 }}>AUTO-DETECTED MOCKUP</div>
           <div style={{ flex: 1, height: 1, background: BORDER }} />
           <div style={{
             fontSize: 9, letterSpacing: 1, fontWeight: 700,
@@ -338,7 +338,7 @@ export function ProjectEditor({
         {/* Color + featured */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "start", marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 6 }}>ACCENT COLOR</div>
+            <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 6 }}>ACCENT COLOR</div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input
                 type="text"

@@ -12,7 +12,7 @@ const TEXT_DIM   = `${YELLOW}b3`;      // "PORTFOLIO — 2025" label
 const DIVIDER    = `${YELLOW}60`;
 const BRACKET    = `${YELLOW}40`;
 const TAGLINE    = "#d4d4d4";
-const SKIP_DIM   = "#333";
+const SKIP_DIM   = "#c8c8c8";
 const CORNER     = `${YELLOW}30`;
 const GLITCH_BG  = `${YELLOW}15`;      // ghost layer behind name
 // ─────────────────────────────────────────────────────────────────────────────

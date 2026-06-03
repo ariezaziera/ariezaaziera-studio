@@ -19,7 +19,7 @@ export default function AdminPage() {
 
   if (authed === null) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ fontSize: 11, color: "#555", letterSpacing: 2 }}>...</div>
+      <div style={{ fontSize: 11, color: "#c8c8c8", letterSpacing: 2 }}>...</div>
     </div>
   );
 

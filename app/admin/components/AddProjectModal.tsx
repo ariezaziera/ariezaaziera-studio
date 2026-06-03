@@ -120,7 +120,7 @@ export function AddProjectModal({
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 20, letterSpacing: -0.5 }}>
               New Project
             </div>
-            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1, marginTop: 4 }}>ADD TO PORTFOLIO</div>
+            <div style={{ fontSize: 10, color: "#c8c8c8", letterSpacing: 1, marginTop: 4 }}>ADD TO PORTFOLIO</div>
           </div>
           <button onClick={onClose} style={{ ...btnStyle, padding: "6px 14px", fontSize: 10 }}>✕ CLOSE</button>
         </div>
@@ -130,7 +130,7 @@ export function AddProjectModal({
 
         {/* Slug preview */}
         <div style={{ marginTop: -8, marginBottom: 16 }}>
-          <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 6 }}>SLUG (auto-generated, editable)</div>
+          <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 6 }}>SLUG (auto-generated, editable)</div>
           <input
             type="text"
             value={form.slug}
@@ -146,7 +146,7 @@ export function AddProjectModal({
 
         {/* Type */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 6 }}>TYPE</div>
+          <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 6 }}>TYPE</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Product", "Systems", "UI"].map((t) => (
               <button
@@ -157,7 +157,7 @@ export function AddProjectModal({
                   fontSize: 10,
                   padding: "6px 16px",
                   borderColor: form.type === t ? YELLOW : BORDER,
-                  color: form.type === t ? YELLOW : "#555",
+                  color: form.type === t ? YELLOW : "#c8c8c8",
                 }}
               >
                 {t}
@@ -168,7 +168,7 @@ export function AddProjectModal({
 
         {/* Color */}
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>ACCENT COLOR</div>
+          <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 8 }}>ACCENT COLOR</div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             {PRESET_COLORS.map((c) => (
               <button
@@ -218,7 +218,7 @@ export function AddProjectModal({
           <button onClick={onClose} style={{ ...btnStyle }}>CANCEL</button>
         </div>
 
-        <div style={{ marginTop: 12, fontSize: 10, color: "#444", lineHeight: 1.6 }}>
+        <div style={{ marginTop: 12, fontSize: 10, color: "#c0c0c0", lineHeight: 1.6 }}>
           Project will be created and opened for full editing (screenshots, case study content, links).
         </div>
       </div>

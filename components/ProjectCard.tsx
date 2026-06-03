@@ -99,7 +99,7 @@ export default function ProjectCard({
           <div style={{ width: 14, height: 14, borderRadius: 3, background: project.color, opacity: 0.8 }} />
         </div>
         <div style={{
-          fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#555",
+          fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8",
           letterSpacing: 1, padding: "4px 8px",
           border: `1px solid ${BORDER}`, borderRadius: 3,
         }}>

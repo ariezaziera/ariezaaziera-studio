@@ -188,7 +188,7 @@ function CropModal({
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>
               Crop to fit
             </div>
-            <div style={{ fontSize: 11, color: "#555", marginTop: 1 }}>
+            <div style={{ fontSize: 11, color: "#c8c8c8", marginTop: 1 }}>
               {deviceType === "mobile" ? "Portrait · 9:19.5" : "Landscape · 4:3"} — drag to reposition
             </div>
           </div>
@@ -301,7 +301,7 @@ function CropModal({
         <div style={{ fontSize: 10, color: "#383838", textAlign: "center", marginBottom: 16, letterSpacing: 0.5 }}>
           {cropW} × {cropH}px
           {queueTotal > 1 && (
-            <span style={{ marginLeft: 10, color: "#444" }}>
+            <span style={{ marginLeft: 10, color: "#c0c0c0" }}>
               {queueIndex + 1} / {queueTotal}
             </span>
           )}
@@ -439,13 +439,13 @@ function DropZone({
           <div style={{ fontSize: 12, color: accent, letterSpacing: 0.5 }}>{uploadProgress}</div>
         ) : (
           <>
-            <div style={{ fontSize: 22, marginBottom: 8, color: "#333" }}>↑</div>
+            <div style={{ fontSize: 22, marginBottom: 8, color: "#c8c8c8" }}>↑</div>
             <div style={{ fontSize: 13, fontWeight: 500, color: "#888", marginBottom: 4 }}>
               {dragOver
                 ? `Drop to upload ${isMobile ? "mobile" : "desktop"} screenshots`
                 : `Add ${isMobile ? "mobile" : "desktop"} screenshots`}
             </div>
-            <div style={{ fontSize: 11, color: "#444" }}>
+            <div style={{ fontSize: 11, color: "#c0c0c0" }}>
               Click or drag &amp; drop · Multiple allowed · Max 5 MB each
             </div>
           </>
@@ -488,7 +488,7 @@ function AutoDetectBanner({ mobile, desktop }: { mobile: number; desktop: number
     }}>
       <div style={{ fontSize: 11, color: YELLOW, letterSpacing: 0.3, flexShrink: 0 }}>Auto-detect</div>
       <div style={{ width: 1, height: 10, background: "#222", flexShrink: 0 }} />
-      <div style={{ fontSize: 11, color: "#555" }}>{message}</div>
+      <div style={{ fontSize: 11, color: "#c8c8c8" }}>{message}</div>
     </div>
   );
 }
@@ -521,7 +521,7 @@ function TabButton({
         padding: "9px 16px",
         background: active ? accentBg : "transparent",
         border: `1px solid ${active ? accent + "40" : BORDER}`,
-        color: active ? accent : "#555",
+        color: active ? accent : "#c8c8c8",
         borderRadius: 8,
         transition: "all 0.15s",
       }}
@@ -554,7 +554,7 @@ function HintChips({ deviceType }: { deviceType: "mobile" | "desktop" }) {
     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
       {chips.map(chip => (
         <div key={chip} style={{
-          fontSize: 10, color: "#555", padding: "3px 9px", borderRadius: 6,
+          fontSize: 10, color: "#c8c8c8", padding: "3px 9px", borderRadius: 6,
           background: "#0a0a0a", border: `1px solid #1a1a1a`,
         }}>
           {chip}
@@ -664,7 +664,7 @@ export function ScreenshotsUpload({
   return (
     <div style={{ marginBottom: 24 }}>
       {/* Section label */}
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 14 }}>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 14 }}>
         SCREENSHOTS
       </div>
 

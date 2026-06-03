@@ -54,7 +54,7 @@ export function ImageUpload({
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 8 }}>{label}</div>
 
       {shownImage ? (
         <div style={{ border: `1px solid ${isPending ? YELLOW + "60" : BORDER}`, borderRadius: 8, overflow: "hidden", position: "relative" }}>
@@ -112,9 +112,9 @@ export function ImageUpload({
           onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) selectFile(f); }}
           style={{ border: `1px dashed ${dragOver ? YELLOW : BORDER}`, borderRadius: 8, padding: "32px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? YELLOW + "08" : "transparent", transition: "all 0.2s" }}
         >
-          <div style={{ fontSize: 22, marginBottom: 8, color: "#444" }}>↑</div>
+          <div style={{ fontSize: 22, marginBottom: 8, color: "#c0c0c0" }}>↑</div>
           <div style={{ fontSize: 11, color: "#666", letterSpacing: 1 }}>CLICK OR DRAG IMAGE HERE</div>
-          <div style={{ fontSize: 10, color: "#333", marginTop: 4 }}>PNG, JPG, WEBP — MAX 5MB</div>
+          <div style={{ fontSize: 10, color: "#c8c8c8", marginTop: 4 }}>PNG, JPG, WEBP — MAX 5MB</div>
         </div>
       )}
 

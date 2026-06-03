@@ -15,7 +15,7 @@ export function Field({
 }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 6 }}>{label}</div>
       {multiline ? (
         <textarea
           value={value}

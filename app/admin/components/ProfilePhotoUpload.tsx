@@ -50,7 +50,7 @@ export function ProfilePhotoUpload({
 
   return (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>PROFILE PHOTO</div>
+      <div style={{ fontSize: 9, color: "#c8c8c8", letterSpacing: 2, marginBottom: 8 }}>PROFILE PHOTO</div>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
         <div
           onClick={() => !shownImage && inputRef.current?.click()}
@@ -59,7 +59,7 @@ export function ProfilePhotoUpload({
           onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) selectFile(f); }}
           style={{
             width: 96, height: 96, borderRadius: "50%", flexShrink: 0,
-            border: `2px ${shownImage ? "solid" : "dashed"} ${isPending ? YELLOW : dragOver ? YELLOW : shownImage ? BORDER : "#333"}`,
+            border: `2px ${shownImage ? "solid" : "dashed"} ${isPending ? YELLOW : dragOver ? YELLOW : shownImage ? BORDER : "#c8c8c8"}`,
             overflow: "hidden", cursor: shownImage ? "default" : "pointer",
             background: "#0a0a0a", position: "relative",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -68,7 +68,7 @@ export function ProfilePhotoUpload({
           {shownImage
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={shownImage} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover", filter: isPending ? "brightness(0.6)" : "none" }} />
-            : <div style={{ fontSize: 28, color: "#333" }}>+</div>
+            : <div style={{ fontSize: 28, color: "#c8c8c8" }}>+</div>
           }
         </div>
 
@@ -107,7 +107,7 @@ export function ProfilePhotoUpload({
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: 11, color: "#555", marginBottom: 6 }}>Click circle or drag photo here</div>
+              <div style={{ fontSize: 11, color: "#c8c8c8", marginBottom: 6 }}>Click circle or drag photo here</div>
               <button onClick={() => inputRef.current?.click()} style={{ ...btnStyle, fontSize: 9, padding: "5px 12px" }}>BROWSE FILE</button>
             </div>
           )}

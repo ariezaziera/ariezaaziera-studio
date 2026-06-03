@@ -389,7 +389,7 @@ export default function LandingSection({
                     style={{
                       fontFamily: "'DM Mono', monospace",
                       fontSize: 9,
-                      color: "#333",
+                      color: "#c8c8c8",
                       letterSpacing: 2,
                     }}
                   >
@@ -742,7 +742,7 @@ export default function LandingSection({
                     style={{
                       fontFamily: "'DM Mono', monospace",
                       fontSize: 9,
-                      color: "#333",
+                      color: "#c8c8c8",
                       letterSpacing: 2,
                     }}
                   >

@@ -44,7 +44,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ fontSize: 11, color: "#555", letterSpacing: 2 }}>LOADING...</div>
+      <div style={{ fontSize: 11, color: "#c8c8c8", letterSpacing: 2 }}>LOADING...</div>
     </div>
   );
 
@@ -70,7 +70,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
           <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 22, letterSpacing: -1 }}>
             AA<span style={{ color: YELLOW }}>.</span> Admin
           </div>
-          <div style={{ fontSize: 10, color: "#555", letterSpacing: 1, marginTop: 4 }}>PORTFOLIO CMS</div>
+          <div style={{ fontSize: 10, color: "#c8c8c8", letterSpacing: 1, marginTop: 4 }}>PORTFOLIO CMS</div>
         </div>
         <button
           onClick={async () => { if (supabase) await supabase.auth.signOut(); onLogout(); }}
@@ -91,7 +91,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
             <div>
               <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 16 }}>{profile.name}</div>
               <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>{profile.title}</div>
-              <div style={{ fontSize: 10, color: "#444", marginTop: 6 }}>{profile.email}</div>
+              <div style={{ fontSize: 10, color: "#c0c0c0", marginTop: 6 }}>{profile.email}</div>
             </div>
             <button onClick={() => setEditingProfile(true)} style={{ ...btnStyle, border: `1px solid ${YELLOW}`, color: YELLOW }}>
               EDIT PROFILE
@@ -105,7 +105,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
           <div style={{ fontSize: 10, color: YELLOW, letterSpacing: 3 }}>02 — PROJECTS</div>
           <div style={{ flex: 1, height: 1, background: BORDER }} />
-          <div style={{ fontSize: 10, color: "#555" }}>{projects.length} TOTAL</div>
+          <div style={{ fontSize: 10, color: "#c8c8c8" }}>{projects.length} TOTAL</div>
           <button
             onClick={handleAddProject}
             style={{ ...btnStyle, background: YELLOW, color: "#000", fontSize: 10, padding: "6px 14px" }}
@@ -144,11 +144,11 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                       <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14 }}>{p.title}</div>
                       {p.featured && <span style={{ fontSize: 8, color: YELLOW, background: YELLOW + "15", border: `1px solid ${YELLOW}30`, padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>FEATURED</span>}
                       {hasScreenshots && <span style={{ fontSize: 8, color: GREEN, background: GREEN + "15", border: `1px solid ${GREEN}30`, padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>{screenshotCount} SHOTS</span>}
-                      {hasGithub && <span style={{ fontSize: 8, color: "#aaa", background: "#ffffff10", border: "1px solid #333", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>GH</span>}
+                      {hasGithub && <span style={{ fontSize: 8, color: "#aaa", background: "#ffffff10", border: "1px solid #c8c8c8", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>GH</span>}
                       {hasLive && <span style={{ fontSize: 8, color: "#60A5FA", background: "#60A5FA15", border: "1px solid #60A5FA30", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>LIVE</span>}
                       {hasVideo && <span style={{ fontSize: 8, color: "#C084FC", background: "#C084FC15", border: "1px solid #C084FC30", padding: "2px 7px", borderRadius: 3, letterSpacing: 1 }}>VIDEO</span>}
                     </div>
-                    <div style={{ fontSize: 10, color: "#444", marginTop: 3 }}>{p.tagline}</div>
+                    <div style={{ fontSize: 10, color: "#c0c0c0", marginTop: 3 }}>{p.tagline}</div>
                   </div>
                 </div>
                 <button onClick={() => setEditingProject(p)} style={{ ...btnStyle, fontSize: 10, padding: "6px 14px" }}>EDIT →</button>

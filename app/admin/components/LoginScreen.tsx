@@ -27,7 +27,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: 24, letterSpacing: -1, marginBottom: 8 }}>
             AA<span style={{ color: YELLOW }}>.</span> Admin
           </div>
-          <div style={{ fontSize: 11, color: "#555", letterSpacing: 1 }}>PORTFOLIO CMS</div>
+          <div style={{ fontSize: 11, color: "#c8c8c8", letterSpacing: 1 }}>PORTFOLIO CMS</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

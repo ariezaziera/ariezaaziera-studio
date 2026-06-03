@@ -131,7 +131,7 @@ function CodeBlock({ visible }: { visible: boolean }) {
         ))}
       </div>
       {CODE_LINES.slice(0, lines).map((l, i) => (
-        <div key={i} style={{ color: l.color || "#333", whiteSpace: "pre" }}>
+        <div key={i} style={{ color: l.color || "#c8c8c8", whiteSpace: "pre" }}>
           {l.text}
           {i === lines - 1 && lines < CODE_LINES.length && (
             <span style={{
