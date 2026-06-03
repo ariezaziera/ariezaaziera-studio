@@ -125,6 +125,7 @@ export function ProjectEditor({
     live_url: project.live_url || "",
     image_url: project.image_url || "",
     status: project.status || "live",
+    preview_url: project.preview_url || "",
   });
 
   const [saving, setSaving] = useState(false);
@@ -179,6 +180,7 @@ export function ProjectEditor({
         video_url: form.video_url || null,
         github_url: form.github_url || null,
         live_url: form.live_url || null,
+        preview_url: form.preview_url || null,
       })
       .eq("id", project.id);
 
@@ -281,6 +283,13 @@ export function ProjectEditor({
           storagePath={`projects/${project.slug}`}
           currentUrl={form.image_url}
           onUploaded={(url) => setForm((f) => ({ ...f, image_url: url }))}
+        />
+        
+        <VideoUpload
+          label="SNEAK PEEK PREVIEW (short MP4 — plays on card hover)"
+          storagePath={`projects/${project.slug}/preview`}
+          currentUrl={form.preview_url}
+          onUploaded={(url) => setForm((f) => ({ ...f, preview_url: url }))}
         />
 
         {/* ── LINKS ─────────────────────────────────────── */}
