@@ -41,7 +41,7 @@ export function VideoThumb({
 
     const obs = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.6 } // 60% of card visible before playing
+      { threshold: 0.9 } // 80% of card visible before playing
     );
     obs.observe(containerRef.current);
     return () => obs.disconnect();
