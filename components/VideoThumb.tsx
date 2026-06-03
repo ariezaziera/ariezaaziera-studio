@@ -25,6 +25,8 @@ export function VideoThumb({
   const [videoError, setVideoError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [inView, setInView] = useState(false);
+  // ← NEW: only true after the 1.5s delay fires
+  const [playing, setPlaying] = useState(false);
 
   // Detect touch/mobile device
   useEffect(() => {
@@ -38,16 +40,15 @@ export function VideoThumb({
   // IntersectionObserver for mobile scroll-to-play
   useEffect(() => {
     if (!isMobile || !containerRef.current || !previewUrl) return;
-
     const obs = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.6 } // 60% of card visible before playing
+      { threshold: 0.6 }
     );
     obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, [isMobile, previewUrl]);
 
-  // Play/pause logic — desktop: hover, mobile: inView with delay
+  // Play/pause logic with delay
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !previewUrl) return;
@@ -55,18 +56,24 @@ export function VideoThumb({
     const shouldPlay = isMobile ? inView : hovered;
 
     if (shouldPlay) {
+      // Wait 1.5s — thumbnail stays fully visible during this time
       const timer = setTimeout(() => {
         video.currentTime = 0;
         video.play().catch(() => setVideoError(true));
-      }, isMobile ? 3500 : 0); // 1.5s delay on mobile, instant on desktop hover
-      return () => clearTimeout(timer);
+        setPlaying(true); // ← only NOW show the video + hide thumbnail
+      }, isMobile ? 1500 : 0);
+      return () => {
+        clearTimeout(timer);
+      };
     } else {
       video.pause();
+      setPlaying(false); // ← reset so thumbnail shows again immediately
     }
   }, [hovered, inView, isMobile, previewUrl]);
 
   const hasPreview = !!previewUrl && !videoError;
-  const isActive = isMobile ? inView : hovered;
+  // Desktop: use hovered as before. Mobile: use playing (post-delay)
+  const isActive = isMobile ? playing : hovered;
   const showVideo = hasPreview && isActive && videoReady;
 
   return (
@@ -83,7 +90,7 @@ export function VideoThumb({
         border: `1px solid ${color}22`,
       }}
     >
-      {/* Static thumbnail */}
+      {/* Static thumbnail — stays until playing kicks in */}
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -144,7 +151,7 @@ export function VideoThumb({
         />
       )}
 
-      {/* Preview badge */}
+      {/* Preview badge — only shows after delay too */}
       {hasPreview && (
         <div
           style={{
@@ -171,7 +178,7 @@ export function VideoThumb({
         </div>
       )}
 
-      {/* Hover/scroll gradient overlay */}
+      {/* Gradient overlay — only shows after delay too */}
       <div
         style={{
           position: "absolute",
