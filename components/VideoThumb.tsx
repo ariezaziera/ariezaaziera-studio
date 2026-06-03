@@ -58,7 +58,7 @@ export function VideoThumb({
       const timer = setTimeout(() => {
         video.currentTime = 0;
         video.play().catch(() => setVideoError(true));
-      }, isMobile ? 1500 : 0); // 1.5s delay on mobile, instant on desktop hover
+      }, isMobile ? 3500 : 0); // 1.5s delay on mobile, instant on desktop hover
       return () => clearTimeout(timer);
     } else {
       video.pause();
