@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BG } from "@/constants";
 import type { Project } from "@/types";
 import Cursor from "@/components/Cursor";
@@ -12,12 +12,45 @@ import ProjectsPage from "@/sections/ProjectsPage";
 import CaseStudyPage from "@/sections/CaseStudyPage";
 
 export default function App() {
-  const [activePage, setActivePage] = useState("home");
+  const [activePage, setActivePageState] = useState("home");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [activeSection, setActiveSection] = useState("home");
   const [isMobile, setIsMobile] = useState(false);
   const [introComplete, setIntroComplete] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+
+  // ── CHANGE 1: Wrap setActivePage to also push browser history ───────────────
+  const setActivePage = useCallback((page: string, project?: Project | null) => {
+    setActivePageState(page);
+    if (project !== undefined) setActiveProject(project);
+    // Push new history entry so back button works
+    window.history.pushState({ page, projectId: project?.id ?? null }, "", `#${page}`);
+  }, []);
+
+  // ── CHANGE 2: Listen to browser back/forward button ─────────────────────────
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      const state = e.state as { page: string; projectId: number | null } | null;
+      if (state?.page) {
+        setActivePageState(state.page);
+        // If going back to casestudy, activeProject should still be in state
+        // (it won't be cleared since we only update it on forward navigation)
+      } else {
+        // No state = back to very beginning, go home
+        setActivePageState("home");
+      }
+      window.scrollTo(0, 0);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // ── CHANGE 3: Set initial history state on mount ─────────────────────────────
+  useEffect(() => {
+    // Replace current entry so the initial "home" state is recorded
+    window.history.replaceState({ page: "home", projectId: null }, "", "#home");
+  }, []);
 
   const handleIntroComplete = () => {
     setIntroComplete(true);
@@ -41,12 +74,11 @@ export default function App() {
         });
       },
       {
-        rootMargin: "-40% 0px -40% 0px", // fires when section is in middle 20% of viewport
+        rootMargin: "-40% 0px -40% 0px",
         threshold: 0,
       }
     );
 
-    // Small delay to let HomePage render first
     const t = setTimeout(() => {
       const sections = document.querySelectorAll("section[id]");
       sections.forEach((s) => observer.observe(s));
