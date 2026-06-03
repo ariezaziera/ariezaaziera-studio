@@ -1,189 +1,159 @@
 "use client";
 
-/**
- * VideoThumb
- * ──────────
- * Drop-in thumbnail component for project cards.
- *
- * - Default:  shows `image_url` as a static thumbnail
- * - On hover: crossfades to `preview_url` MP4 (autoplay, muted, loop)
- * - If no image_url: shows a solid color placeholder
- * - If no preview_url: stays as static image (no video attempt)
- *
- * Usage inside ProjectCard:
- *   <VideoThumb
- *     imageUrl={project.image_url}
- *     previewUrl={project.preview_url}
- *     color={project.color}
- *     hovered={hovered}
- *     title={project.title}
- *   />
- */
+import { useRef, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { YELLOW, BORDER, RED } from "../layout";
 
-import { useEffect, useRef, useState } from "react";
-
-interface VideoThumbProps {
-  imageUrl?: string;
-  previewUrl?: string;
-  color: string;
-  hovered: boolean;
-  title: string;
-  /** Height of the thumbnail area. Default: 160px */
-  height?: number | string;
+interface VideoUploadProps {
+  label: string;
+  storagePath: string;
+  currentUrl?: string;
+  onUploaded: (url: string) => void;
 }
 
-export function VideoThumb({
-  imageUrl,
-  previewUrl,
-  color,
-  hovered,
-  title,
-  height = 160,
-}: VideoThumbProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+export function VideoUpload({ label, storagePath, currentUrl, onUploaded }: VideoUploadProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(currentUrl || "");
 
-  // Play/pause video on hover
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !previewUrl) return;
+  const handleFile = async (file: File) => {
+    if (!supabase) return;
 
-    if (hovered) {
-      // Reset to start for a snappy preview every time
-      video.currentTime = 0;
-      video.play().catch(() => {
-        // Autoplay blocked — silently fall back to thumbnail
-        setVideoError(true);
-      });
-    } else {
-      video.pause();
+    if (!file.type.startsWith("video/")) {
+      setError("Please upload a video file (MP4 recommended).");
+      return;
     }
-  }, [hovered, previewUrl]);
+    if (file.size > 30 * 1024 * 1024) {
+      setError("File too large. Max 30MB.");
+      return;
+    }
 
-  const hasPreview = !!previewUrl && !videoError;
-  const showVideo = hasPreview && hovered && videoReady;
+    setUploading(true);
+    setError("");
+
+    const ext = file.name.split(".").pop() || "mp4";
+    const path = `${storagePath}/preview.${ext}`;
+
+    const { error: upErr } = await supabase.storage
+      .from("project-assets")
+      .upload(path, file, { upsert: true });
+
+    if (upErr) {
+      setError(upErr.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("project-assets")
+      .getPublicUrl(path);
+
+    const url = data.publicUrl;
+    setPreviewUrl(url);
+    onUploaded(url);
+    setUploading(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  };
+
+  const handleRemove = () => {
+    setPreviewUrl("");
+    onUploaded("");
+  };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height,
-        borderRadius: 8,
-        overflow: "hidden",
-        marginBottom: 16,
-        background: imageUrl ? "transparent" : color + "18",
-        border: `1px solid ${color}22`,
-      }}
-    >
-      {/* ── Static thumbnail ──────────────────────────── */}
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={title}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: 8,
-            opacity: showVideo ? 0 : 1,
-            transition: "opacity 0.35s ease",
-          }}
-        />
-      ) : (
-        /* Placeholder when no image_url */
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: showVideo ? 0 : 1,
-            transition: "opacity 0.35s ease",
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: color + "44",
-              border: `1px solid ${color}66`,
-            }}
-          />
-        </div>
-      )}
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ fontSize: 9, color: "#555", letterSpacing: 2, marginBottom: 8 }}>
+        {label}
+      </div>
 
-      {/* ── Preview video ──────────────────────────────── */}
-      {hasPreview && (
-        <video
-          ref={videoRef}
-          src={previewUrl}
-          muted
-          loop
-          playsInline
-          preload="metadata" // only load metadata until hover
-          onCanPlay={() => setVideoReady(true)}
-          onError={() => setVideoError(true)}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: 8,
-            opacity: showVideo ? 1 : 0,
-            transition: "opacity 0.35s ease",
-            // Prevents layout shift — video hidden until ready
-            display: "block",
-          }}
-        />
-      )}
-
-      {/* ── "Preview" badge — only visible on hover when video exists ── */}
-      {hasPreview && (
-        <div
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            padding: "3px 8px",
-            borderRadius: 4,
-            background: "rgba(0,0,0,0.7)",
-            backdropFilter: "blur(6px)",
-            border: `1px solid ${color}33`,
-            fontFamily: "'DM Mono', monospace",
-            fontSize: 8,
-            color: color,
-            letterSpacing: 1.5,
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? "translateY(0)" : "translateY(-4px)",
-            transition: "opacity 0.25s, transform 0.25s",
-            pointerEvents: "none",
-            zIndex: 3,
-          }}
-        >
-          ▶ PREVIEW
-        </div>
-      )}
-
-      {/* ── Hover gradient overlay (always present, subtle) ── */}
       <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
         style={{
-          position: "absolute",
-          inset: 0,
-          background: `linear-gradient(180deg, transparent 40%, ${color}22 100%)`,
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.35s ease",
-          pointerEvents: "none",
-          zIndex: 2,
+          border: `1px dashed ${previewUrl ? YELLOW + "44" : BORDER}`,
           borderRadius: 8,
+          padding: "20px",
+          textAlign: "center",
+          cursor: "pointer",
+          background: previewUrl ? YELLOW + "06" : "#0a0a0a",
+          transition: "all 0.2s",
+        }}
+      >
+        {uploading ? (
+          <div style={{ fontSize: 11, color: YELLOW, letterSpacing: 1 }}>UPLOADING...</div>
+        ) : previewUrl ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <video
+              src={previewUrl}
+              muted
+              loop
+              autoPlay
+              playsInline
+              style={{
+                width: "100%", maxHeight: 120,
+                objectFit: "cover", borderRadius: 6,
+                border: `1px solid ${YELLOW}33`,
+              }}
+            />
+            <div style={{ fontSize: 9, color: "#555", letterSpacing: 1 }}>Click to replace</div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <div style={{ fontSize: 22, opacity: 0.3 }}>▶</div>
+            <div style={{ fontSize: 10, color: "#555", letterSpacing: 1 }}>
+              Drop MP4 here or click to upload
+            </div>
+            <div style={{ fontSize: 9, color: "#333", letterSpacing: 0.5 }}>
+              Max 30MB · MP4 recommended · Keep under 10 seconds
+            </div>
+          </div>
+        )}
+      </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="video/mp4,video/*"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
         }}
       />
+
+      {previewUrl && (
+        <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+          <div style={{
+            flex: 1, fontSize: 9, color: "#444",
+            fontFamily: "'DM Mono', monospace",
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>
+            {previewUrl}
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleRemove(); }}
+            style={{
+              fontSize: 9, color: RED, background: "none",
+              border: `1px solid ${RED}33`, borderRadius: 4,
+              padding: "3px 8px", cursor: "pointer", letterSpacing: 1,
+              flexShrink: 0,
+            }}
+          >
+            REMOVE
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div style={{ fontSize: 10, color: RED, marginTop: 6 }}>{error}</div>
+      )}
     </div>
   );
 }
