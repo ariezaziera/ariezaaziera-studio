@@ -5,6 +5,7 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 import { YELLOW, BORDER } from "@/constants";
 import type { Project } from "@/types";
 import { useFeaturedProjects } from "@/lib/hooks";
+import { VideoThumb } from "@/components/VideoThumb";
 
 interface FeaturedSectionProps {
   setActivePage: (page: string) => void;
@@ -39,7 +40,7 @@ function AmbientOrbs() {
   );
 }
 
-// ─── NEW: Drifting particle field ─────────────────────────────────────────────
+// ─── Drifting particle field ───────────────────────────────────────────────────
 function ParticleField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -81,7 +82,6 @@ function ParticleField() {
         ctx.globalAlpha = p.alpha;
         ctx.fill();
       }
-      // Draw faint connecting lines for nearby particles
       ctx.globalAlpha = 1;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -137,7 +137,7 @@ function GrainOverlay() {
   );
 }
 
-// ─── NEW: Magnetic cursor blob ─────────────────────────────────────────────────
+// ─── Magnetic cursor blob ──────────────────────────────────────────────────────
 function CursorBlob({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }) {
   const blobRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ x: -200, y: -200 });
@@ -174,7 +174,7 @@ function CursorBlob({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }
   );
 }
 
-// ─── NEW: Typewriter text ──────────────────────────────────────────────────────
+// ─── Typewriter text ───────────────────────────────────────────────────────────
 function Typewriter({ text, active, delay = 0 }: { text: string; active: boolean; delay?: number }) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -205,7 +205,7 @@ function Typewriter({ text, active, delay = 0 }: { text: string; active: boolean
   );
 }
 
-// ─── NEW: Glitch text effect ───────────────────────────────────────────────────
+// ─── Glitch text effect ────────────────────────────────────────────────────────
 function GlitchText({ children, color }: { children: string; color?: string }) {
   const [glitching, setGlitching] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -240,14 +240,11 @@ function GlitchText({ children, color }: { children: string; color?: string }) {
           }}>{children}</span>
         </>
       )}
-      {color && (
-        <span style={{ color }}>{/* color prop applied by parent */}</span>
-      )}
     </span>
   );
 }
 
-// ─── NEW: Stats counter strip ──────────────────────────────────────────────────
+// ─── Stats counter strip ───────────────────────────────────────────────────────
 function useCountUp(target: number, active: boolean, delay = 0) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -297,7 +294,6 @@ function StatsStrip({ projects, visible }: { projects: Project[]; visible: boole
           borderRight: i < stats.length - 1 ? `1px solid ${BORDER}` : "none",
           position: "relative", overflow: "hidden",
         }}>
-          {/* Hover shimmer background */}
           <div style={{
             position: "absolute", inset: 0,
             background: `linear-gradient(135deg, ${YELLOW}08, transparent)`,
@@ -305,8 +301,7 @@ function StatsStrip({ projects, visible }: { projects: Project[]; visible: boole
           <div style={{
             fontFamily: "'DM Mono', monospace",
             fontSize: 28, fontWeight: 700,
-            color: YELLOW, letterSpacing: -1,
-            lineHeight: 1,
+            color: YELLOW, letterSpacing: -1, lineHeight: 1,
           }}>
             {s.value}{s.suffix}
           </div>
@@ -375,7 +370,7 @@ function ScanLine({ active }: { active: boolean }) {
   );
 }
 
-// ─── NEW: Holographic shimmer overlay ─────────────────────────────────────────
+// ─── Holographic shimmer overlay ───────────────────────────────────────────────
 function HoloShimmer({ active, mousePos }: { active: boolean; mousePos: { x: number; y: number } }) {
   return (
     <div style={{
@@ -393,7 +388,7 @@ function HoloShimmer({ active, mousePos }: { active: boolean; mousePos: { x: num
   );
 }
 
-// ─── NEW: Floating tag cloud ───────────────────────────────────────────────────
+// ─── Floating tag cloud ────────────────────────────────────────────────────────
 function FloatingTagCloud({ tags }: { tags: string[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [positions, setPositions] = useState<Array<{ x: number; y: number; delay: number; dur: number }>>([]);
@@ -466,7 +461,7 @@ function MetricStrip({ project, visible }: { project: Project; visible: boolean 
   );
 }
 
-// ─── NEW: Animated border beam ─────────────────────────────────────────────────
+// ─── Animated border beam ──────────────────────────────────────────────────────
 function BorderBeam({ active, color }: { active: boolean; color: string }) {
   return (
     <div style={{
@@ -493,7 +488,7 @@ function BorderBeam({ active, color }: { active: boolean; color: string }) {
   );
 }
 
-// ─── NEW: Depth noise background for cards ────────────────────────────────────
+// ─── Depth noise background for cards ─────────────────────────────────────────
 function CardNoise({ color }: { color: string }) {
   return (
     <div style={{
@@ -539,7 +534,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
     setTilt({ x: tx, y: ty });
   };
 
-  const allTags = project.tech;
+  const hasMedia = !!(project.image_url || project.preview_url);
 
   return (
     <div
@@ -566,7 +561,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
       }}
     >
       {/* Floating tag cloud background */}
-      <FloatingTagCloud tags={allTags} />
+      <FloatingTagCloud tags={project.tech} />
 
       {/* Depth noise corners */}
       <CardNoise color={project.color} />
@@ -579,7 +574,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         opacity: hovered ? 1 : 0,
       }} />
 
-      {/* NEW: Holographic shimmer */}
+      {/* Holographic shimmer */}
       <HoloShimmer active={hovered} mousePos={mousePos} />
 
       {/* Top accent bar */}
@@ -590,7 +585,7 @@ function FeaturedCard({ project, onClick, index, large = false }: {
         transition: "opacity 0.3s",
       }} />
 
-      {/* NEW: Animated border beam */}
+      {/* Animated border beam */}
       <BorderBeam active={hovered} color={project.color} />
 
       {/* Corner number */}
@@ -625,6 +620,20 @@ function FeaturedCard({ project, onClick, index, large = false }: {
       <div style={{ marginBottom: large ? 8 : 4, position: "relative", zIndex: 2 }}>
         <StatusPill status={project.status} />
       </div>
+
+      {/* ── VIDEO / IMAGE THUMBNAIL ── */}
+      {hasMedia && (
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <VideoThumb
+            imageUrl={project.image_url}
+            previewUrl={project.preview_url}
+            color={project.color}
+            hovered={hovered}
+            title={project.title}
+            height={large ? 220 : 160}
+          />
+        </div>
+      )}
 
       {/* Title */}
       <h3 style={{
@@ -736,12 +745,9 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
         }
       `}</style>
 
-      {/* Layers: orbs → particles → grain */}
       <AmbientOrbs />
       <ParticleField />
       <GrainOverlay />
-
-      {/* Magnetic cursor */}
       <CursorBlob sectionRef={sectionRef as React.RefObject<HTMLElement>} />
 
       {/* Header */}
@@ -801,7 +807,6 @@ export default function FeaturedSection({ setActivePage, setActiveProject }: Fea
           </button>
         </div>
 
-        {/* Stats counter strip */}
         <StatsStrip projects={featuredProjects} visible={headerVisible} />
       </div>
 
