@@ -1,25 +1,5 @@
 "use client";
 
-/**
- * VideoThumb
- * ──────────
- * Drop-in thumbnail component for project cards.
- *
- * - Default:  shows `image_url` as a static thumbnail
- * - On hover: crossfades to `preview_url` MP4 (autoplay, muted, loop)
- * - If no image_url: shows a solid color placeholder
- * - If no preview_url: stays as static image (no video attempt)
- *
- * Usage inside ProjectCard:
- *   <VideoThumb
- *     imageUrl={project.image_url}
- *     previewUrl={project.preview_url}
- *     color={project.color}
- *     hovered={hovered}
- *     title={project.title}
- *   />
- */
-
 import { useEffect, useRef, useState } from "react";
 
 interface VideoThumbProps {
@@ -28,7 +8,6 @@ interface VideoThumbProps {
   color: string;
   hovered: boolean;
   title: string;
-  /** Height of the thumbnail area. Default: 160px */
   height?: number | string;
 }
 
@@ -41,31 +20,55 @@ export function VideoThumb({
   height = 160,
 }: VideoThumbProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [inView, setInView] = useState(false);
 
-  // Play/pause video on hover
+  // Detect touch/mobile device
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // IntersectionObserver for mobile scroll-to-play
+  useEffect(() => {
+    if (!isMobile || !containerRef.current || !previewUrl) return;
+
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.6 } // 60% of card visible before playing
+    );
+    obs.observe(containerRef.current);
+    return () => obs.disconnect();
+  }, [isMobile, previewUrl]);
+
+  // Play/pause logic — desktop: hover, mobile: inView
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !previewUrl) return;
 
-    if (hovered) {
-      // Reset to start for a snappy preview every time
+    const shouldPlay = isMobile ? inView : hovered;
+
+    if (shouldPlay) {
       video.currentTime = 0;
-      video.play().catch(() => {
-        // Autoplay blocked — silently fall back to thumbnail
-        setVideoError(true);
-      });
+      video.play().catch(() => setVideoError(true));
     } else {
       video.pause();
     }
-  }, [hovered, previewUrl]);
+  }, [hovered, inView, isMobile, previewUrl]);
 
   const hasPreview = !!previewUrl && !videoError;
-  const showVideo = hasPreview && hovered && videoReady;
+  const isActive = isMobile ? inView : hovered;
+  const showVideo = hasPreview && isActive && videoReady;
 
   return (
     <div
+      ref={containerRef}
       style={{
         position: "relative",
         width: "100%",
@@ -77,7 +80,7 @@ export function VideoThumb({
         border: `1px solid ${color}22`,
       }}
     >
-      {/* ── Static thumbnail ──────────────────────────── */}
+      {/* Static thumbnail */}
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -94,7 +97,6 @@ export function VideoThumb({
           }}
         />
       ) : (
-        /* Placeholder when no image_url */
         <div
           style={{
             position: "absolute",
@@ -106,19 +108,15 @@ export function VideoThumb({
             transition: "opacity 0.35s ease",
           }}
         >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: color + "44",
-              border: `1px solid ${color}66`,
-            }}
-          />
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: color + "44",
+            border: `1px solid ${color}66`,
+          }} />
         </div>
       )}
 
-      {/* ── Preview video ──────────────────────────────── */}
+      {/* Preview video */}
       {hasPreview && (
         <video
           ref={videoRef}
@@ -126,7 +124,7 @@ export function VideoThumb({
           muted
           loop
           playsInline
-          preload="metadata" // only load metadata until hover
+          preload="metadata"
           onCanPlay={() => setVideoReady(true)}
           onError={() => setVideoError(true)}
           style={{
@@ -138,13 +136,12 @@ export function VideoThumb({
             borderRadius: 8,
             opacity: showVideo ? 1 : 0,
             transition: "opacity 0.35s ease",
-            // Prevents layout shift — video hidden until ready
             display: "block",
           }}
         />
       )}
 
-      {/* ── "Preview" badge — only visible on hover when video exists ── */}
+      {/* Preview badge */}
       {hasPreview && (
         <div
           style={{
@@ -160,8 +157,8 @@ export function VideoThumb({
             fontSize: 8,
             color: color,
             letterSpacing: 1.5,
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? "translateY(0)" : "translateY(-4px)",
+            opacity: isActive ? 1 : 0,
+            transform: isActive ? "translateY(0)" : "translateY(-4px)",
             transition: "opacity 0.25s, transform 0.25s",
             pointerEvents: "none",
             zIndex: 3,
@@ -171,13 +168,13 @@ export function VideoThumb({
         </div>
       )}
 
-      {/* ── Hover gradient overlay (always present, subtle) ── */}
+      {/* Hover/scroll gradient overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background: `linear-gradient(180deg, transparent 40%, ${color}22 100%)`,
-          opacity: hovered ? 1 : 0,
+          opacity: isActive ? 1 : 0,
           transition: "opacity 0.35s ease",
           pointerEvents: "none",
           zIndex: 2,
