@@ -41,13 +41,13 @@ export function VideoThumb({
 
     const obs = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.9 } // 80% of card visible before playing
+      { threshold: 0.6 } // 60% of card visible before playing
     );
     obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, [isMobile, previewUrl]);
 
-  // Play/pause logic — desktop: hover, mobile: inView
+  // Play/pause logic — desktop: hover, mobile: inView with delay
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !previewUrl) return;
@@ -55,8 +55,11 @@ export function VideoThumb({
     const shouldPlay = isMobile ? inView : hovered;
 
     if (shouldPlay) {
-      video.currentTime = 0;
-      video.play().catch(() => setVideoError(true));
+      const timer = setTimeout(() => {
+        video.currentTime = 0;
+        video.play().catch(() => setVideoError(true));
+      }, isMobile ? 1500 : 0); // 1.5s delay on mobile, instant on desktop hover
+      return () => clearTimeout(timer);
     } else {
       video.pause();
     }
