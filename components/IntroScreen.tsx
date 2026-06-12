@@ -86,7 +86,23 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
   }, [phase]);
 
   return (
-    <div>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        transform: phase === "exit" ? "translateY(-100%)" : "translateY(0)",
+        transition:
+          phase === "exit"
+            ? "transform 0.85s cubic-bezier(0.76, 0, 0.24, 1)"
+            : "none",
+      }}
+    >
       <style>{`
         @keyframes introDotPulse {
           0%, 100% { opacity: 0.08; transform: scale(1); }
