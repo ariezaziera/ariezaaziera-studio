@@ -26,9 +26,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
   const [showTagline, setShowTagline] = useState(false);
   const [showSkip, setShowSkip] = useState(false);
   const [exitStarted, setExitStarted] = useState(false);
-  const [petals, setPetals] = useState<
-    { x: number; y: number; size: number; delay: number; dur: number; rotate: number; opacity: number }[]
-  >([]);
   const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const fullName = "ARIEZA AZIERA";
@@ -47,17 +44,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
   };
 
   useEffect(() => {
-    setPetals(
-      Array.from({ length: 10 }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 50 + 30,
-        delay: Math.random() * 3,
-        dur: Math.random() * 6 + 6,
-        rotate: Math.random() * 360,
-        opacity: Math.random() * 0.25 + 0.1,
-      }))
-    );
     const t0 = setTimeout(() => setPhase("typing"), 300);
     timeouts.current.push(t0);
     return () => timeouts.current.forEach(clearTimeout);
@@ -105,10 +91,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
       }}
     >
       <style>{`
-        @keyframes introPetalFloat {
-          0%, 100% { opacity: var(--p-op); transform: translateY(0) rotate(var(--p-rot)); }
-          50%       { opacity: calc(var(--p-op) + 0.15); transform: translateY(-18px) rotate(calc(var(--p-rot) + 8deg)); }
-        }
         @keyframes introAmbientGlow {
           0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
           50%       { opacity: 0.9; transform: translate(-50%, -50%) scale(1.15); }
@@ -148,26 +130,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         }
       `}</style>
 
-      {/* ── Hibiscus petal glows ─────────────────────────────────────────── */}
-      {petals.map((p, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-            borderRadius: "50% 0 50% 50%",
-            background: `radial-gradient(circle at 35% 35%, ${HIBISCUS}, ${BORDER} 70%, transparent 100%)`,
-            filter: "blur(1px)",
-            "--p-op": p.opacity,
-            "--p-rot": `${p.rotate}deg`,
-            animation: `introPetalFloat ${p.dur}s ${p.delay}s ease-in-out infinite`,
-            pointerEvents: "none",
-          } as React.CSSProperties}
-        />
-      ))}
 
       {/* ── Rose-gold ambient glow ───────────────────────────────────────── */}
       <div
@@ -249,17 +211,30 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
               letterSpacing: -1,
               margin: 0,
               color: "#F0E6D3",
-              animation:
-                phase === "reveal"
-                  ? "introGlitch 0.6s ease-out both, introNameGlow 2.5s ease-in-out infinite"
-                  : "none",
+              animation: phase === "reveal" ? "introGlitch 0.6s ease-out both" : "none",
               whiteSpace: "nowrap",
             }}
           >
-            {/* First name — cream */}
-            <span style={{ color: "#F0E6D3" }}>{typedName.slice(0, SPLIT)}</span>
-            {/* Last name — GOLD accent */}
-            <span style={{ color: GOLD }}>{typedName.slice(SPLIT)}</span>
+            {/* First name — cream, glow */}
+            <span
+              style={{
+                color: "#F0E6D3",
+                display: "inline-block",
+                animation: phase === "reveal" ? "introNameGlow 2.5s ease-in-out infinite" : "none",
+              }}
+            >
+              {typedName.slice(0, SPLIT)}
+            </span>
+            {/* Last name — GOLD accent, glow (offset) */}
+            <span
+              style={{
+                color: GOLD,
+                display: "inline-block",
+                animation: phase === "reveal" ? "introNameGlow 2.5s 1.25s ease-in-out infinite" : "none",
+              }}
+            >
+              {typedName.slice(SPLIT)}
+            </span>
             {/* Blinking cursor while typing */}
             {phase === "typing" && (
               <span
