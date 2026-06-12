@@ -2,18 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 
-// ─── Theme tokens (maroon & gold) ─────────────────────────────────────────
-const GOLD        = "#FFD700";
-const GOLD_BRIGHT = "#FFE054";
-const BG_BASE     = "#1E0305";
-const BORDER      = "#7A202C";
-const HIBISCUS    = "#FA6B86";
-const TEXT_DIM    = "#F0E6D3b3";
+// ─── Theme tokens (rose gold glow) ─────────────────────────────────────────
+import { YELLOW, AMBER, AMBER_DEEP, HIBISCUS, BG, BORDER } from "@/constants";
+
+const GOLD        = YELLOW;
+const GOLD_BRIGHT = AMBER;
+const BG_BASE     = BG;
+const TEXT_DIM    = `${YELLOW}b3`;
 const TAGLINE     = "#F0E6D3";
-const DIVIDER     = `${GOLD}60`;
-const BRACKET     = `${GOLD}50`;
-const GLOW_SOFT   = `${GOLD}55`;
-const GLOW_STRONG = `${GOLD}aa`;
+const DIVIDER     = `${HIBISCUS}80`;
+const BRACKET     = `${AMBER}60`;
+const GLOW_SOFT   = `${HIBISCUS}66`;
+const GLOW_STRONG = `${AMBER_DEEP}cc`;
 // ─────────────────────────────────────────────────────────────────────────
 
 interface IntroScreenProps {
@@ -109,13 +109,9 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           0%, 100% { opacity: var(--p-op); transform: translateY(0) rotate(var(--p-rot)); }
           50%       { opacity: calc(var(--p-op) + 0.15); transform: translateY(-18px) rotate(calc(var(--p-rot) + 8deg)); }
         }
-        @keyframes introRingGlow {
-          0%, 100% { box-shadow: 0 0 40px 6px ${GLOW_SOFT}, 0 0 90px 20px ${GOLD}33, inset 0 0 30px ${GOLD}22; }
-          50%       { box-shadow: 0 0 60px 14px ${GLOW_STRONG}, 0 0 130px 35px ${GOLD}55, inset 0 0 45px ${GOLD}40; }
-        }
-        @keyframes introRingSpin {
-          from { transform: translate(-50%, -50%) rotate(0deg); }
-          to   { transform: translate(-50%, -50%) rotate(360deg); }
+        @keyframes introAmbientGlow {
+          0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+          50%       { opacity: 0.9; transform: translate(-50%, -50%) scale(1.15); }
         }
         @keyframes introLineGrow {
           from { width: 0; }
@@ -147,8 +143,8 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           to   { width: 100%; }
         }
         @keyframes introNameGlow {
-          0%, 100% { text-shadow: 0 0 18px ${GOLD}66, 0 0 40px ${GOLD}33; }
-          50%       { text-shadow: 0 0 32px ${GOLD}aa, 0 0 70px ${GOLD}66; }
+          0%, 100% { text-shadow: 0 0 20px ${HIBISCUS}99, 0 0 45px ${GOLD}66, 0 0 8px ${GOLD_BRIGHT}; }
+          50%       { text-shadow: 0 0 40px ${HIBISCUS}cc, 0 0 85px ${GOLD}aa, 0 0 16px ${GOLD_BRIGHT}; }
         }
       `}</style>
 
@@ -173,21 +169,18 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         />
       ))}
 
-      {/* ── Glowing gold ring behind name ───────────────────────────────── */}
+      {/* ── Rose-gold ambient glow ───────────────────────────────────────── */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: "50%",
-          width: "min(70vw, 520px)",
-          height: "min(70vw, 520px)",
+          width: "min(80vw, 700px)",
+          height: "min(80vw, 700px)",
           borderRadius: "50%",
-          border: `2px solid ${GOLD}`,
-          transform: "translate(-50%, -50%)",
-          animation:
-            phase !== "idle"
-              ? "introRingGlow 2.4s ease-in-out infinite, introRingSpin 60s linear infinite"
-              : "none",
+          background: `radial-gradient(circle, ${GLOW_STRONG} 0%, ${GLOW_SOFT} 35%, transparent 70%)`,
+          filter: "blur(40px)",
+          animation: phase !== "idle" ? "introAmbientGlow 3.5s ease-in-out infinite" : "none",
           opacity: phase !== "idle" ? 1 : 0,
           transition: "opacity 1s",
           pointerEvents: "none",
