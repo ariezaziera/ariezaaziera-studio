@@ -1,33 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1E0305;
-  --foreground: #F0E6D3;
-  --accent: #E3C896;
-  --accent-amber: #FFE054;
-  --card: #2B0A0D;
-  --border: #7A202C;
-  --shadow: #52131C;
-  --hibiscus: #FA6B86;
-  --green: #39FF14;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-amber: var(--accent-amber);
-  --color-card: var(--card);
-  --color-border: var(--border);
-  --font-sans: var(--font-display);
-  --font-mono: var(--font-mono);
+  --background: #1E0305;   /* Deep maroon */
+  --foreground: #F0E6D3;   /* Soft cream text */
+  --accent: #FFD700;       /* Gold */
+  --accent-amber: #FFE054; /* Bright highlight */
+  --card: #2B0A0D;         /* Darker maroon for cards */
+  --border: #7A202C;       /* Maroon border */
+  --shadow: #52131C;       /* Shadow depth */
+  --hibiscus: #FA6B86;     /* Floral pink */
+  --green: #39FF14;        /* Neon accent */
 }
 
 body {
-  background: radial-gradient(ellipse at 50% 0%, #3D1116 0%, #2A080C 40%, #1E0305 100%);
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    #3D1116 0%,
+    #2A080C 40%,
+    #1E0305 100%
+  );
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-display), "DM Sans", Arial, sans-serif;
+}
+
+/* Glow effect for buttons and accents */
+.glow {
+  text-shadow: 0 0 8px var(--accent);
+}
+.btn-gold {
+  background: var(--accent);
+  color: var(--background);
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background: var(--hibiscus);
+  box-shadow: 0 0 12px var(--accent);
 }
 
 /* Scrollbar */
