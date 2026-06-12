@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
-import { YELLOW, BORDER, CARD_BG, AMBER } from "@/constants";
+import { YELLOW, BORDER, CARD_BG, AMBER, STATUS_GREEN } from "@/constants";
 import Image from "next/image";
 import CircuitBackground from "@/components/Circuitbackground";
 import { useProfile } from "@/lib/hooks";
@@ -288,11 +288,11 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
                 fontFamily: "'DM Mono', monospace", fontSize: 8,
-                color: YELLOW, letterSpacing: 1,
+                color: STATUS_GREEN, letterSpacing: 1,
               }}>
                 <span style={{
                   width: 4, height: 4, borderRadius: "50%",
-                  background: YELLOW, animation: "cornerPulse 1.5s infinite", display: "inline-block",
+                  background: STATUS_GREEN, animation: "cornerPulse 1.5s infinite", display: "inline-block",
                 }} />
                 AVAILABLE
               </span>
@@ -491,11 +491,11 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 5,
                 fontFamily: "'DM Mono', monospace", fontSize: 9,
-                color: YELLOW, letterSpacing: 1,
+                color: STATUS_GREEN, letterSpacing: 1,
               }}>
                 <span style={{
                   width: 5, height: 5, borderRadius: "50%",
-                  background: YELLOW, animation: "cornerPulse 1.5s infinite", display: "inline-block",
+                  background: STATUS_GREEN, animation: "cornerPulse 1.5s infinite", display: "inline-block",
                 }} />
                 AVAILABLE
               </span>
