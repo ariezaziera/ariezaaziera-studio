@@ -15,11 +15,11 @@ interface FeaturedSectionProps {
 // ─── Ambient floating orbs ────────────────────────────────────────────────────
 function AmbientOrbs() {
   const orbs = [
-    { size: 340, x: "8%",  y: "15%", color: YELLOW,   delay: 0,  dur: 18 },
-    { size: 260, x: "72%", y: "60%", color: "#60A5FA", delay: 4,  dur: 22 },
-    { size: 200, x: "45%", y: "80%", color: "#4ADE80", delay: 8,  dur: 16 },
-    { size: 180, x: "85%", y: "10%", color: YELLOW,   delay: 2,  dur: 20 },
-  ];
+  { size: 340, x: "8%",  y: "15%", color: YELLOW,     delay: 0,  dur: 18 },
+  { size: 260, x: "72%", y: "60%", color: "#FA6B86",  delay: 4,  dur: 22 },
+  { size: 200, x: "45%", y: "80%", color: "#FFE054",  delay: 8,  dur: 16 },
+  { size: 180, x: "85%", y: "10%", color: YELLOW,     delay: 2,  dur: 20 },
+];
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
       {orbs.map((o, i) => (
@@ -57,7 +57,7 @@ function ParticleField() {
 
     const count = 55;
     type Particle = { x: number; y: number; vx: number; vy: number; r: number; alpha: number; color: string };
-    const palette = [YELLOW, "#60A5FA", "#4ADE80", "#a78bfa", "#f472b6"];
+    const palette = [YELLOW, "#FA6B86", "#FFE054", "#E3C896", "#7A202C"];
     const particles: Particle[] = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
