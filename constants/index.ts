@@ -5,6 +5,7 @@ export const GOLD_DEEP = "#B89A6C";     // Deep Gold — secondary labels
 export const AMBER = "#FFE054";         // Neon Amber — glows, skill bars, metrics
 export const AMBER_DEEP = "#FFAE00";    // Deep Amber — hover states
 export const HIBISCUS = "#FA6B86";      // Soft Hibiscus Pink — decorative accents
+export const STATUS_GREEN = "#39FF14";  // Tech Green — available badge, UI indicators
 export const BG = "#1E0305";            // Deep Wine — main background
 export const CARD_BG = "#2B0A0D";       // Dark Maroon — cards
 export const BORDER = "#7A202C";        // Muted Crimson — borders
