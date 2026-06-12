@@ -108,3 +108,58 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
+
+/* ── Intro Screen Animations ───────────────────────────── */
+
+/* Ambient dots pulsing */
+@keyframes introDotPulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.5); }
+}
+
+/* Divider line grow */
+@keyframes introLineGrow {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Fade up for text/buttons */
+@keyframes introFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Glitch effect on name */
+@keyframes introGlitch {
+  0% { clip-path: inset(0 0 100% 0); transform: skewX(0deg); }
+  10% { clip-path: inset(15% 0 72% 0); transform: skewX(-2deg); }
+  20% { clip-path: inset(40% 0 40% 0); transform: skewX(1.5deg); }
+  30% { clip-path: inset(60% 0 20% 0); transform: skewX(-1deg); }
+  40% { clip-path: inset(80% 0 5% 0); transform: skewX(0.5deg); }
+  50% { clip-path: inset(0 0 0 0); transform: skewX(0deg); }
+  100% { clip-path: inset(0 0 0 0); transform: skewX(0deg); }
+}
+
+/* Scan line moving down */
+@keyframes introScan {
+  0% { top: -4px; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 0.7; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Brackets sliding in */
+@keyframes introBracketLeft {
+  from { transform: translateY(-50%) translateX(-12px); opacity: 0; }
+  to { transform: translateY(-50%) translateX(0); opacity: 1; }
+}
+@keyframes introBracketRight {
+  from { transform: translateY(-50%) translateX(12px); opacity: 0; }
+  to { transform: translateY(-50%) translateX(0); opacity: 1; }
+}
+
+/* Loading bar fill */
+@keyframes introBarFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
