@@ -9,6 +9,7 @@
   --border: #7A202C;
   --shadow: #52131C;
   --hibiscus: #FA6B86;
+  --green: #39FF14;
 }
 
 @theme inline {
@@ -23,7 +24,8 @@
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(ellipse at 50% 0%, #3D1116 0%, #2A080C 40%, #1E0305 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-display), "DM Sans", Arial, sans-serif;
 }
