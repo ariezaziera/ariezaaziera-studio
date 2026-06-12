@@ -1,9 +1,14 @@
 import type { Project } from "@/types";
 
-export const YELLOW = "#F5C542";
-export const BG = "#0d0800";
-export const CARD_BG = "#0f0f0f";
-export const BORDER = "#1a1a1a";
+export const YELLOW = "#E3C896";        // Champagne Gold — headers, accents
+export const GOLD_DEEP = "#B89A6C";     // Deep Gold — secondary labels
+export const AMBER = "#FFE054";         // Neon Amber — glows, skill bars, metrics
+export const AMBER_DEEP = "#FFAE00";    // Deep Amber — hover states
+export const HIBISCUS = "#FA6B86";      // Soft Hibiscus Pink — decorative accents
+export const BG = "#1E0305";            // Deep Wine — main background
+export const CARD_BG = "#2B0A0D";       // Dark Maroon — cards
+export const BORDER = "#7A202C";        // Muted Crimson — borders
+export const SHADOW = "#52131C";        // Rust Shadow — floating shadows
 
 export const navLinks = ["Home", "About", "Projects", "Contact"];
 
