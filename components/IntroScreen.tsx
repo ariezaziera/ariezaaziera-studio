@@ -91,7 +91,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: BG,
+        background: ,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
