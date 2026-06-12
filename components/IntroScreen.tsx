@@ -219,7 +219,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             <span
               style={{
                 color: "#F0E6D3",
-                display: "inline-block",
                 animation: phase === "reveal" ? "introNameGlow 2.5s ease-in-out infinite" : "none",
               }}
             >
@@ -229,7 +228,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             <span
               style={{
                 color: GOLD,
-                display: "inline-block",
                 animation: phase === "reveal" ? "introNameGlow 2.5s 1.25s ease-in-out infinite" : "none",
               }}
             >
