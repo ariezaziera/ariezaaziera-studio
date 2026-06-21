@@ -99,36 +99,39 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
     >
       <CircuitBackground />
 
-      {/* Floating Orbs — warm wine glow */}
+      {/* Floating Orbs — luminous burgundy glow */}
       <div style={{
         position: "absolute", top: "15%", left: "10%",
         width: "min(320px, 60vw)", height: "min(320px, 60vw)",
-        background: `radial-gradient(circle, ${YELLOW}12 0%, transparent 70%)`,
+        background: `radial-gradient(circle, ${YELLOW}15 0%, transparent 70%)`,
         borderRadius: "50%",
         animation: "orbFloat1 12s ease-in-out infinite",
         pointerEvents: "none",
+        filter: "blur(40px)",
       }} />
       <div style={{
         position: "absolute", bottom: "20%", right: "8%",
         width: "min(260px, 50vw)", height: "min(260px, 50vw)",
-        background: `radial-gradient(circle, ${AMBER}08 0%, transparent 70%)`,
+        background: `radial-gradient(circle, ${AMBER}0c 0%, transparent 70%)`,
         borderRadius: "50%",
         animation: "orbFloat2 16s ease-in-out infinite",
         pointerEvents: "none",
+        filter: "blur(50px)",
       }} />
       <div style={{
         position: "absolute", top: "55%", left: "55%",
         width: "min(180px, 35vw)", height: "min(180px, 35vw)",
-        background: "radial-gradient(circle, rgba(122,32,44,0.12) 0%, transparent 70%)",
+        background: `radial-gradient(circle, rgba(168, 80, 90, 0.1) 0%, transparent 70%)`,
         borderRadius: "50%",
         animation: "orbFloat3 9s ease-in-out infinite",
         pointerEvents: "none",
+        filter: "blur(30px)",
       }} />
 
-      {/* Scan line */}
+      {/* Luminous scan line */}
       <div style={{
         position: "absolute", left: 0, right: 0, height: 1,
-        background: `linear-gradient(90deg, transparent 0%, ${YELLOW}18 30%, ${YELLOW}28 50%, ${YELLOW}18 70%, transparent 100%)`,
+        background: `linear-gradient(90deg, transparent 0%, ${YELLOW}20 30%, ${YELLOW}35 50%, ${YELLOW}20 70%, transparent 100%)`,
         animation: "scanLine 8s ease-in-out infinite",
         pointerEvents: "none",
       }} />
@@ -231,28 +234,29 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
         >
           <div style={{
             width: "clamp(220px, 65vw, 360px)",
-            background: CARD_BG,
+            background: "rgba(43, 15, 18, 0.8)",
             border: `1px solid ${BORDER}`,
-            borderRadius: 8,
+            borderRadius: 12,
             overflow: "visible",
             position: "relative",
-            boxShadow: `0 0 0 1px ${YELLOW}22, 0 16px 40px rgba(30,3,5,0.7)`,
+            boxShadow: `0 0 0 1px ${YELLOW}22, 0 0 30px ${YELLOW}15, 0 16px 40px rgba(20,5,5,0.8)`,
+            backdropFilter: "blur(8px)",
             perspective: "600px",
             transformStyle: "preserve-3d",
             animation: "cardFlip 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.8s forwards",
           }}>
             {cornerAccents(10, 1.5)}
-            <div style={{ position: "absolute", inset: 0, borderRadius: 8, pointerEvents: "none", zIndex: 0 }}>
+            <div style={{ position: "absolute", inset: 0, borderRadius: 12, pointerEvents: "none", zIndex: 0 }}>
               <div style={{
                 position: "absolute", inset: 0,
-                background: `radial-gradient(circle, ${YELLOW}66 0%, ${YELLOW}22 40%, transparent 70%)`,
-                borderRadius: 8, opacity: 0,
+                background: `radial-gradient(circle, ${YELLOW}66 0%, ${YELLOW}30 40%, transparent 70%)`,
+                borderRadius: 12, opacity: 0,
                 animation: "backlightFlicker 0.5s ease-out 1.1s forwards",
               }} />
             </div>
             <div style={{
               position: "relative", aspectRatio: "3/4",
-              borderRadius: "8px 8px 0 0", overflow: "hidden",
+              borderRadius: "12px 12px 0 0", overflow: "hidden",
               transformStyle: "preserve-3d",
             }}>
               {!photoLoaded && (
@@ -260,9 +264,9 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
                   position: "absolute", inset: 0, display: "flex",
                   alignItems: "center", justifyContent: "center",
                   backfaceVisibility: "hidden",
-                  background: "#3D1015",
+                  background: "#2D1416",
                 }}>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C4A882", letterSpacing: 2 }}>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C9A87C", letterSpacing: 2 }}>
                     [ PHOTO ]
                   </span>
                 </div>
@@ -279,8 +283,8 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
               padding: "6px 8px",
               borderTop: `1px solid ${BORDER}`,
               display: "flex", justifyContent: "space-between", alignItems: "center",
-              background: "#1E0305",
-              borderRadius: "0 0 8px 8px",
+              background: "rgba(26, 10, 10, 0.9)",
+              borderRadius: "0 0 12px 12px",
             }}>
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#C4A882", letterSpacing: 1.5 }}>
                 (JB)MY, SG
@@ -342,7 +346,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: "clamp(12px, 2.5vw, 14px)",
-            color: "#C4A882",
+            color: "#C9A87C",
             maxWidth: 440, lineHeight: 1.8, marginBottom: 48,
             opacity: 0, animation: "fadeUp 0.6s 0.8s forwards",
           }}>
@@ -411,7 +415,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             }} />
             <span style={{
               fontFamily: "'DM Mono', monospace", fontSize: 9,
-              color: "#9E7070", letterSpacing: 2, writingMode: "vertical-rl",
+              color: "#8A6B6B", letterSpacing: 2, writingMode: "vertical-rl",
             }}>
               SCROLL
             </span>
@@ -452,15 +456,16 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             }} />
 
             <div style={{
-              position: "relative", borderRadius: 6, overflow: "hidden",
+              position: "relative", borderRadius: 12, overflow: "hidden",
               animation: "photoFloat 6s ease-in-out infinite",
               border: `1px solid ${BORDER}`,
               paddingTop: "20px", aspectRatio: "3/4",
               boxSizing: "border-box", background: "transparent",
+              boxShadow: `0 0 30px ${YELLOW}15, inset 0 0 60px rgba(212, 165, 116, 0.05)`,
             }}>
               <div style={{
                 position: "absolute", inset: "20% 15%",
-                background: `${YELLOW}18`,
+                background: `${YELLOW}20`,
                 filter: "blur(60px)", borderRadius: "50%", zIndex: 0,
               }} />
               <div style={{
@@ -471,7 +476,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
               {photoImg}
               {!photoLoaded && (
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C4A882", letterSpacing: 2 }}>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C9A87C", letterSpacing: 2 }}>
                     [ PHOTO ]
                   </span>
                 </div>
@@ -480,12 +485,13 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
 
             <div style={{
               marginTop: 12, padding: "8px 12px",
-              border: `1px solid ${BORDER}`, borderRadius: 4,
+              border: `1px solid ${BORDER}`, borderRadius: 8,
               display: "flex", justifyContent: "space-between", alignItems: "center",
               animation: "tagFloat 4s ease-in-out infinite",
-              background: `${CARD_BG}`,
+              background: "rgba(43, 15, 18, 0.8)",
+              backdropFilter: "blur(8px)",
             }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C4A882", letterSpacing: 2 }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#C9A87C", letterSpacing: 2 }}>
                 (JB)MY, SG
               </span>
               <span style={{
