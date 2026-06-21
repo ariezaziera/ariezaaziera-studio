@@ -12,7 +12,7 @@ export default function CircuitBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const COLOR = "#F5C542";
+    const COLOR = "#D4A574";
     let W: number, H: number;
     let animFrameId: number;
 
