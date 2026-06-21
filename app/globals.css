@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
+/* ── Dark Burgundy Luxe Theme ─────────────────────────────────────────── */
 :root {
-  --background: #1E0305;   /* Deep maroon */
-  --foreground: #F0E6D3;   /* Soft cream text */
-  --accent: #FFD700;       /* Gold */
-  --accent-amber: #FFE054; /* Bright highlight */
-  --card: #2B0A0D;         /* Darker maroon for cards */
-  --border: #7A202C;       /* Maroon border */
-  --shadow: #52131C;       /* Shadow depth */
-  --hibiscus: #FA6B86;     /* Floral pink */
-  --green: #39FF14;        /* Neon accent */
+  --background: #1A0A0A;         /* Deep burgundy base */
+  --foreground: #F5E6D3;         /* Warm cream text */
+  --accent: #D4A574;             /* Champagne gold */
+  --accent-amber: #E8C9A0;       /* Soft amber highlight */
+  --card: rgba(43, 15, 18, 0.75); /* Glassmorphism dark maroon */
+  --border: #5C1A22;             /* Muted burgundy border */
+  --shadow: #3D1116;             /* Deep rust shadow */
+  --hibiscus: #E8A0A0;           /* Soft rose pink */
+  --green: #7FB069;              /* Muted sage green */
 }
 
 body {
   background: radial-gradient(
     ellipse at 50% 0%,
-    #3D1116 0%,
-    #2A080C 40%,
-    #1E0305 100%
+    #3D1518 0%,
+    #2A0C10 30%,
+    #1A0A0A 70%,
+    #140505 100%
   );
   background-attachment: fixed;
   color: var(--foreground);
@@ -37,23 +39,23 @@ body {
   transition: all 0.3s ease;
 }
 .btn-gold:hover {
-  background: var(--hibiscus);
-  box-shadow: 0 0 12px var(--accent);
+  background: var(--accent-amber);
+  box-shadow: 0 0 16px rgba(212, 165, 116, 0.5);
 }
 
-/* Scrollbar */
+/* Scrollbar — burgundy luxe */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #1E0305;
+  background: #1A0A0A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #7A202C;
+  background: #5C1A22;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #E3C896;
+  background: #D4A574;
 }
 
 /* Mobile */
@@ -67,6 +69,21 @@ body {
     display: inline-flex;
     align-items: center;
   }
+}
+
+/* ── Glassmorphism card utility ─────────────────────────── */
+.glass-card {
+  background: rgba(43, 15, 18, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(92, 26, 34, 0.5);
+  border-radius: 12px;
+}
+
+/* ── Gold luminous glow utility ─────────────────────────── */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(212, 165, 116, 0.25),
+              0 0 60px rgba(212, 165, 116, 0.1);
 }
 
 /* Animations */
@@ -94,7 +111,7 @@ body {
   animation: appFadeIn 0.6s ease both;
 }
 
-/* Scrollbar (already partly defined, but unify) */
+/* Scrollbar unified */
 ::-webkit-scrollbar {
   width: 6px;
 }
