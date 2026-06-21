@@ -34,7 +34,7 @@ function DotGrid() {
           const alpha = 0.04 + wave * 0.07;
           ctx.beginPath();
           ctx.arc(x, y, 1, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(245,197,24,${alpha})`;
+          ctx.fillStyle = `rgba(212,165,116,${alpha})`;
           ctx.fill();
         }
       }
@@ -74,7 +74,7 @@ function Spotlight({ containerRef }: { containerRef: React.RefObject<HTMLElement
   return (
     <div style={{
       position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1,
-      background: `radial-gradient(600px circle at ${pos.x}px ${pos.y}px, rgba(245,197,24,0.055), transparent 55%)`,
+      background: `radial-gradient(600px circle at ${pos.x}px ${pos.y}px, rgba(212,165,116,0.06), transparent 55%)`,
       transition: "background 0.08s",
     }} />
   );
@@ -112,9 +112,9 @@ function CodeBlock({ visible }: { visible: boolean }) {
     <div style={{
       marginTop: 24,
       padding: "18px 20px",
-      background: "#070707",
-      border: "1px solid #1a1a1a",
-      borderRadius: 10,
+      background: "rgba(20, 10, 10, 0.8)",
+      border: `1px solid ${BORDER}`,
+      borderRadius: 12,
       fontFamily: "'DM Mono', monospace",
       fontSize: 11,
       lineHeight: 1.85,
@@ -123,6 +123,7 @@ function CodeBlock({ visible }: { visible: boolean }) {
       opacity: visible ? 1 : 0,
       transform: visible ? "none" : "translateY(10px)",
       transition: "opacity 0.5s 0.8s, transform 0.5s 0.8s",
+      backdropFilter: "blur(8px)",
     }}>
       {/* window chrome dots */}
       <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
@@ -173,13 +174,14 @@ function LiveBadge({ visible }: { visible: boolean }) {
     <div style={{
       display: "inline-flex", alignItems: "center", gap: 10,
       padding: "7px 14px",
-      border: `1px solid #1e1e1e`,
+      border: `1px solid ${BORDER}`,
       borderRadius: 999,
-      background: "#0a0a0a",
+      background: "rgba(43, 15, 18, 0.6)",
       marginBottom: 28,
       opacity: visible ? 1 : 0,
       transform: visible ? "none" : "translateY(10px)",
       transition: "opacity 0.5s 0.05s, transform 0.5s 0.05s",
+      backdropFilter: "blur(8px)",
     }}>
       {/* pulsing green dot */}
       <span style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -241,12 +243,12 @@ function TimelineTicker({ visible }: { visible: boolean }) {
       {/* fade edges */}
       <div style={{
         position: "absolute", left: 0, top: 0, bottom: 0, width: 80,
-        background: "linear-gradient(90deg, #080808, transparent)",
+        background: "linear-gradient(90deg, #1A0A0A, transparent)",
         zIndex: 2, pointerEvents: "none",
       }} />
       <div style={{
         position: "absolute", right: 0, top: 0, bottom: 0, width: 80,
-        background: "linear-gradient(-90deg, #080808, transparent)",
+        background: "linear-gradient(-90deg, #1A0A0A, transparent)",
         zIndex: 2, pointerEvents: "none",
       }} />
 
@@ -398,7 +400,7 @@ export default function AboutSection() {
         {/* LEFT — text */}
         <div>
           <h2 style={{
-            fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800,
+            fontFamily: "var(--font-display), 'Playfair Display', serif", fontWeight: 800,
             fontSize: "clamp(26px, 5vw, 38px)", letterSpacing: -1,
             margin: "0 0 24px",
             opacity: visible ? 1 : 0,
@@ -437,9 +439,9 @@ export default function AboutSection() {
                     fontFamily: "'DM Mono', monospace", fontSize: 10,
                     color: YELLOW,
                     padding: "6px 12px",
-                    border: `1px solid #222`,
+                    border: `1px solid ${BORDER}`,
                     borderRadius: 4,
-                    background: "#0d0d0d",
+                    background: "rgba(43, 15, 18, 0.5)",
                     cursor: "default",
                     animation: visible ? `skillSlide 0.5s ${0.35 + i * 0.04}s both` : "none",
                     transition: "color 0.2s, border-color 0.2s, background 0.2s",
@@ -447,12 +449,12 @@ export default function AboutSection() {
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLDivElement).style.color = YELLOW;
                     (e.currentTarget as HTMLDivElement).style.borderColor = YELLOW + "55";
-                    (e.currentTarget as HTMLDivElement).style.background = YELLOW + "0d";
+                    (e.currentTarget as HTMLDivElement).style.background = YELLOW + "15";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLDivElement).style.color = "#aaa";
-                    (e.currentTarget as HTMLDivElement).style.borderColor = "#222";
-                    (e.currentTarget as HTMLDivElement).style.background = "#0d0d0d";
+                    (e.currentTarget as HTMLDivElement).style.borderColor = BORDER;
+                    (e.currentTarget as HTMLDivElement).style.background = "rgba(43, 15, 18, 0.5)";
                   }}
                 >
                   {s}
@@ -499,14 +501,15 @@ function StatCard({ stat, index, visible }: { stat: { num: string; label: string
       onMouseLeave={() => setHovered(false)}
       style={{
         padding: "20px 18px",
-        background: "#0a0a0a",
-        border: `1px solid ${hovered ? color + "40" : "#181818"}`,
+        background: "rgba(43, 15, 18, 0.6)",
+        border: `1px solid ${hovered ? color + "40" : BORDER}`,
         borderRadius: 12,
         position: "relative",
         overflow: "hidden",
         cursor: "default",
         animation: visible ? `statCount 0.6s ${0.2 + index * 0.1}s both` : "none",
         transition: "border-color 0.3s",
+        backdropFilter: "blur(8px)",
       }}
     >
       {/* glow on hover */}
@@ -553,12 +556,13 @@ function SkillBars({ visible }: { visible: boolean }) {
   return (
     <div style={{
       padding: "20px",
-      background: "#0a0a0a",
-      border: "1px solid #181818",
+      background: "rgba(43, 15, 18, 0.6)",
+      border: `1px solid ${BORDER}`,
       borderRadius: 12,
       opacity: visible ? 1 : 0,
       transform: visible ? "none" : "translateY(16px)",
       transition: "opacity 0.7s 0.5s, transform 0.7s 0.5s",
+      backdropFilter: "blur(8px)",
     }}>
       <div style={{
         fontFamily: "'DM Mono', monospace", fontSize: 9,
@@ -573,7 +577,7 @@ function SkillBars({ visible }: { visible: boolean }) {
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c0c0c0" }}>{b.label}</span>
               <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#d4d4d4" }}>{b.pct}%</span>
             </div>
-            <div style={{ height: 3, background: "#151515", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: 3, background: "rgba(92, 26, 34, 0.3)", borderRadius: 2, overflow: "hidden" }}>
               <div style={{
                 height: "100%",
                 width: visible ? `${b.pct}%` : "0%",
