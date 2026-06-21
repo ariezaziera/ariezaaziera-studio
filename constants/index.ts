@@ -1,15 +1,16 @@
 import type { Project } from "@/types";
 
-export const YELLOW = "#E3C896";        // Champagne Gold — headers, accents
+export const YELLOW = "#D4A574";        // Warm Champagne Gold — headers, accents
 export const GOLD_DEEP = "#B89A6C";     // Deep Gold — secondary labels
-export const AMBER = "#FFE054";         // Neon Amber — glows, skill bars, metrics
-export const AMBER_DEEP = "#FFAE00";    // Deep Amber — hover states
-export const HIBISCUS = "#FA6B86";      // Soft Hibiscus Pink — decorative accents
-export const STATUS_GREEN = "#39FF14";  // Tech Green — available badge, UI indicators
-export const BG = "#1E0305";            // Deep Wine — main background
-export const CARD_BG = "#2B0A0D";       // Dark Maroon — cards
-export const BORDER = "#7A202C";        // Muted Crimson — borders
-export const SHADOW = "#52131C";        // Rust Shadow — floating shadows
+export const AMBER = "#E8C9A0";         // Soft Amber — glows, skill bars, metrics
+export const AMBER_DEEP = "#C9956B";    // Deep Amber — hover states
+export const HIBISCUS = "#E8A0A0";      // Soft Rose Pink — decorative accents
+export const STATUS_GREEN = "#7FB069";  // Muted Sage Green — available badge
+export const BG = "#1A0A0A";            // Deep Burgundy — main background
+export const CARD_BG = "rgba(43, 15, 18, 0.75)";  // Glassmorphism Dark Maroon — cards
+export const BORDER = "#5C1A22";        // Muted Burgundy — borders
+export const SHADOW = "#3D1116";        // Deep Rust Shadow — floating shadows
+export const GOLDEN_GLOW = "rgba(212, 165, 116, 0.4)";  // Luminous gold glow
 
 export const navLinks = ["Home", "About", "Projects", "Contact"];
 
