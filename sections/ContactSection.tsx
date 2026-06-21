@@ -271,7 +271,6 @@ export default function ContactSection() {
             display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16,
             padding: "20px 0", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`,
             opacity: visible ? 1 : 0, transition: "opacity 0.6s 0.4s ease",
-            opacity: visible ? 1 : 0, transition: "opacity 0.6s 0.4s ease",
           }}>
             <Counter to={24} label="PROJECTS" />
             <Counter to={5} label="YEARS EXP" />
