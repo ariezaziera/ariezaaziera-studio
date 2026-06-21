@@ -117,7 +117,7 @@ function ParticleBG() {
     }
     resize();
 
-    const COLS = [`rgba(245,197,24,`, `rgba(0,255,231,`, `rgba(191,90,242,`, `rgba(48,209,88,`];
+    const COLS = [`rgba(212,165,116,`, `rgba(160,200,180,`, `rgba(200,160,180,`, `rgba(127,176,105,`];
     const pts = Array.from({ length: 55 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -480,7 +480,7 @@ function StatsBar({ total, filtered, filter }: { total: number; filtered: number
     <div ref={ref} style={{
       display: "flex", gap: 24, flexWrap: "wrap",
       padding: "16px 20px",
-      background: "rgba(255,255,255,0.02)",
+      background: "rgba(43, 15, 18, 0.5)",
       border: `1px solid ${BORDER}`,
       borderRadius: 8,
       position: "relative", overflow: "hidden",
@@ -585,7 +585,7 @@ function AnimatedCardWrapper({
         position: "relative", overflow: "hidden",
         borderRadius: 14, cursor: "pointer",
         background: hovered
-          ? `conic-gradient(from 200deg at ${mousePos.x}% ${mousePos.y}%, ${color}44, #00ffe733, #bf5af244, ${color}44)`
+          ? `conic-gradient(from 200deg at ${mousePos.x}% ${mousePos.y}%, ${color}44, rgba(160,200,180,0.2), rgba(200,160,180,0.27), ${color}44)`
           : `linear-gradient(135deg, ${color}22, transparent 60%)`,
         padding: 1,
         transform: visible
