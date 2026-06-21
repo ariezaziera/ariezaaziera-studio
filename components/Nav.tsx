@@ -50,8 +50,8 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
           padding: "0 clamp(16px, 5vw, 40px)",
           height: 64,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: scrolled || menuOpen ? "rgba(20,4,6,0.96)" : "transparent",
-          backdropFilter: scrolled || menuOpen ? "blur(12px)" : "none",
+          background: scrolled || menuOpen ? "rgba(26, 10, 10, 0.95)" : "transparent",
+          backdropFilter: scrolled || menuOpen ? "blur(16px)" : "none",
           borderBottom: scrolled ? `1px solid ${BORDER}` : "1px solid transparent",
           transition: "all 0.4s ease",
         }}
@@ -76,7 +76,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
                 style={{
                   background: "none", border: "none", cursor: "pointer",
                   fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 500,
-                  color: isActive ? YELLOW : "#F0E6D3",
+                  color: isActive ? YELLOW : "#F5E6D3",
                   letterSpacing: 1.5, padding: "6px 12px",
                   position: "relative",
                   transition: "color 0.2s",
@@ -106,9 +106,9 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
           }}
           aria-label="Toggle menu"
         >
-          <span style={{ display: "block", width: 22, height: 1.5, background: menuOpen ? YELLOW : "#F0E6D3", transition: "all 0.3s", transform: menuOpen ? "rotate(45deg) translate(4.5px, 4.5px)" : "none" }} />
-          <span style={{ display: "block", width: 16, height: 1.5, background: menuOpen ? YELLOW : "#F0E6D3", transition: "all 0.3s", opacity: menuOpen ? 0 : 1 }} />
-          <span style={{ display: "block", width: 22, height: 1.5, background: menuOpen ? YELLOW : "#F0E6D3", transition: "all 0.3s", transform: menuOpen ? "rotate(-45deg) translate(4.5px, -4.5px)" : "none" }} />
+          <span style={{ display: "block", width: 22, height: 1.5, background: menuOpen ? YELLOW : "#F5E6D3", transition: "all 0.3s", transform: menuOpen ? "rotate(45deg) translate(4.5px, 4.5px)" : "none" }} />
+          <span style={{ display: "block", width: 16, height: 1.5, background: menuOpen ? YELLOW : "#F5E6D3", transition: "all 0.3s", opacity: menuOpen ? 0 : 1 }} />
+          <span style={{ display: "block", width: 22, height: 1.5, background: menuOpen ? YELLOW : "#F5E6D3", transition: "all 0.3s", transform: menuOpen ? "rotate(-45deg) translate(4.5px, -4.5px)" : "none" }} />
         </button>
       </nav>
 
@@ -117,8 +117,8 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
         className="mobile-menu"
         style={{
           position: "fixed", top: 64, left: 0, right: 0, zIndex: 99,
-          background: "rgba(20,4,6,0.97)",
-          backdropFilter: "blur(16px)",
+          background: "rgba(26, 10, 10, 0.97)",
+          backdropFilter: "blur(20px)",
           borderBottom: `1px solid ${BORDER}`,
           padding: "24px clamp(16px, 5vw, 40px) 32px",
           display: "none",
@@ -138,7 +138,7 @@ export default function Nav({ activePage, setActivePage, activeSection }: NavPro
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 500,
-                color: isActive ? YELLOW : "#9E7070",
+                color: isActive ? YELLOW : "#8A6B6B",
                 letterSpacing: 2, padding: "14px 0",
                 textAlign: "left",
                 borderBottom: `1px solid ${BORDER}`,
