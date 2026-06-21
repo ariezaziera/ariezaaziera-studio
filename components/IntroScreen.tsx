@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 
-// ─── Theme tokens (rose gold glow) ─────────────────────────────────────────
+// ─── Theme tokens (burgundy luxe glow) ─────────────────────────────────────
 import { YELLOW, AMBER, AMBER_DEEP, HIBISCUS, BG, BORDER } from "@/constants";
 
 const GOLD        = YELLOW;
 const GOLD_BRIGHT = AMBER;
 const BG_BASE     = BG;
 const TEXT_DIM    = `${YELLOW}b3`;
-const TAGLINE     = "#F0E6D3";
+const TAGLINE     = "#F5E6D3";
 const DIVIDER     = `${HIBISCUS}80`;
 const BRACKET     = `${AMBER}60`;
 const GLOW_SOFT   = `${HIBISCUS}66`;
@@ -82,7 +82,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        background: `radial-gradient(ellipse at 50% 45%, #3D1116 0%, #2A080C 45%, ${BG_BASE} 100%)`,
+        background: `radial-gradient(ellipse at 50% 45%, #3D1518 0%, #2A0C10 45%, ${BG_BASE} 100%)`,
         transform: phase === "exit" ? "translateY(-100%)" : "translateY(0)",
         transition:
           phase === "exit"
@@ -126,7 +126,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         }
         @keyframes introNameGlow {
           0%, 100% { text-shadow: 0 0 20px ${HIBISCUS}99, 0 0 45px ${GOLD}66, 0 0 8px ${GOLD_BRIGHT}; }
-          50%       { text-shadow: 0 0 40px ${HIBISCUS}cc, 0 0 85px ${GOLD}aa, 0 0 16px ${GOLD_BRIGHT}; }
+          50%       { text-shadow: 0 0 40px ${HIBISCUS}cc, 0 0 85px ${GOLD}aa, 0 0 20px ${GOLD_BRIGHT}; }
         }
       `}</style>
 
