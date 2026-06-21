@@ -219,7 +219,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             <span
               style={{
                 color: "#F0E6D3",
-                animation: phase === "reveal",
+                animation: phase === "reveal" ? "introNameGlow 2.5s ease-in-out infinite" : "none",
               }}
             >
               {typedName.slice(0, SPLIT)}
@@ -228,7 +228,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             <span
               style={{
                 color: GOLD,
-                animation: phase === "reveal",
+                animation: phase === "reveal" ? "introNameGlow 2.5s ease-in-out infinite 0.3s" : "none",
               }}
             >
               {typedName.slice(SPLIT)}
