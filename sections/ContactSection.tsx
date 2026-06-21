@@ -88,7 +88,7 @@ function ParticleField() {
         if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(230,200,100,0.35)";
+        ctx.fillStyle = "rgba(212,165,116,0.35)";
         ctx.fill();
       });
       for (let i = 0; i < particles.length; i++) {
@@ -100,7 +100,7 @@ function ParticleField() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(230,200,100,${0.12 * (1 - dist / 100)})`;
+            ctx.strokeStyle = `rgba(212,165,116,${0.12 * (1 - dist / 100)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -143,18 +143,19 @@ function MorphCard({ children, delay = 0 }: { children: React.ReactNode; delay?:
       style={{
         position: "relative",
         padding: "20px 22px",
-        background: CARD_BG,
-        borderRadius: 8,
+        background: "rgba(43, 15, 18, 0.7)",
+        borderRadius: 10,
         transition: "transform 0.3s ease",
         transform: hovered ? "translateX(6px) scale(1.01)" : "none",
         cursor: "default",
         animationDelay: `${delay}ms`,
+        backdropFilter: "blur(10px)",
       }}
     >
       <div
         className="morph-border"
         style={{
-          position: "absolute", inset: 0, borderRadius: 8,
+          position: "absolute", inset: 0, borderRadius: 10,
           background: hovered
             ? `linear-gradient(135deg, ${YELLOW}44, transparent 60%)`
             : "transparent",
@@ -270,6 +271,7 @@ export default function ContactSection() {
             display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16,
             padding: "20px 0", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`,
             opacity: visible ? 1 : 0, transition: "opacity 0.6s 0.4s ease",
+            opacity: visible ? 1 : 0, transition: "opacity 0.6s 0.4s ease",
           }}>
             <Counter to={24} label="PROJECTS" />
             <Counter to={5} label="YEARS EXP" />
@@ -317,8 +319,9 @@ export default function ContactSection() {
             transition: "opacity 0.6s 0.55s ease",
           }}>
             <div style={{
-              padding: "14px 18px", border: `1px dashed ${BORDER}`, borderRadius: 8,
+              padding: "14px 18px", border: `1px dashed ${BORDER}`, borderRadius: 10,
               display: "flex", alignItems: "center", gap: 12,
+              background: "rgba(43, 15, 18, 0.4)",
             }}>
               <div className="pulse-dot" />
               <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c8c8c8", lineHeight: 1.6 }}>
