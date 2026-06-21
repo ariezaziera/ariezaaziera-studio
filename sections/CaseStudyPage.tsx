@@ -218,7 +218,7 @@ function CaseSection({ label, content, color, index }: { label: string; content:
     <div ref={ref} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ marginBottom: 24, opacity: visible ? 1 : 0, transform: visible ? "none" : `translateX(${index % 2 === 0 ? -60 : 60}px) skewX(${index % 2 === 0 ? -1.5 : 1.5}deg)`, transition: `all 0.8s ${index * 0.14}s cubic-bezier(0.22,1,0.36,1)`, position: "relative" }}>
       <div style={{ position: "absolute", top: -22, right: 8, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900, fontSize: "clamp(80px,14vw,130px)", lineHeight: 1, color: color, opacity: hov ? 0.08 : 0.03, userSelect: "none", pointerEvents: "none", transition: "opacity 0.4s" }}>0{index + 1}</div>
-      <div style={{ position: "relative", overflow: "hidden", background: hov ? color + "07" : CARD_BG, border: `1px solid ${hov ? color + "50" : BORDER}`, borderRadius: 12, padding: "28px 32px", transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)", boxShadow: hov ? `0 0 0 1px ${color}1a, 0 20px 56px ${color}12, inset 0 1px 0 ${color}18` : "none" }}>
+      <div style={{ position: "relative", overflow: "hidden", background: hov ? color + "10" : "rgba(43, 15, 18, 0.7)", border: `1px solid ${hov ? color + "50" : BORDER}`, borderRadius: 12, padding: "28px 32px", transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)", boxShadow: hov ? `0 0 0 1px ${color}1a, 0 20px 56px ${color}12, inset 0 1px 0 ${color}18` : "none", backdropFilter: "blur(10px)" }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: color, opacity: hov ? 1 : 0, boxShadow: hov ? `0 0 14px ${color}, 0 0 28px ${color}88` : "none", transition: "opacity 0.3s, box-shadow 0.3s" }} />
         {hov && <div style={{ position: "absolute", top: 0, left: "-100%", bottom: 0, width: "50%", background: `linear-gradient(90deg, transparent, ${color}08, transparent)`, animation: "shimmerSweep 0.85s ease-out forwards", pointerEvents: "none" }} />}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
@@ -259,7 +259,7 @@ function ArrowNav({ index, total, color, onPrev, onNext }: { index: number; tota
     return (
       <button type="button" aria-label={dir} onClick={e => { e.stopPropagation(); onClick(); }} disabled={!can}
         onMouseEnter={() => setH(true)} onMouseLeave={() => { setH(false); setP(false); }} onMouseDown={() => setP(true)} onMouseUp={() => setP(false)}
-        style={{ width: 44, height: 44, borderRadius: 999, border: `1px solid ${h && can ? color : BORDER}`, background: h && can ? color + "1a" : "rgba(10,10,10,0.8)", color: h && can ? color : "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: can ? "pointer" : "default", opacity: can ? 1 : 0.2, transform: p ? "scale(0.88)" : h && can ? "scale(1.1)" : "scale(1)", transition: "all 0.18s cubic-bezier(0.34,1.56,0.64,1)", pointerEvents: can ? "auto" : "none", boxShadow: h && can ? `0 0 18px ${color}44` : "none" }}>
+        style={{ width: 44, height: 44, borderRadius: 999, border: `1px solid ${h && can ? color : BORDER}`, background: h && can ? color + "1a" : "rgba(26, 10, 10, 0.8)", color: h && can ? color : "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: can ? "pointer" : "default", opacity: can ? 1 : 0.2, transform: p ? "scale(0.88)" : h && can ? "scale(1.1)" : "scale(1)", transition: "all 0.18s cubic-bezier(0.34,1.56,0.64,1)", pointerEvents: can ? "auto" : "none", boxShadow: h && can ? `0 0 18px ${color}44` : "none" }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d={dir === "prev" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
     );
@@ -288,7 +288,7 @@ function MobileMockup({ srcs, color, delay = 0, width }: { srcs: string[]; color
         onMouseMove={(e: ReactMouseEvent<HTMLDivElement>) => { const r = e.currentTarget.getBoundingClientRect(); setTilt({ x: ((e.clientX - r.left) / r.width - 0.5) * 16, y: ((e.clientY - r.top) / r.height - 0.5) * -16 }); }}
         onMouseLeave={() => setTilt({ x: 0, y: 0 })}
         style={{ position: "relative", width, height, flexShrink: 0, opacity: visible ? 1 : 0, transform: visible ? `perspective(900px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` : "translateY(70px) scale(0.85) rotateX(14deg)", transition: `opacity 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1)`, animation: visible ? "mobileFloat 4s ease-in-out infinite" : "none", cursor: "pointer", filter: `drop-shadow(0 30px 60px rgba(0,0,0,0.62)) drop-shadow(0 0 44px ${color}35)` }}>
-        <div style={{ position: "absolute", top: "1%", bottom: "0.7%", left: "12.85%", right: "12.85%", borderRadius: "10% / 7%", overflow: "hidden", background: "#0a0a0a", zIndex: 1 }}>
+        <div style={{ position: "absolute", top: "1%", bottom: "0.7%", left: "12.85%", right: "12.85%", borderRadius: "10% / 7%", overflow: "hidden", background: "rgba(20, 10, 10, 0.95)", zIndex: 1 }}>
           {src ? <img key={src} src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block", animation: "imgSwap 0.35s cubic-bezier(0.22,1,0.36,1)" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#c8c8c8" }}>SCREENSHOT</span></div>}
         </div>
         <img src="/mockup-mobile.png" alt="Phone frame" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
@@ -310,7 +310,7 @@ function DesktopMockup({ srcs, color, delay = 0, width }: { srcs: string[]; colo
         onMouseMove={(e: ReactMouseEvent<HTMLDivElement>) => { const r = e.currentTarget.getBoundingClientRect(); setTilt({ x: ((e.clientX - r.left) / r.width - 0.5) * 10, y: ((e.clientY - r.top) / r.height - 0.5) * -7 }); }}
         onMouseLeave={() => setTilt({ x: 0, y: 0 })}
         style={{ position: "relative", width, height, flexShrink: 0, opacity: visible ? 1 : 0, transform: visible ? `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` : "translateY(60px) scale(0.92) rotateX(8deg)", transition: `opacity 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1), transform 0.9s ${delay}s cubic-bezier(0.22,1,0.36,1)`, animation: visible ? "desktopFloat 5s ease-in-out infinite" : "none", filter: `drop-shadow(0 30px 72px rgba(0,0,0,0.65)) drop-shadow(0 0 55px ${color}1a)` }}>
-        <div style={{ position: "absolute", top: "3.2%", bottom: "25%", left: "2.2%", right: "2.2%", overflow: "hidden", background: "#0a0a0a", zIndex: 1 }}>
+        <div style={{ position: "absolute", top: "3.2%", bottom: "25%", left: "2.2%", right: "2.2%", overflow: "hidden", background: "rgba(20, 10, 10, 0.95)", zIndex: 1 }}>
           {src ? <img key={src} src={src} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block", animation: "imgSwap 0.35s cubic-bezier(0.22,1,0.36,1)" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "#c8c8c8", letterSpacing: 2 }}>SCREENSHOT</span></div>}
         </div>
         <img src="/mockup-desktop.png" alt="Desktop frame" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", zIndex: 2 }} />
@@ -349,7 +349,7 @@ function VideoPromo({ videoUrl, color, title }: { videoUrl: string; color: strin
   return (
     <div ref={ref} style={{ marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transition: "all 0.8s 0.1s cubic-bezier(0.22,1,0.36,1)" }}>
       <SectionLabel label="PROMO VIDEO" color={color} />
-      <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: `1px solid ${BORDER}`, aspectRatio: "16/9", background: "#0a0a0a", boxShadow: `0 28px 88px rgba(0,0,0,0.55), 0 0 140px ${color}10` }}>
+      <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: `1px solid ${BORDER}`, aspectRatio: "16/9", background: "rgba(20, 10, 10, 0.9)", boxShadow: `0 28px 88px rgba(0,0,0,0.55), 0 0 140px ${color}10` }}>
         {playing ? (
           isYT ? <iframe src={ytEmbed(videoUrl)} style={{ width: "100%", height: "100%", border: "none" }} allow="autoplay; fullscreen" title={title} /> :
           <video ref={vRef} src={videoUrl} autoPlay controls style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -404,7 +404,7 @@ function MagneticCTA({ project, setActivePage }: { project: Project; setActivePa
   return (
     <div ref={ref} style={{ marginTop: 80, opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(44px)", transition: "all 0.9s cubic-bezier(0.22,1,0.36,1)" }}>
       <div ref={ctaRef} onMouseMove={onMove} onMouseEnter={() => setInside(true)} onMouseLeave={() => { setInside(false); setMx(0); setMy(0); }}
-        style={{ position: "relative", padding: "clamp(36px,7vw,60px)", borderRadius: 18, border: `1px solid ${inside ? project.color + "40" : BORDER}`, background: CARD_BG, textAlign: "center", overflow: "hidden", transition: "border-color 0.3s, box-shadow 0.3s", boxShadow: inside ? `0 0 0 1px ${project.color}1a, 0 40px 100px ${project.color}14` : "none", transform: inside ? `translate(${mx * 0.3}px, ${my * 0.3}px)` : "none" }}>
+        style={{ position: "relative", padding: "clamp(36px,7vw,60px)", borderRadius: 18, border: `1px solid ${inside ? project.color + "40" : BORDER}`, background: "rgba(43, 15, 18, 0.75)", textAlign: "center", overflow: "hidden", transition: "border-color 0.3s, box-shadow 0.3s", boxShadow: inside ? `0 0 0 1px ${project.color}1a, 0 40px 100px ${project.color}14` : "none", transform: inside ? `translate(${mx * 0.3}px, ${my * 0.3}px)` : "none", backdropFilter: "blur(12px)" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${project.color}04 1px, transparent 1px), linear-gradient(90deg, ${project.color}04 1px, transparent 1px)`, backgroundSize: "30px 30px", pointerEvents: "none" }} />
         <div style={{ position: "absolute", top: -80, left: -80, width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${project.color}12 0%, transparent 70%)`, animation: "slowDrift 6s ease-in-out infinite", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -80, right: -80, width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${project.color}0c 0%, transparent 70%)`, animation: "slowDrift 9s 2s ease-in-out infinite reverse", pointerEvents: "none" }} />
@@ -545,7 +545,7 @@ export default function CaseStudyPage({ project, setActivePage }: CaseStudyPageP
         ]} color={project.color} />
 
         {/* tech strip */}
-        <div style={{ background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "18px 24px", marginBottom: 56, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ background: "rgba(43, 15, 18, 0.7)", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "18px 24px", marginBottom: 56, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", backdropFilter: "blur(8px)" }}>
           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#c8c8c8", letterSpacing: 3, flexShrink: 0 }}>STACK</div>
           <div style={{ flex: 1, height: 1, background: `linear-gradient(to right, ${project.color}33, transparent)`, minWidth: 20 }} />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
