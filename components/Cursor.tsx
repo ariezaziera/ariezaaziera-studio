@@ -44,7 +44,7 @@ export default function Cursor() {
           borderRadius: "50%",
           pointerEvents: "none",
           zIndex: 9999,
-          opacity: 0.5,
+          opacity: 0.4,
           transition: "opacity 0.2s",
         }}
       />
