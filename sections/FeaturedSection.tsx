@@ -16,8 +16,8 @@ interface FeaturedSectionProps {
 function AmbientOrbs() {
   const orbs = [
   { size: 340, x: "8%",  y: "15%", color: YELLOW,     delay: 0,  dur: 18 },
-  { size: 260, x: "72%", y: "60%", color: "#FA6B86",  delay: 4,  dur: 22 },
-  { size: 200, x: "45%", y: "80%", color: "#FFE054",  delay: 8,  dur: 16 },
+  { size: 260, x: "72%", y: "60%", color: "#E8A0A0",  delay: 4,  dur: 22 },
+  { size: 200, x: "45%", y: "80%", color: "#E8C9A0",  delay: 8,  dur: 16 },
   { size: 180, x: "85%", y: "10%", color: YELLOW,     delay: 2,  dur: 20 },
 ];
   return (
@@ -57,7 +57,7 @@ function ParticleField() {
 
     const count = 55;
     type Particle = { x: number; y: number; vx: number; vy: number; r: number; alpha: number; color: string };
-    const palette = [YELLOW, "#FA6B86", "#FFE054", "#E3C896", "#7A202C"];
+    const palette = [YELLOW, "#E8A0A0", "#E8C9A0", "#D4A574", "#5C1A22"];
     const particles: Particle[] = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -166,7 +166,7 @@ function CursorBlob({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }
     <div ref={blobRef} style={{
       position: "absolute", top: 0, left: 0,
       width: 240, height: 240, borderRadius: "50%",
-      background: `radial-gradient(circle, ${YELLOW}18 0%, transparent 70%)`,
+      background: `radial-gradient(circle, ${YELLOW}20 0%, transparent 70%)`,
       pointerEvents: "none", zIndex: 1,
       filter: "blur(40px)",
       transition: "opacity 0.3s",
@@ -545,8 +545,9 @@ function FeaturedCard({ project, onClick, index, large = false }: {
       onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false); setMousePos({ x: 50, y: 50 }); }}
       style={{
         position: "relative",
-        background: "#0a0a0a",
-        border: `1px solid ${hovered ? project.color + "40" : "#1c1c1c"}`,
+        background: "rgba(43, 15, 18, 0.65)",
+        border: `1px solid ${hovered ? project.color + "40" : BORDER}`,
+        backdropFilter: "blur(8px)",
         borderRadius: large ? 20 : 16,
         padding: large ? "36px 32px" : "24px 22px",
         cursor: "pointer",
