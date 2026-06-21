@@ -51,8 +51,9 @@ export default function ProjectCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false); }}
       style={{
-        background: CARD_BG,
+        background: "rgba(43, 15, 18, 0.7)",
         border: `1px solid ${hovered ? project.color + "55" : BORDER}`,
+        backdropFilter: "blur(8px)",
         borderRadius: 12,
         padding: featured ? 28 : 22,
         cursor: "pointer",
