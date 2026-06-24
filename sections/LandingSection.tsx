@@ -65,7 +65,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
         }
       `}</style>
 
-      {/* Subtle ambient glow — one, centered, low opacity */}
+      {/* Subtle ambient glow */}
       <div
         style={{
           position: "absolute",
@@ -95,7 +95,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           {/* Eyebrow */}
           <div
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono), 'DM Mono', monospace",
               fontSize: 10,
               letterSpacing: "0.3em",
               color: `${YELLOW}99`,
@@ -110,10 +110,10 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           {/* Headline */}
           <h1
             style={{
-              fontFamily: "var(--font-display), 'Playfair Display', serif",
-              fontWeight: 900,
-              fontSize: "clamp(40px, 7.5vw, 84px)",
-              lineHeight: 1.05,
+              fontFamily: "var(--font-mono), 'DM Mono', monospace",
+              fontWeight: 500,
+              fontSize: "clamp(36px, 7vw, 80px)",
+              lineHeight: 1.1,
               letterSpacing: "-0.02em",
               margin: "0 0 28px",
               color: "#F0E6D3",
@@ -141,7 +141,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           {/* Bio */}
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-body), 'DM Sans', sans-serif",
               fontSize: "clamp(13px, 2vw, 15px)",
               color: `${AMBER}cc`,
               maxWidth: 420,
@@ -168,7 +168,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             <button
               onClick={() => setActivePage("projects")}
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono), 'DM Mono', monospace",
                 fontSize: 10,
                 letterSpacing: "0.2em",
                 fontWeight: 700,
@@ -199,7 +199,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
                   ?.scrollIntoView({ behavior: "smooth" })
               }
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono), 'DM Mono', monospace",
                 fontSize: 10,
                 letterSpacing: "0.2em",
                 fontWeight: 700,
@@ -245,7 +245,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             />
             <span
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono), 'DM Mono', monospace",
                 fontSize: 8,
                 color: `${YELLOW}50`,
                 letterSpacing: "0.25em",
@@ -272,7 +272,6 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
               width: "clamp(180px, 20vw, 260px)",
             }}
           >
-            {/* Photo frame */}
             <div
               style={{
                 position: "relative",
@@ -295,7 +294,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
                 >
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono), 'DM Mono', monospace",
                       fontSize: 8,
                       color: `${YELLOW}60`,
                       letterSpacing: 2,
@@ -333,7 +332,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             >
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono), 'DM Mono', monospace",
                   fontSize: 8,
                   color: `${AMBER}99`,
                   letterSpacing: "0.15em",
@@ -346,7 +345,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono), 'DM Mono', monospace",
                   fontSize: 8,
                   color: "#7FB069",
                   letterSpacing: "0.1em",
