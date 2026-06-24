@@ -49,12 +49,20 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           0%, 100% { opacity: 0.5; }
           50%       { opacity: 1; }
         }
+
+        /* ── Desktop layout ── */
         .landing-grid {
           display: grid;
           grid-template-columns: 1fr auto;
           gap: clamp(48px, 8vw, 100px);
           align-items: center;
+          position: relative;
+          zIndex: 2;
         }
+        .landing-photo-wrap { display: block; }
+        .landing-mobile-bg  { display: none; }
+
+        /* ── Mobile layout ── */
         @media (max-width: 700px) {
           .landing-grid {
             grid-template-columns: 1fr !important;
@@ -62,10 +70,52 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           .landing-photo-wrap {
             display: none !important;
           }
+          .landing-mobile-bg {
+            display: block !important;
+          }
         }
       `}</style>
 
-      {/* Subtle ambient glow */}
+      {/* ── MOBILE: Full bleed background photo ── */}
+      <div
+        className="landing-mobile-bg"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+        }}
+      >
+        <Image
+          src={PHOTO_SRC}
+          alt=""
+          fill
+          sizes="100vw"
+          priority
+          onLoad={() => setPhotoLoaded(true)}
+          style={{
+            objectFit: "cover",
+            objectPosition: "top center",
+            opacity: photoLoaded ? 1 : 0,
+            transition: "opacity 0.6s ease",
+          }}
+        />
+        {/* Gradient overlay — dark at bottom for text legibility */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `linear-gradient(
+              to bottom,
+              rgba(26,10,10,0.2) 0%,
+              rgba(26,10,10,0.15) 30%,
+              rgba(26,10,10,0.7) 60%,
+              rgba(26,10,10,0.97) 100%
+            )`,
+          }}
+        />
+      </div>
+
+      {/* Subtle ambient glow — desktop only */}
       <div
         style={{
           position: "absolute",
@@ -90,7 +140,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           width: "100%",
         }}
       >
-        {/* ── LEFT ── */}
+        {/* ── LEFT / MAIN CONTENT ── */}
         <div>
           {/* Eyebrow */}
           <div
@@ -257,7 +307,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
           </div>
         </div>
 
-        {/* ── RIGHT: Photo ── */}
+        {/* ── RIGHT: Desktop photo ── */}
         <div
           className="landing-photo-wrap"
           style={{
@@ -266,12 +316,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             animation: visible ? "photoFade 0.9s 0.6s both" : "none",
           }}
         >
-          <div
-            style={{
-              position: "relative",
-              width: "clamp(180px, 20vw, 260px)",
-            }}
-          >
+          <div style={{ position: "relative", width: "clamp(180px, 20vw, 260px)" }}>
             <div
               style={{
                 position: "relative",
@@ -310,10 +355,7 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
                 fill
                 sizes="(max-width: 700px) 0px, 260px"
                 onLoad={() => setPhotoLoaded(true)}
-                style={{
-                  objectFit: "contain",
-                  objectPosition: "bottom center",
-                }}
+                style={{ objectFit: "contain", objectPosition: "bottom center" }}
               />
             </div>
 
