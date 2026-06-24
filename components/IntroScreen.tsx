@@ -60,11 +60,10 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
       `}</style>
 
       <div style={{ textAlign: "center" }}>
-        {/* Name */}
         <h1
           style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 800,
+            fontFamily: "var(--font-mono), 'DM Mono', monospace",
+            fontWeight: 500,
             fontSize: "clamp(28px, 8vw, 72px)",
             margin: 0,
             letterSpacing: "0.12em",
@@ -77,7 +76,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           <span style={{ color: YELLOW }}>AZIERA</span>
         </h1>
 
-        {/* Divider */}
         <div
           style={{
             height: 1,
@@ -91,10 +89,9 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
           }}
         />
 
-        {/* Tagline */}
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono), 'DM Mono', monospace",
             fontSize: "clamp(8px, 1.8vw, 11px)",
             letterSpacing: "0.3em",
             color: `${AMBER_DEEP}cc`,
@@ -107,7 +104,6 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
         </p>
       </div>
 
-      {/* Skip */}
       {visible && !exiting && (
         <button
           onClick={exit}
@@ -115,7 +111,7 @@ export default function IntroScreen({ onComplete }: IntroScreenProps) {
             position: "absolute",
             bottom: 28,
             right: 28,
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono), 'DM Mono', monospace",
             fontSize: 9,
             letterSpacing: "0.2em",
             color: `${YELLOW}60`,
