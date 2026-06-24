@@ -99,19 +99,18 @@ export default function LandingSection({ setActivePage }: LandingSectionProps) {
             transition: "opacity 0.6s ease",
           }}
         />
-        {/* Gradient overlay — darker throughout, bottom matches body bg */}
+        {/* Gradient overlay — darker, bottom matches background */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             background: `linear-gradient(
               to bottom,
-              rgba(20,5,5,0.55) 0%,
-              rgba(20,5,5,0.45) 15%,
-              rgba(20,5,5,0.85) 40%,
-              rgba(20,5,5,0.97) 65%,
-              rgba(20,5,5,1) 85%,
-              rgba(20,5,5,1) 100%
+              rgba(26,10,10,0.45) 0%,
+              rgba(26,10,10,0.35) 20%,
+              rgba(26,10,10,0.8) 50%,
+              rgba(26,10,10,0.95) 75%,
+              rgba(26,10,10,1) 100%
             )`,
           }}
         />
